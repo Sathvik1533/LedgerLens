@@ -12,6 +12,7 @@
 - [Gate 1A: Database Fundamentals & Precision](#gate-1a-database-fundamentals--precision)
 - [Gate 1B: Advanced Relational Engineering & Optimization](#gate-1b-advanced-relational-engineering--optimization)
 - [Gate 1C: J.P. Morgan AI Research & Synthetic Data Engineering](#gate-1c-jp-morgan-ai-research--synthetic-data-engineering)
+- [Gate 1 P0: CSV-to-DB Column Mapping](#gate-1-p0-exercise-1-csv-to-db-column-mapping)
 - [Gate 2: Deterministic Reconciliation Engine](#gate-2-deterministic-reconciliation-engine-upcoming)
 - [Gate 3: Evaluation Harness & Metrics](#gate-3-evaluation-harness--metrics-upcoming)
 - [Gate 4: Human-in-the-Loop Review & Auditability](#gate-4-human-in-the-loop-review--auditability-upcoming)
@@ -64,19 +65,61 @@
   3. **"Ask David" Hybrid Model:** Use SQL database queries to get exact financial numbers, and use Vector AI only to read company policy text. The AI explains the policy; it never changes the money balance.
 
 ### Concept 7: The 6 Concrete Things We Acquired and Implemented in Our Code
-1. **Cross-Table Relational Invariants:** `data/generator.py` links 4 CSVs (`payments`, `settlements`, `bank_credits`, `refunds`) where $\text{Gross} - \text{Fee} - \text{GST} = \text{Net Bank Credit}$ exactly.
-2. **70/30 Anomaly Injection:** Exactly 350 clean records ($70\%$) and 150 injected anomalies ($30\%$) across the 8 closed exception classes (`missing_settlement`, `fee_mismatch`, `amount_mismatch`, `duplicate_payment`, etc.).
+1. **Cross-Table Relational Invariants:** `data/generator.py` links 4 CSVs where $\text{Gross} - \text{Fee} - \text{GST} = \text{Net Bank Credit}$ exactly.
+2. **70/30 Anomaly Injection:** Exactly 350 clean records ($70\%$) and 150 injected anomalies ($30\%$) across the 8 closed exception classes.
 3. **Deterministic Python Decimal Core:** All fees and net amounts use Python's `Decimal` with `ROUND_HALF_UP` quantization (`0.01`). Zero float errors.
-4. **Hybrid SQL + Policy Vector RAG:** SQL supplies exact financial facts; Vector search supplies policy text; Pydantic enforces citations (`[Doc: fee_policy.md#L12]`).
-5. **Physical Ground-Truth Isolation:** Test answers are stored in `evaluator.ground_truth` in Supabase with app permissions revoked to prevent data leakage.
-6. **Amount-at-Risk Review Prioritization:** Exceptions are sorted by dollar exposure (`settlement_discrepancy DESC`) with append-only audit tracking (`audit_events`).
+4. **Hybrid SQL + Policy Vector RAG:** SQL supplies exact financial facts; Vector search supplies policy text; Pydantic enforces citations.
+5. **Physical Ground-Truth Isolation:** Test answers are stored in `evaluator.ground_truth` in Supabase with app permissions revoked.
+6. **Amount-at-Risk Review Prioritization:** Exceptions are sorted by dollar exposure with append-only audit tracking.
 
 ### Concept 8: Why This Puts Us at a Senior/Staff Engineering Level
-- **Competitors:** Put 61 rows in a Jupyter notebook or simple Streamlit app, send raw rows into an LLM prompt, let the LLM guess if they match, and claim "95% accuracy" with zero proof.
-- **Our Submission:** Backed by **J.P. Morgan Chase AI Research**, uses a 100% deterministic Python/PostgreSQL core with sub-millisecond throughput, handles the full 4-source gateway clearing cycle, and proves 100% precision on a 500-record benchmark with isolated ground truth.
-
 - **20-Second Pitch Answer for Interviews:**
   > *"Instead of building a naive chatbot that asks an LLM to guess transaction matches, we grounded our architecture in **J.P. Morgan AI Research's TS-Agent and FedSyn principles**. We built a 100% deterministic core in Python Decimal and PostgreSQL that auto-reconciles 80%+ of clean records at millisecond speeds. For exceptions, a bounded Hybrid SQL + Vector RAG assistant retrieves exact SQL evidence and company policy text with strict citation guardrails to explain the discrepancy to human analysts."*
+
+---
+
+## Gate 1 P0 Exercise 1: CSV-to-DB Column Mapping
+
+**Date Completed:** 2026-08-26  
+**Ownership Status:** `understood` ✅  
+
+### The Full Verified Column Mapping
+
+| CSV Column | Python Type in `PaymentRecord` | PostgreSQL Column Type | Notes |
+|---|---|---|---|
+| `payment_id` | `str` | `VARCHAR` | Primary identifier |
+| `order_id` | `str` | `VARCHAR` | Merchant's order reference |
+| `merchant_id` | `str` | `VARCHAR` | Which merchant owns this payment |
+| `payment_type` | `str` | `TEXT` | e.g., `card`, `wallet` |
+| `payment_method` | `str` | `TEXT` | e.g., `upi`, `netbanking` |
+| `amount` | `Decimal` | `NUMERIC(18,2)` | **Base-10 exact. Never float.** |
+| `currency` | `str` | `TEXT` | ISO currency code (e.g., `INR`) |
+| `status` | `str` (default: `"captured"`) | `VARCHAR + CHECK constraint` | NOT a PostgreSQL native ENUM (hard to ALTER in production) |
+| `payment_timestamp` | `datetime` | `TIMESTAMPTZ` | UTC timezone-aware |
+| `captured_timestamp` | `Optional[datetime]` | `TIMESTAMPTZ NULLABLE` | May arrive slightly after payment |
+| `settlement_id` | `Optional[str]` | `VARCHAR NULLABLE` | **NULL is a valid domain state (T+2 clearing window)** |
+
+### Q1: Why Does Float Arithmetic Fail in Reconciliation?
+- **Question:** What breaks at runtime if `amount` is stored as `FLOAT` instead of `NUMERIC(18,2)`?
+- **Your Initial Answer:** "2% tax and 18% GST will fail at runtime."
+- **Correction Applied:** The failure is a specific silent mismatch. For example:
+  - `726.0 * 0.02 = 14.52` (fine)
+  - `14.52 * 0.18 = 2.6136000000000004` (float drift!)
+  - Net = `726.0 - 14.52 - 2.6136000000000004 = 708.8663999999999`
+  - Bank says: `708.87`. Matcher comparison: `708.87 != 708.8663...` → **False `amount_mismatch` exception on a clean transaction!**
+- **Interview Key Takeaway:** Float arithmetic creates phantom discrepancies on clean transactions, corrupting precision and recall metrics.
+
+### Q2: Why is `settlement_id IS NULL` a Domain State, Not Bad Data?
+- **Your Answer:** "To catch the financial anomaly after T+2 days it is intentionally written."
+- **Correction Applied:** `NULL` does not catch anomalies. It IS the normal state during T+2 clearing:
+  - Day 0: Payment captured → `settlement_id = NULL` (normal)
+  - Day 2: Settlement arrives → `settlement_id = 'set_001001'` (normal)
+  - Day 3+: Still NULL → NOW it becomes `missing_settlement` exception
+- **Interview Key Takeaway:** `NULL` means "clearing in progress." The matcher raises `missing_settlement` only when it looks for a settlement record and finds none — not because of the NULL value itself.
+
+### Q3: Pydantic Trade-off
+- **Your Answer:** "It provides strict type hints unlike a traditional Python dictionary."
+- **Full Answer:** The **gain** is type safety (enforces `Decimal`, validates `datetime`, rejects `"N/A"`). The **cost** is schema coupling (if CSV format changes, the Pydantic model must be updated) and parsing overhead (acceptable at 500 records, measurable at 5,000,000 records). This project accepts the cost because safety on financial data far outweighs the parsing overhead.
 
 ---
 
@@ -84,10 +127,12 @@
 
 | Gate | Focus Area | Hands-On Exercise | Status |
 |:---:|---|---|:---:|
-| **Gate 1A** | Schema Planning & DDL Design | Design 16 tables, 14 indexes, constraints | Completed ✅ |
+| **Gate 1A** | Schema Planning & DDL Design | 16 tables, 14 indexes, constraints | Completed ✅ |
 | **Gate 1B** | Supabase Migration Execution | Apply DDL, verify 46 indexes and schemas | Completed ✅ |
-| **Gate 1C** | JPMC Research & Synthetic Generator | Code Python generator script, produce 500 records with 8 anomaly types | Completed ✅ |
-| **Gate 2** | Deterministic Matcher | Build Python Decimal normaliser, 3-stage candidate matcher | Starting Next 🚀 |
-| **Gate 3** | Evaluation Harness | Run benchmark CLI, calculate precision, recall, and throughput | Scheduled |
-| **Gate 4** | Review Queue & Audit | Build triage queue sorted by Amount-at-Risk, record append-only audit events | Scheduled |
-| **Gate 5** | Hybrid RAG Assistant | Implement LangGraph flow: SQL facts + vector policy retrieval + citations | Scheduled |
+| **Gate 1C** | JPMC Research & Synthetic Generator | 500 records, 8 anomaly types | Completed ✅ |
+| **Gate 1 P0** | CSV-to-DB Column Mapping | Mapped 11 fields, explained types | `understood` ✅ |
+| **Gate 1 P0** | Raw vs Normalized Dual-Storage | Inspect `payments_raw` vs `payments` DDL | In Progress 🚀 |
+| **Gate 2** | FastAPI + SQLAlchemy + Matcher | Full critical path trace | Upcoming |
+| **Gate 3** | Evaluation Harness | Precision, recall, throughput CLI | Upcoming |
+| **Gate 4** | Review Queue & Audit | Amount-at-Risk triage, audit events | Upcoming |
+| **Gate 5** | Hybrid RAG Assistant | SQL facts + vector policy + citations | Upcoming |

@@ -203,11 +203,12 @@ def generate_synthetic_dataset(total_records: int = 500, seed: int = 42, output_
             gt_review = "True"
 
         elif anomaly == 'ambiguous_match':
-            # Create two competing bank credits with identical amounts
+            # Two competing bank credits for the same settlement_id (same amount, different refs)
             bc_row_alt = dict(bc_row)
             bc_row_alt["bank_credit_id"] = f"bc_{idx:06d}_alt"
             bc_row_alt["bank_reference"] = f"UTR{idx:08d}B"
-            bank_credits.append(bc_row_alt)
+            bank_credits.append(bc_row)     # primary credit
+            bank_credits.append(bc_row_alt) # competing credit — triggers ambiguity
             gt_status = "needs_review"
             gt_exception = "ambiguous_match"
             gt_reason = "multiple_candidates"
@@ -219,6 +220,7 @@ def generate_synthetic_dataset(total_records: int = 500, seed: int = 42, output_
             settlements.append(s_row)
         if bc_row and anomaly not in ('duplicate_bank_credit', 'ambiguous_match'):
             bank_credits.append(bc_row)
+
 
         ground_truth.append({
             "case_id": case_id,
