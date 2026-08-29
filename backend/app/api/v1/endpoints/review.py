@@ -12,6 +12,7 @@ from backend.app.schemas.review import (
     ReviewQueueItemResponse,
     ReviewQueueResponse,
 )
+from backend.app.domain.exceptions import ConcurrentUpdateError
 from backend.app.repositories.review_repo import ReviewRepository
 from backend.app.repositories.reconciliation_repo import ReconciliationRepository
 
@@ -107,6 +108,7 @@ def submit_review_action(
     try:
         review_action, audit_event = repo.apply_review_action_atomic(
             case=case,
+            expected_version=body.expected_version,
             actor=body.actor,
             action=body.action,
             human_comment=body.human_comment,
@@ -114,6 +116,8 @@ def submit_review_action(
         )
     except ValueError as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+    except ConcurrentUpdateError as e:
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(e))
 
     return HumanReviewResponse(
         review_action_id=review_action.id,

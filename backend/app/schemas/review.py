@@ -9,6 +9,8 @@ class HumanReviewRequest(BaseModel):
     """Body for POST /reconciliation/cases/{case_id}/review"""
     actor: str = Field(..., description="Identifier of the human reviewer (e.g. 'ops_team_lead')")
     action: str = Field(..., description="One of: approve | reject | mark_unresolved")
+    expected_version: int = Field(..., description="The expected DB version of the case to prevent concurrent modifications")
+
     human_comment: Optional[str] = Field(None, description="Free-text rationale from the reviewer")
     selected_candidate_id: Optional[UUID] = Field(None, description="If approving, the candidate match ID chosen")
 
@@ -29,6 +31,7 @@ class HumanReviewResponse(BaseModel):
     case_id: UUID
     actor: str
     action: str
+
     previous_decision_status: str
     new_decision_status: str
     human_comment: Optional[str]
