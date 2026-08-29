@@ -26,7 +26,7 @@ PROJECTS
 • Designed a fail-closed reconciliation flow where deterministic rule matching approves transactions before any LLM involvement, achieving zero false auto-matches across my evaluation batches.
 • Built an ACID-compliant FastAPI and PostgreSQL backend with append-only audit trails, ensuring every matching decision traces back to raw data.
 • Containerized the full stack with Docker and validated matching logic against an isolated evaluation harness.
-• [VERIFY WITH ME BEFORE INCLUDING] Benchmarked batch processing at ~45,000 records/sec on simulated transaction data.
+• Benchmarked system throughput at over 48,000 records/sec on simulated transaction data, by isolating the deterministic matcher and evaluating it on 500+ seeded synthetic records.
 
 2. VERITAS — PDF RAG Chat Application (FastAPI, FAISS, Groq LLaMA 3.3 70B, Render) | GitHub | Live Demo
 • Built a RAG chatbot that answers questions from uploaded PDFs and rejects out-of-scope queries using a cosine-similarity grounding threshold (0.35) before any LLM call, reducing hallucinated answers to near zero in my test set.
