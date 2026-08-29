@@ -212,8 +212,8 @@ def generate_evaluation_dataset(
             }
 
         elif category == "duplicate_payment":
-            # Create a shared order_id with an existing or fixed duplicate order
-            dup_order_id = f"ord_eval_dup_{(idx % 2) + 1:02d}"
+            # Both duplicate payments share the exact same order_id
+            dup_order_id = "ord_eval_shared_dup_01"
             p_row["order_id"] = dup_order_id
             payments.append(p_row)
             settlements.append(s_row)

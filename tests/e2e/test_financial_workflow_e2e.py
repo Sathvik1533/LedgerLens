@@ -63,9 +63,9 @@ def test_four_source_financial_workflow_e2e(client, db_session):
 
     # Assert raw vs normalized payments in DB
     db_session.expire_all()
-    assert db_session.query(PaymentsRawModel).count() == 5
-    assert db_session.query(PaymentModel).count() == 4
-    for p in db_session.query(PaymentModel).all():
+    assert db_session.query(PaymentsRawModel).filter_by(batch_id=pay_data["batch_id"]).count() == 5
+    assert db_session.query(PaymentModel).filter_by(batch_id=pay_data["batch_id"]).count() == 4
+    for p in db_session.query(PaymentModel).filter_by(batch_id=pay_data["batch_id"]).all():
         assert p.currency == "INR"
 
     # Source 2: Settlements CSV (4 valid records matching payments)
@@ -88,7 +88,7 @@ def test_four_source_financial_workflow_e2e(client, db_session):
     assert set_data["batch_status"] == "completed"
 
     db_session.expire_all()
-    assert db_session.query(SettlementsRawModel).count() == 4
+    assert db_session.query(SettlementsRawModel).filter_by(batch_id=set_data["batch_id"]).count() == 4
     assert db_session.query(SettlementModel).count() == 4
 
     # Source 3: Refunds CSV (1 valid partial refund on pay_e2e_004)
@@ -107,7 +107,7 @@ def test_four_source_financial_workflow_e2e(client, db_session):
     assert ref_data["row_count_rejected"] == 0
 
     db_session.expire_all()
-    assert db_session.query(RefundsRawModel).count() == 1
+    assert db_session.query(RefundsRawModel).filter_by(batch_id=ref_data["batch_id"]).count() == 1
     assert db_session.query(RefundModel).count() == 1
 
     # Source 4: Bank Credits CSV (2 valid records: exact credit for set_001, short credit for set_002)
@@ -127,7 +127,7 @@ def test_four_source_financial_workflow_e2e(client, db_session):
     assert bc_data["row_count_rejected"] == 0
 
     db_session.expire_all()
-    assert db_session.query(BankCreditsRawModel).count() == 2
+    assert db_session.query(BankCreditsRawModel).filter_by(batch_id=bc_data["batch_id"]).count() == 2
     assert db_session.query(BankCreditModel).count() == 2
     assert db_session.query(IngestionBatchModel).count() == 4
 

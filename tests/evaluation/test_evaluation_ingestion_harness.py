@@ -53,9 +53,9 @@ def test_evaluation_ingestion_harness(client, db_session):
     assert len(pay_data["errors"]) == 1
 
     db_session.expire_all()
-    assert db_session.query(PaymentsRawModel).count() == 61
-    assert db_session.query(PaymentModel).count() == 60
-    for p in db_session.query(PaymentModel).all():
+    assert db_session.query(PaymentsRawModel).filter_by(batch_id=pay_data["batch_id"]).count() == 61
+    assert db_session.query(PaymentModel).filter_by(batch_id=pay_data["batch_id"]).count() == 60
+    for p in db_session.query(PaymentModel).filter_by(batch_id=pay_data["batch_id"]).all():
         assert p.currency == "INR"
 
     # ── 4. Ingestion: Settlements CSV ────────────────────────────────────────
@@ -71,7 +71,7 @@ def test_evaluation_ingestion_harness(client, db_session):
     assert set_data["batch_status"] == "completed"
 
     db_session.expire_all()
-    assert db_session.query(SettlementsRawModel).count() == 58
+    assert db_session.query(SettlementsRawModel).filter_by(batch_id=set_data["batch_id"]).count() == 58
     assert db_session.query(SettlementModel).count() == 58
 
     # ── 5. Ingestion: Refunds CSV ────────────────────────────────────────────
@@ -87,7 +87,7 @@ def test_evaluation_ingestion_harness(client, db_session):
     assert ref_data["batch_status"] == "completed"
 
     db_session.expire_all()
-    assert db_session.query(RefundsRawModel).count() == 3
+    assert db_session.query(RefundsRawModel).filter_by(batch_id=ref_data["batch_id"]).count() == 3
     assert db_session.query(RefundModel).count() == 3
 
     # ── 6. Ingestion: Bank Credits CSV ───────────────────────────────────────
@@ -103,6 +103,6 @@ def test_evaluation_ingestion_harness(client, db_session):
     assert bc_data["batch_status"] == "completed"
 
     db_session.expire_all()
-    assert db_session.query(BankCreditsRawModel).count() == 54
+    assert db_session.query(BankCreditsRawModel).filter_by(batch_id=bc_data["batch_id"]).count() == 54
     assert db_session.query(BankCreditModel).count() == 54
     assert db_session.query(IngestionBatchModel).count() == 4
