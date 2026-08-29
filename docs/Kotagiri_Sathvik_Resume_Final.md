@@ -44,7 +44,6 @@ B.Tech CSE student (2024–2028) building production-grade AI backend systems an
 - **Backend & APIs:** FastAPI, Pydantic, SQLAlchemy, REST API Design, Async Workflows, APScheduler, Redis Streams
 - **Databases:** PostgreSQL, Supabase (RLS, Storage, Auth), ChromaDB, Upstash Redis
 - **Cloud & DevOps:** Vercel, Render, Railway, AWS EC2, AWS S3, Docker, Git, GitHub, Linux CLI
-- **Soft Skills:** Technical Communication, Rapid Prototyping, Analytical Problem Solving, Systems Thinking, Adaptability
 
 ---
 
@@ -53,3 +52,9 @@ B.Tech CSE student (2024–2028) building production-grade AI backend systems an
 - **3rd Prize — Agentic AI Hackathon (Team):** Designed n8n automation workflow and agent orchestration layer for AI-powered marketing assistant using LangChain.  
 - **3rd Prize — AWS Cloud Challenge (Solo):** Deployed production-style static site on EC2 + S3 under competition time constraints.  
 - **Google Cloud:** Build Real-World AI Applications with Gemini — badge verified.  
+
+---
+
+## Soft Skills
+
+- Technical Communication, Rapid Prototyping, Analytical Problem Solving, Systems Thinking, Adaptability
