@@ -334,10 +334,13 @@ class ReconciliationRepository:
                 self.db.add(case_model)
                 case_models.append(case_model)
 
+            self.db.flush()
+
+            for res, case_model in zip(results, case_models):
                 if res.matched_settlement_id:
                     cand = CandidateMatchModel(
                         id=uuid.uuid4(),
-                        case_id=case_id,
+                        case_id=case_model.id,
                         match_stage="exact_identifier",
                         candidate_type="settlement",
                         candidate_entity_id=res.matched_settlement_id,
@@ -350,7 +353,7 @@ class ReconciliationRepository:
                 if res.matched_bank_credit_id:
                     cand = CandidateMatchModel(
                         id=uuid.uuid4(),
-                        case_id=case_id,
+                        case_id=case_model.id,
                         match_stage="exact_identifier",
                         candidate_type="bank_credit",
                         candidate_entity_id=res.matched_bank_credit_id,
