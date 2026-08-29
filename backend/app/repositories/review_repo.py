@@ -91,7 +91,8 @@ class ReviewRepository:
                 update(ReconciliationCaseModel)
                 .where(
                     ReconciliationCaseModel.id == case.id,
-                    ReconciliationCaseModel.version == expected_version
+                    ReconciliationCaseModel.version == expected_version,
+                    ReconciliationCaseModel.decision_status == "needs_review"
                 )
                 .values(**values_to_update)
             )
@@ -102,6 +103,7 @@ class ReviewRepository:
                 
             # Reflect changes in memory model for subsequent code if needed
             case.version = expected_version + 1
+            case.decision_status = new_status
 
             # 2. Write append-only review action row
             review_action = HumanReviewActionModel(

@@ -1,17 +1,15 @@
 import pytest
+from sqlalchemy import text
 import uuid
 from decimal import Decimal
 from datetime import datetime, timezone
-from sqlalchemy import select
 
 from backend.app.models.reconciliation import ReconciliationCaseModel
 from backend.app.models.review import HumanReviewActionModel, AuditEventModel
+from backend.app.models.ingestion import IngestionBatchModel, PaymentsRawModel
+from backend.app.models.payment import PaymentModel
 
-@pytest.mark.integration
-def test_optimistic_locking_success_and_conflict(client, db_session):
-    # 1. Setup case at version=1
-    from backend.app.models.ingestion import IngestionBatchModel, PaymentsRawModel
-    from backend.app.models.payment import PaymentModel
+def _setup_case_in_db(db_session, version: int, decision_status: str = "needs_review"):
     batch_id = uuid.uuid4()
     batch = IngestionBatchModel(
         id=batch_id, idempotency_key=uuid.uuid4().hex, batch_status="processed", source_tables=["payments"],
@@ -38,40 +36,66 @@ def test_optimistic_locking_success_and_conflict(client, db_session):
         batch_id=batch_id,
         payment_id=payment_id,
         exception_type="amount_mismatch",
-        decision_status="needs_review",
+        decision_status=decision_status,
         confidence="high",
         expected_net_settlement=Decimal("100.00"),
         case_opened_at=datetime.now(timezone.utc),
-        version=1
+        version=version
     )
     db_session.add(case)
     db_session.commit()
-    
-    # 2. Success path: Submit action with expected_version=1
-    res1 = client.post(
+    return case_id
+
+@pytest.mark.integration
+def test_optimistic_locking_success(client, db_session):
+    # Setup natural state: case is needs_review, version 1
+    case_id = _setup_case_in_db(db_session, version=1, decision_status="needs_review")
+
+    # Request with correct expected version
+    res = client.post(
         f"/api/v1/review/cases/{case_id}/review",
         json={"actor": "tester", "action": "approve", "expected_version": 1}
     )
-    assert res1.status_code == 200
-    
-    # Verify DB state mutated and audit event wrote
-    db_session.refresh(case)
+    assert res.status_code == 200
+
+    body = res.json()
+    assert body["current_version"] == 2
+    assert body["new_decision_status"] == "auto_reconciled"
+
+    # Status transition succeeds, version increments exactly once
+    case = db_session.get(ReconciliationCaseModel, case_id)
     assert case.version == 2
     assert case.decision_status == "auto_reconciled"
+
+    # One review/audit record is created
+    assert db_session.query(HumanReviewActionModel).filter_by(case_id=case_id).count() == 1
     assert db_session.query(AuditEventModel).filter_by(case_id=case_id).count() == 1
-    
-    case.decision_status = "needs_review"
-    db_session.commit()
-    # 3. Conflict path: Concurrently submit action again with expected_version=1
-    res2 = client.post(
+
+
+@pytest.mark.integration
+def test_optimistic_locking_stale_version_rejection(client, db_session):
+    # Setup natural state: case is needs_review, version 2
+    case_id = _setup_case_in_db(db_session, version=2, decision_status="needs_review")
+
+    # Submit a review request with stale expected_version = 1
+    res = client.post(
         f"/api/v1/review/cases/{case_id}/review",
         json={"actor": "tester2", "action": "reject", "expected_version": 1}
     )
-    assert res2.status_code == 409
-    assert "version mismatch" in res2.json()["detail"]
-    
-    # Verify DB state didn't mutate and NO new audit event wrote
-    db_session.refresh(case)
+
+    # Assert HTTP 409
+    assert res.status_code == 409
+    assert "mismatch" in res.json()["detail"].lower() or "status changed" in res.json()["detail"].lower()
+
+    # Case remains needs_review, case version remains 2
+    db_session.expire_all() # ensure we fetch fresh from DB
+    case = db_session.get(ReconciliationCaseModel, case_id)
     assert case.version == 2
     assert case.decision_status == "needs_review"
-    assert db_session.query(AuditEventModel).filter_by(case_id=case_id).count() == 1
+
+    # No review action is created, no audit event is created
+    assert db_session.query(HumanReviewActionModel).filter_by(case_id=case_id).count() == 0
+    assert db_session.query(AuditEventModel).filter_by(case_id=case_id).count() == 0
+
+    # Session is usable after conflict
+    assert db_session.execute(text("SELECT 1")).scalar() == 1

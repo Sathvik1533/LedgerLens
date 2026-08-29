@@ -124,6 +124,7 @@ def submit_review_action(
         case_id=case_id,
         actor=review_action.actor,
         action=review_action.action,
+        current_version=case.version,
         previous_decision_status=review_action.previous_decision_status,
         new_decision_status=review_action.new_decision_status,
         human_comment=review_action.human_comment,

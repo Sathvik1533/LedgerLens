@@ -31,6 +31,7 @@ class HumanReviewResponse(BaseModel):
     case_id: UUID
     actor: str
     action: str
+    current_version: int
 
     previous_decision_status: str
     new_decision_status: str

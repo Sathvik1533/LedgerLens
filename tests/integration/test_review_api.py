@@ -43,6 +43,7 @@ def _make_needs_review_case(payment_id: str = "pay_001") -> ReconciliationCaseMo
         currency="INR",
         case_opened_at=now,
         last_updated_at=now,
+        version=2,
     )
     return c
 
