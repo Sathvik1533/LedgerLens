@@ -17,7 +17,7 @@ Sri Chaitanya Junior College, Hyderabad — Intermediate MPC (2022–2024), 92%
 
 INTERNSHIP EXPERIENCE
 Associate Software Engineer Intern — thaa Technologies, Hyderabad
-(Jan 2026 – Mar 2026 [VERIFY], Remote, Unpaid)
+(Jan 2026 – Mar 2026, Remote, Unpaid)
 • Reviewed a production web application end-to-end from a user's perspective, identifying UI/UX defects and workflow flaws.
 • Documented and reported actionable fixes directly to the founding team via calls and chat.
 
