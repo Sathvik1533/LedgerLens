@@ -26,6 +26,8 @@ class ReconciliationCaseModel(Base):
     case_opened_at = Column(DateTime(timezone=True), nullable=False, default=func.now(), server_default=func.now())
     case_closed_at = Column(DateTime(timezone=True), nullable=True)
     last_updated_at = Column(DateTime(timezone=True), nullable=False, default=func.now(), server_default=func.now())
+    version = Column(Integer, nullable=False, default=1, server_default="1")
+
 
 
 class CandidateMatchModel(Base):

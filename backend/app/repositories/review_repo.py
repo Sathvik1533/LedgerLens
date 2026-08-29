@@ -40,6 +40,7 @@ class ReviewRepository:
     def apply_review_action_atomic(
         self,
         case: ReconciliationCaseModel,
+        expected_version: int,
         actor: str,
         action: str,                    # approve | reject | mark_unresolved
         human_comment: Optional[str],
@@ -71,16 +72,38 @@ class ReviewRepository:
         new_status = ACTION_TO_STATUS[action]
 
         try:
-            # 1. Mutate the case
-            case.decision_status = new_status
-            case.resolution_reason = action          # approve / reject / mark_unresolved
-            case.last_updated_at = now
+            from sqlalchemy import update
+            from backend.app.domain.exceptions import ConcurrentUpdateError
+            
+            # 1. Mutate the case via atomic optimistic locking UPDATE
+            values_to_update = {
+                "decision_status": new_status,
+                "resolution_reason": action,
+                "last_updated_at": now,
+                "version": expected_version + 1,
+            }
             if action == "approve":
-                case.case_closed_at = now
+                values_to_update["case_closed_at"] = now
             if selected_candidate_id:
-                case.selected_candidate_id = selected_candidate_id
-
-            self.db.flush()   # surface constraint violations before commit
+                values_to_update["selected_candidate_id"] = selected_candidate_id
+                
+            stmt = (
+                update(ReconciliationCaseModel)
+                .where(
+                    ReconciliationCaseModel.id == case.id,
+                    ReconciliationCaseModel.version == expected_version,
+                    ReconciliationCaseModel.decision_status == "needs_review"
+                )
+                .values(**values_to_update)
+            )
+            result = self.db.execute(stmt)
+            if result.rowcount == 0:
+                self.db.rollback()
+                raise ConcurrentUpdateError("Case version mismatch or status changed.")
+                
+            # Reflect changes in memory model for subsequent code if needed
+            case.version = expected_version + 1
+            case.decision_status = new_status
 
             # 2. Write append-only review action row
             review_action = HumanReviewActionModel(
