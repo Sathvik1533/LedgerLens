@@ -63,7 +63,6 @@ def db_session():
                 bank_credits, 
                 reconciliation_cases, 
                 audit_events, 
-                reconciled_transactions,
                 ingestion_batches
             RESTART IDENTITY CASCADE;
         """))
