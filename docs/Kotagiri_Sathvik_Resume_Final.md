@@ -40,10 +40,11 @@ B.Tech CSE student (2024–2028) building production-grade AI backend systems an
 ## Technical Skills
 
 - **Languages:** Python (primary), Java, JavaScript, SQL
-- **AI & GenAI:** LangGraph, LangChain, LlamaIndex, Groq LLM, Groq Vision OCR, Guardrails AI, FAISS, Dense Vector Retrieval, Structured Prompt Engineering (Pydantic / JSON Schema), LangSmith
+- **AI & GenAI:** LangGraph, LangChain, Groq LLM, Groq Vision OCR, Guardrails AI, FAISS, Dense Vector Retrieval, Structured Prompt Engineering (Pydantic / JSON Schema)
 - **Backend & APIs:** FastAPI, Pydantic, SQLAlchemy, REST API Design, Async Workflows, APScheduler, Redis Streams
 - **Databases:** PostgreSQL, Supabase (RLS, Storage, Auth), ChromaDB, Upstash Redis
 - **Cloud & DevOps:** Vercel, Render, Railway, AWS EC2, AWS S3, Docker, Git, GitHub, Linux CLI
+- **Soft Skills:** Technical Communication, Rapid Prototyping, Analytical Problem Solving, Systems Thinking, Adaptability
 
 ---
 
