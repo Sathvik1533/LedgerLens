@@ -4,6 +4,7 @@ import {
   HumanReviewRequest,
   HumanReviewResponse,
   AuditEventItem,
+  InvestigationResult,
 } from '../types/api';
 
 const API_BASE = '/api/v1';
@@ -72,4 +73,10 @@ export async function submitCaseReview(
 
 export async function fetchCaseAuditTrail(caseId: string): Promise<AuditEventItem[]> {
   return request<AuditEventItem[]>(`/review/cases/${encodeURIComponent(caseId)}/audit`);
+}
+
+export async function investigateCase(caseId: string): Promise<InvestigationResult> {
+  return request<InvestigationResult>(`/rag/investigate/${encodeURIComponent(caseId)}`, {
+    method: 'POST',
+  });
 }

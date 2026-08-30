@@ -109,3 +109,17 @@ export interface AuditEventItem {
   new_status: string | null;
   occurred_at: string;
 }
+
+export interface Citation {
+  source_file: string;
+  quote: string;
+}
+
+export interface InvestigationResult {
+  summary: string;
+  root_cause_analysis: string;
+  recommended_action: string;
+  citations: Citation[];
+  is_confident: boolean;
+}
+
