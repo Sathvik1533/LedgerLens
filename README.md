@@ -1,8 +1,8 @@
 <div align="center">
   <img src="docs/assets/ledgerlens-logo.svg" alt="LedgerLens Mark" width="56" height="56" />
   <h1>LedgerLens</h1>
-  <p><strong>Financial Reconciliation Control Room & AI Exception Inspector</strong></p>
-  <p>A rule-based reconciliation system and human review dashboard for payment operations.</p>
+  <p><strong>Financial Reconciliation Control Room</strong></p>
+  <p>Four financial sources. Deterministic matching. Human-reviewed exceptions.</p>
 
   [![CI Test Gate](https://github.com/Sathvik1533/razorpay-ai-finance-controller/actions/workflows/ci-tests.yml/badge.svg)](https://github.com/Sathvik1533/razorpay-ai-finance-controller/actions)
   ![Python 3.11](https://img.shields.io/badge/Python-3.11-3776AB?logo=python&logoColor=white)
@@ -25,6 +25,8 @@ Many modern AI tools attempt to match transactions by feeding raw numbers into L
 ---
 
 ## 2. What LedgerLens Does
+
+The LedgerLens mark represents four financial data sources converging through an inspection point into a traceable reconciliation outcome. It is a visual metaphor for the system’s role; it does not represent an automated approval.
 
 LedgerLens keeps financial matching strictly rule-based while using AI only to help humans understand flagged issues:
 
