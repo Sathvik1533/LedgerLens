@@ -77,3 +77,16 @@ def client(db_session):
     with TestClient(app) as c:
         yield c
     app.dependency_overrides.clear()
+
+
+import pytest_asyncio
+
+@pytest_asyncio.fixture(scope="function")
+async def client_async():
+    """Provides an httpx.AsyncClient hooked to the FastAPI app via ASGITransport with real session pooling."""
+    import httpx
+    transport = httpx.ASGITransport(app=app)
+    async with httpx.AsyncClient(transport=transport, base_url="http://test") as c:
+        yield c
+
+
