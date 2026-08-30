@@ -1,0 +1,62 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630" fill="none">
+  <title>LedgerLens Social Preview</title>
+  <desc>LedgerLens Financial Reconciliation Control Room architecture and brand preview</desc>
+  <rect width="1200" height="630" fill="#080D1A" />
+  
+  <!-- Subtle Grid Background -->
+  <g stroke="#1E293B" stroke-width="1" opacity="0.35">
+    <line x1="0" y1="105" x2="1200" y2="105" />
+    <line x1="0" y1="210" x2="1200" y2="210" />
+    <line x1="0" y1="315" x2="1200" y2="315" />
+    <line x1="0" y1="420" x2="1200" y2="420" />
+    <line x1="0" y1="525" x2="1200" y2="525" />
+    <line x1="200" y1="0" x2="200" y2="630" />
+    <line x1="400" y1="0" x2="400" y2="630" />
+    <line x1="600" y1="0" x2="600" y2="630" />
+    <line x1="800" y1="0" x2="800" y2="630" />
+    <line x1="1000" y1="0" x2="1000" y2="630" />
+  </g>
+
+  <!-- Glow effect -->
+  <circle cx="600" cy="220" r="180" fill="#2563EB" opacity="0.12" />
+  <circle cx="700" cy="260" r="140" fill="#0891B2" opacity="0.08" />
+
+  <!-- Candidate 1 Logo Mark Centered -->
+  <g transform="translate(540, 70) scale(1.85)">
+    <line x1="10" y1="14" x2="26" y2="26" stroke="#2563EB" stroke-width="4.5" stroke-linecap="round" />
+    <line x1="10" y1="50" x2="26" y2="38" stroke="#0891B2" stroke-width="4.5" stroke-linecap="round" />
+    <line x1="44" y1="14" x2="38" y2="26" stroke="#2563EB" stroke-width="4.5" stroke-linecap="round" />
+    <line x1="44" y1="50" x2="38" y2="38" stroke="#0891B2" stroke-width="4.5" stroke-linecap="round" />
+    <polygon points="26,32 32,26 38,32 32,38" fill="#0F172A" stroke="#2563EB" stroke-width="3" stroke-linejoin="round" />
+    <line x1="38" y1="32" x2="56" y2="32" stroke="#059669" stroke-width="4.5" stroke-linecap="round" />
+  </g>
+
+  <!-- Title & Subtitles -->
+  <text x="600" y="255" fill="#FFFFFF" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="44" font-weight="800" text-anchor="middle" letter-spacing="-0.5">LedgerLens</text>
+  <text x="600" y="295" fill="#60A5FA" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="18" font-weight="700" text-anchor="middle" letter-spacing="0.5">Financial Reconciliation Control Room</text>
+  <text x="600" y="335" fill="#94A3B8" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="15" font-weight="400" text-anchor="middle">Four financial sources. Deterministic matching. Human-reviewed exceptions.</text>
+
+  <!-- 3 Flow Architecture Pillars -->
+  <g transform="translate(180, 410)">
+    <!-- Pillar 1: Ingestion -->
+    <rect x="0" y="0" width="240" height="120" rx="12" fill="#0F172A" stroke="#334155" stroke-width="1.5" />
+    <text x="24" y="36" fill="#38BDF8" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="13" font-weight="700">1. FOUR-SOURCE INTAKE</text>
+    <text x="24" y="62" fill="#E2E8F0" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="500">Payments &bull; Settlements</text>
+    <text x="24" y="82" fill="#E2E8F0" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="500">Refunds &bull; Bank Credits</text>
+    <text x="24" y="102" fill="#64748B" font-family="monospace" font-size="10">Raw + Normalized Storage</text>
+
+    <!-- Pillar 2: Matcher -->
+    <rect x="300" y="0" width="240" height="120" rx="12" fill="#0F172A" stroke="#3B82F6" stroke-width="1.5" />
+    <text x="324" y="36" fill="#60A5FA" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="13" font-weight="700">2. DETERMINISTIC ENGINE</text>
+    <text x="324" y="62" fill="#E2E8F0" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="500">Python Decimal Matching</text>
+    <text x="324" y="82" fill="#94A3B8" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="11">Exact Two-Decimal Math</text>
+    <text x="324" y="102" fill="#10B981" font-family="monospace" font-size="10">8 Exception Categories</text>
+
+    <!-- Pillar 3: Control Room -->
+    <rect x="600" y="0" width="240" height="120" rx="12" fill="#0F172A" stroke="#334155" stroke-width="1.5" />
+    <text x="624" y="36" fill="#A78BFA" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="13" font-weight="700">3. HUMAN REVIEW &amp; AUDIT</text>
+    <text x="624" y="62" fill="#E2E8F0" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="500">Operations Control Room</text>
+    <text x="624" y="82" fill="#94A3B8" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="11">Reviewer Sign-Off &bull; Audit Trail</text>
+    <text x="624" y="102" fill="#06B6D4" font-family="monospace" font-size="10">Read-Only Policy Copilot</text>
+  </g>
+</svg>

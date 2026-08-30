@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" fill="none">
+  <title>LedgerLens Mark</title>
+  <desc>Four financial data sources converge into a central inspection diamond, producing a traceable reconciliation outcome.</desc>
+  <!-- 1. Top-Left Feeder (Payments: Cobalt #2563EB) -->
+  <line x1="10" y1="14" x2="26" y2="26" stroke="#2563EB" stroke-width="4.5" stroke-linecap="round" />
+  <!-- 2. Bottom-Left Feeder (Refunds: Cyan #0891B2) -->
+  <line x1="10" y1="50" x2="26" y2="38" stroke="#0891B2" stroke-width="4.5" stroke-linecap="round" />
+  <!-- 3. Top-Right Feeder (Settlements: Cobalt #2563EB) -->
+  <line x1="44" y1="14" x2="38" y2="26" stroke="#2563EB" stroke-width="4.5" stroke-linecap="round" />
+  <!-- 4. Bottom-Right Feeder (Bank Credits: Cyan #0891B2) -->
+  <line x1="44" y1="50" x2="38" y2="38" stroke="#0891B2" stroke-width="4.5" stroke-linecap="round" />
+  <!-- 5. Central Diamond Inspection Aperture -->
+  <polygon points="26,32 32,26 38,32 32,38" fill="#0F172A" stroke="#2563EB" stroke-width="3" stroke-linejoin="round" />
+  <!-- 6. Reconciled Outcome Line (Emerald #059669) -->
+  <line x1="38" y1="32" x2="56" y2="32" stroke="#059669" stroke-width="4.5" stroke-linecap="round" />
+</svg>
