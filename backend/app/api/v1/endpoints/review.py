@@ -168,3 +168,32 @@ def get_case_audit_trail(
         )
         for e in events
     ]
+
+
+# ── 4. Case Detail & Multi-Source Facts ──────────────────────────────────────────
+
+@router.get(
+    "/cases/{case_id}",
+    response_model=dict,
+    status_code=status.HTTP_200_OK,
+    summary="Get single reconciliation case with full multi-source evidence",
+)
+def get_case_detail(
+    case_id: UUID = Path(..., description="UUID of the reconciliation case"),
+    db: Session = Depends(get_db),
+):
+    from backend.app.rag.tools.sql_tool import SQLEvidenceTool
+    repo = ReviewRepository(db)
+    case = repo.get_case_by_id(case_id)
+    if case is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Reconciliation case '{case_id}' not found.",
+        )
+    sql_tool = SQLEvidenceTool(db)
+    evidence = sql_tool.get_case_evidence(str(case_id))
+    evidence["version"] = case.version
+    evidence["decision_status"] = case.decision_status
+    evidence["case_opened_at"] = case.case_opened_at.isoformat() if case.case_opened_at else None
+    return evidence
+
