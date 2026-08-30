@@ -1,5 +1,5 @@
 import React from 'react';
-import { CheckCircle2, AlertTriangle, ShieldCheck, HelpCircle } from 'lucide-react';
+import { CheckCircle2, AlertTriangle } from 'lucide-react';
 
 interface ConfidenceIndicatorProps {
   isConfident: boolean;

@@ -9,9 +9,6 @@ import {
   BookOpen,
   RefreshCw,
   Info,
-  Layers,
-  ArrowRightCircle,
-  CheckCircle2,
 } from 'lucide-react';
 import { InvestigationResult } from '../types/api';
 import { investigateCase } from '../api/client';
