@@ -1,10 +1,20 @@
 import React, { useState, useEffect } from 'react';
-import { ArrowLeft, RefreshCw, AlertCircle, Copy, Check } from 'lucide-react';
+import {
+  ArrowLeft,
+  RefreshCw,
+  AlertCircle,
+  Copy,
+  Check,
+  Sparkles,
+  Scale,
+  History,
+} from 'lucide-react';
 import { CaseEvidenceResponse, AuditEventItem } from '../types/api';
 import { fetchCaseDetail, fetchCaseAuditTrail } from '../api/client';
 import { MultiSourceCard } from '../components/MultiSourceCard';
 import { ReviewActionForm } from '../components/ReviewActionForm';
 import { AuditTimeline } from '../components/AuditTimeline';
+import { RagCopilotPanel } from '../components/RagCopilotPanel';
 import { StatusBadge } from '../components/StatusBadge';
 import { ExceptionBadge } from '../components/ExceptionBadge';
 
@@ -13,9 +23,12 @@ interface CaseDetailPageProps {
   onBack: () => void;
 }
 
+type TabType = 'evidence' | 'copilot' | 'audit';
+
 export const CaseDetailPage: React.FC<CaseDetailPageProps> = ({ caseId, onBack }) => {
   const [evidence, setEvidence] = useState<CaseEvidenceResponse | null>(null);
   const [auditEvents, setAuditEvents] = useState<AuditEventItem[]>([]);
+  const [activeTab, setActiveTab] = useState<TabType>('evidence');
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
@@ -127,25 +140,89 @@ export const CaseDetailPage: React.FC<CaseDetailPageProps> = ({ caseId, onBack }
         </div>
       </div>
 
-      {/* Main Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2 space-y-6">
-          {/* Multi-Source Comparison */}
-          <MultiSourceCard evidence={evidence} />
+      {/* Navigation Tabs */}
+      <div className="flex flex-wrap gap-2 border-b border-slate-800/80 pb-2">
+        <button
+          onClick={() => setActiveTab('evidence')}
+          className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all duration-200 border ${
+            activeTab === 'evidence'
+              ? 'bg-blue-600 border-blue-400 text-white shadow-md shadow-blue-600/30'
+              : 'bg-slate-900/60 border-slate-800 text-slate-400 hover:text-slate-200 hover:bg-slate-800/80'
+          }`}
+        >
+          <Scale className="w-4 h-4 text-blue-300" />
+          <span>1. Multi-Source Evidence & Review Decision</span>
+        </button>
 
-          {/* Review Decision Form */}
-          <ReviewActionForm
-            evidence={evidence}
-            onSuccess={loadCaseData}
-            onRefreshCase={loadCaseData}
-          />
+        <button
+          onClick={() => setActiveTab('copilot')}
+          className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all duration-200 border ${
+            activeTab === 'copilot'
+              ? 'bg-gradient-to-r from-blue-600 via-indigo-600 to-cyan-600 border-blue-400 text-white shadow-md shadow-indigo-600/30'
+              : 'bg-slate-900/60 border-slate-800 text-slate-400 hover:text-slate-200 hover:bg-slate-800/80'
+          }`}
+        >
+          <Sparkles className="w-4 h-4 text-cyan-400 animate-pulse" />
+          <span>2. Grounded AI Copilot Assistant</span>
+          <span className="text-[10px] uppercase tracking-wider px-1.5 py-0.2 rounded bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">
+            Advisory
+          </span>
+        </button>
+
+        <button
+          onClick={() => setActiveTab('audit')}
+          className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all duration-200 border ${
+            activeTab === 'audit'
+              ? 'bg-blue-600 border-blue-400 text-white shadow-md shadow-blue-600/30'
+              : 'bg-slate-900/60 border-slate-800 text-slate-400 hover:text-slate-200 hover:bg-slate-800/80'
+          }`}
+        >
+          <History className="w-4 h-4 text-slate-300" />
+          <span>3. Audit Trail ({auditEvents.length})</span>
+        </button>
+      </div>
+
+      {/* Tab Panels */}
+      {activeTab === 'evidence' && (
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="lg:col-span-2 space-y-6">
+            <MultiSourceCard evidence={evidence} />
+            <ReviewActionForm
+              evidence={evidence}
+              onSuccess={loadCaseData}
+              onRefreshCase={loadCaseData}
+            />
+          </div>
+
+          <div className="space-y-6">
+            <AuditTimeline events={auditEvents} />
+          </div>
         </div>
+      )}
 
+      {activeTab === 'copilot' && (
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="lg:col-span-2 space-y-6">
+            <RagCopilotPanel caseId={evidence.case_id} />
+          </div>
+
+          <div className="space-y-6">
+            {/* Quick Action Preview while in Copilot mode */}
+            <ReviewActionForm
+              evidence={evidence}
+              onSuccess={loadCaseData}
+              onRefreshCase={loadCaseData}
+            />
+            <AuditTimeline events={auditEvents} />
+          </div>
+        </div>
+      )}
+
+      {activeTab === 'audit' && (
         <div className="space-y-6">
-          {/* Append-Only Audit Timeline */}
           <AuditTimeline events={auditEvents} />
         </div>
-      </div>
+      )}
     </div>
   );
 };
