@@ -1,0 +1,34 @@
+sequenceDiagram
+    autonumber
+    actor Reviewer as Finance Operator
+    participant UI as React Control Room
+    participant API as FastAPI Backend
+    participant DB as PostgreSQL Database
+    participant RAG as Grounded Policy Assistant
+
+    Reviewer->>UI: Select Case (#pay_synth_001)
+    UI->>API: GET /api/v1/review/cases/{case_id}
+    API->>DB: Fetch case facts, version, and multi-source records
+    DB-->>API: Return evidence (version = 1)
+    API-->>UI: Render 3-Source Comparison Grid
+
+    opt Advisory RAG Investigation
+        Reviewer->>UI: Open "AI Copilot" Tab
+        UI->>API: POST /api/v1/rag/investigate/{case_id}
+        API->>RAG: Synthesize DB facts + Policy Citations
+        RAG-->>UI: Return Summary, Root Cause & Quotes (Read-Only)
+    end
+
+    Reviewer->>UI: Submit Review Decision (Approve/Reject + Actor Stamp)
+    UI->>API: POST /api/v1/review/cases/{case_id}/review (expected_version = 1)
+    alt Version Matches (version == 1)
+        API->>DB: Atomic UPDATE version=2, status=new_status
+        API->>DB: INSERT INTO audit_events
+        DB-->>API: Commit Transaction
+        API-->>UI: HTTP 200 OK (Updated State)
+        UI-->>Reviewer: Render Case Closed & Append Audit Event
+    else Stale Version / Concurrent Update
+        DB-->>API: ConcurrentUpdateError
+        API-->>UI: HTTP 409 Conflict
+        UI-->>Reviewer: Display Collision Banner + Refresh Prompt
+    end

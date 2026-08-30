@@ -1,0 +1,18 @@
+graph LR
+    subgraph CI["GitHub Actions CI Pipeline (.github/workflows/ci-tests.yml)"]
+        DOCKER["PostgreSQL 15 Docker Container"] --> ALEMBIC["Alembic Migrations"]
+        ALEMBIC --> SUITE["Pytest Suite (40 Tests Passing)"]
+    end
+
+    subgraph SUITE_BREAKDOWN["Test Coverage Breakdown"]
+        SUITE --> T1["Integration Tests<br>&bull; Two-Decimal Decimal Arithmetic<br>&bull; Ingestion Idempotency<br>&bull; Safety Checks"]
+        SUITE --> T2["E2E Financial Workflow<br>&bull; 4-Source Ingest & Reconciliation"]
+        SUITE --> T3["Evaluation Harness<br>&bull; 60-Record Ground Truth Benchmark<br>&bull; JSON/CSV Artifact Emission"]
+        SUITE --> T4["Concurrency & Race Conditions<br>&bull; 10-Worker Async Barrier<br>&bull; Optimistic Locking 409s"]
+        SUITE --> T5["Tested Read-Only Investigation Path<br>&bull; Before/after database row counts unchanged<br>&bull; 0.35 cosine grounding floor"]
+    end
+
+    subgraph ARTIFACTS["Emitted Reports"]
+        T3 --> JSON_OUT["artifacts/evaluation/reconciliation_benchmark_report.json"]
+        T3 --> CSV_OUT["artifacts/evaluation/reconciliation_metrics_summary.csv"]
+    end
