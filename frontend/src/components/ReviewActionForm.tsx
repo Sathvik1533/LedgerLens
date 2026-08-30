@@ -1,5 +1,16 @@
 import React, { useState } from 'react';
-import { CheckCircle, XCircle, HelpCircle, AlertTriangle, RefreshCw, Send } from 'lucide-react';
+import {
+  CheckCircle2,
+  XCircle,
+  HelpCircle,
+  AlertTriangle,
+  RefreshCw,
+  Send,
+  Lock,
+  User,
+  MessageSquare,
+  ShieldAlert,
+} from 'lucide-react';
 import { CaseEvidenceResponse, HumanReviewRequest } from '../types/api';
 import { submitCaseReview, ApiError } from '../api/client';
 
@@ -14,7 +25,7 @@ export const ReviewActionForm: React.FC<ReviewActionFormProps> = ({
   onSuccess,
   onRefreshCase,
 }) => {
-  const [actor, setActor] = useState('ops_finance_lead');
+  const [actor, setActor] = useState('finance_ops_lead');
   const [action, setAction] = useState<'approve' | 'reject' | 'mark_unresolved'>('approve');
   const [comment, setComment] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -41,10 +52,10 @@ export const ReviewActionForm: React.FC<ReviewActionFormProps> = ({
       if (err instanceof ApiError && err.status === 409) {
         setConflictError(true);
         setErrorMsg(
-          'Optimistic Locking Conflict (HTTP 409): This case was updated or resolved by another reviewer concurrently.'
+          'Optimistic Locking Collision (HTTP 409): This case was modified by another reviewer concurrently.'
         );
       } else {
-        setErrorMsg(err.message || 'Failed to submit review action.');
+        setErrorMsg(err.message || 'Failed to record decision.');
       }
     } finally {
       setIsSubmitting(false);
@@ -54,121 +65,148 @@ export const ReviewActionForm: React.FC<ReviewActionFormProps> = ({
   const isResolved = evidence.decision_status === 'auto_reconciled' || evidence.decision_status === 'rejected';
 
   return (
-    <div className="bg-slate-900/60 border border-slate-800 rounded-xl p-5 space-y-4">
-      <div className="flex items-center justify-between border-b border-slate-800 pb-3">
-        <h3 className="text-sm font-semibold text-slate-200 uppercase tracking-wider">Human Review Decision</h3>
-        <span className="text-xs font-mono text-slate-400 bg-slate-800 px-2 py-0.5 rounded border border-slate-700">
-          DB Version: {evidence.version}
-        </span>
+    <div className="rounded-2xl bg-slate-900/70 border border-slate-800/80 p-6 space-y-5 shadow-xl backdrop-blur-md">
+      {/* Header */}
+      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-800/80 pb-3.5">
+        <div className="flex items-center gap-2.5">
+          <div className="w-8 h-8 rounded-lg bg-blue-500/10 border border-blue-500/30 flex items-center justify-center text-blue-400">
+            <Lock className="w-4 h-4" />
+          </div>
+          <div>
+            <h3 className="text-sm font-bold text-slate-100 uppercase tracking-wider">Human Review Decision Protocol</h3>
+            <p className="text-[11px] text-slate-400">Append-only audit trail sign-off & optimistic locking</p>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-2">
+          <span className="text-[11px] font-mono font-semibold text-blue-300 bg-blue-950/60 border border-blue-500/40 px-2.5 py-1 rounded-md">
+            Locked Version: v{evidence.version}
+          </span>
+        </div>
       </div>
 
+      {/* Conflict Error Alert */}
       {conflictError && (
-        <div className="bg-amber-950/40 border border-amber-600/50 rounded-lg p-3.5 space-y-2">
-          <div className="flex items-center gap-2 text-xs font-semibold text-amber-300">
-            <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0" />
-            <span>{errorMsg}</span>
+        <div className="rounded-xl bg-amber-950/50 border border-amber-500/50 p-4 space-y-3 shadow-lg">
+          <div className="flex items-start gap-3 text-xs text-amber-300">
+            <AlertTriangle className="w-5 h-5 text-amber-400 shrink-0 mt-0.5" />
+            <div>
+              <p className="font-bold text-amber-200">Concurrent Modification Detected</p>
+              <p className="mt-0.5 text-amber-300/80">{errorMsg}</p>
+            </div>
           </div>
           <button
             type="button"
             onClick={onRefreshCase}
-            className="flex items-center gap-1.5 px-3 py-1.5 bg-amber-600 hover:bg-amber-500 text-slate-950 text-xs font-bold rounded transition-colors"
+            className="flex items-center gap-1.5 px-3.5 py-1.5 bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-bold rounded-lg transition-colors shadow"
           >
             <RefreshCw className="w-3.5 h-3.5" />
-            Refresh Case to Latest State
+            Refresh Case State & Version
           </button>
         </div>
       )}
 
       {errorMsg && !conflictError && (
-        <div className="bg-rose-950/40 border border-rose-800 text-rose-300 rounded-lg p-3 text-xs flex items-center gap-2">
-          <AlertTriangle className="w-4 h-4 text-rose-400 shrink-0" />
+        <div className="rounded-xl bg-rose-950/50 border border-rose-500/50 p-3.5 text-xs text-rose-300 flex items-center gap-2.5">
+          <ShieldAlert className="w-4 h-4 text-rose-400 shrink-0" />
           <span>{errorMsg}</span>
         </div>
       )}
 
       {isResolved ? (
-        <div className="bg-slate-800/40 border border-slate-700/50 rounded-lg p-4 text-center space-y-1 text-xs">
-          <p className="font-semibold text-emerald-400">Case is currently in status: {evidence.decision_status}</p>
-          <p className="text-slate-400">No further human decision is pending for this reconciliation case.</p>
+        <div className="rounded-xl bg-slate-950/60 border border-slate-800/80 p-5 text-center space-y-1.5 text-xs">
+          <p className="font-bold text-emerald-400 text-sm">Case Closed: {evidence.decision_status}</p>
+          <p className="text-slate-400">All reconciliation discrepancies for this record have been resolved.</p>
         </div>
       ) : (
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Actor Identity */}
             <div>
-              <label className="block text-xs font-medium text-slate-300 mb-1">Reviewer Identity (Actor)</label>
+              <label className="block text-xs font-bold uppercase tracking-wider text-slate-300 mb-1.5 flex items-center gap-1">
+                <User className="w-3.5 h-3.5 text-blue-400" />
+                Reviewer Identity (Actor)
+              </label>
               <input
                 type="text"
                 required
                 value={actor}
                 onChange={(e) => setActor(e.target.value)}
-                className="w-full bg-slate-800 border border-slate-700 rounded-md px-3 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-blue-500 font-mono"
-                placeholder="e.g. ops_finance_lead"
+                className="w-full bg-slate-950/80 border border-slate-700/80 rounded-xl px-3.5 py-2 text-xs text-slate-200 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 font-mono transition-all"
+                placeholder="e.g. finance_ops_lead"
               />
             </div>
+
+            {/* Decision Action Buttons */}
             <div>
-              <label className="block text-xs font-medium text-slate-300 mb-1">Decision Action</label>
+              <label className="block text-xs font-bold uppercase tracking-wider text-slate-300 mb-1.5">
+                Decision Action
+              </label>
               <div className="grid grid-cols-3 gap-2">
                 <button
                   type="button"
                   onClick={() => setAction('approve')}
-                  className={`flex items-center justify-center gap-1.5 py-1.5 px-2 rounded text-xs font-medium border transition-colors ${
+                  className={`flex items-center justify-center gap-1.5 py-2 px-2.5 rounded-xl text-xs font-semibold border transition-all duration-200 ${
                     action === 'approve'
-                      ? 'bg-emerald-600/30 border-emerald-500 text-emerald-300 font-semibold'
-                      : 'bg-slate-800 border-slate-700 text-slate-400 hover:text-slate-200'
+                      ? 'bg-emerald-950/60 border-emerald-500 text-emerald-300 shadow-md shadow-emerald-900/30'
+                      : 'bg-slate-950/60 border-slate-800 text-slate-400 hover:text-slate-200 hover:border-slate-700'
                   }`}
                 >
-                  <CheckCircle className="w-3.5 h-3.5" />
+                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
                   Approve
                 </button>
                 <button
                   type="button"
                   onClick={() => setAction('reject')}
-                  className={`flex items-center justify-center gap-1.5 py-1.5 px-2 rounded text-xs font-medium border transition-colors ${
+                  className={`flex items-center justify-center gap-1.5 py-2 px-2.5 rounded-xl text-xs font-semibold border transition-all duration-200 ${
                     action === 'reject'
-                      ? 'bg-rose-600/30 border-rose-500 text-rose-300 font-semibold'
-                      : 'bg-slate-800 border-slate-700 text-slate-400 hover:text-slate-200'
+                      ? 'bg-rose-950/60 border-rose-500 text-rose-300 shadow-md shadow-rose-900/30'
+                      : 'bg-slate-950/60 border-slate-800 text-slate-400 hover:text-slate-200 hover:border-slate-700'
                   }`}
                 >
-                  <XCircle className="w-3.5 h-3.5" />
+                  <XCircle className="w-3.5 h-3.5 text-rose-400" />
                   Reject
                 </button>
                 <button
                   type="button"
                   onClick={() => setAction('mark_unresolved')}
-                  className={`flex items-center justify-center gap-1.5 py-1.5 px-2 rounded text-xs font-medium border transition-colors ${
+                  className={`flex items-center justify-center gap-1.5 py-2 px-2.5 rounded-xl text-xs font-semibold border transition-all duration-200 ${
                     action === 'mark_unresolved'
-                      ? 'bg-amber-600/30 border-amber-500 text-amber-300 font-semibold'
-                      : 'bg-slate-800 border-slate-700 text-slate-400 hover:text-slate-200'
+                      ? 'bg-amber-950/60 border-amber-500 text-amber-300 shadow-md shadow-amber-900/30'
+                      : 'bg-slate-950/60 border-slate-800 text-slate-400 hover:text-slate-200 hover:border-slate-700'
                   }`}
                 >
-                  <HelpCircle className="w-3.5 h-3.5" />
+                  <HelpCircle className="w-3.5 h-3.5 text-amber-400" />
                   Unresolved
                 </button>
               </div>
             </div>
           </div>
 
+          {/* Comment */}
           <div>
-            <label className="block text-xs font-medium text-slate-300 mb-1">
-              Audit Rationale / Comment (Optional)
+            <label className="block text-xs font-bold uppercase tracking-wider text-slate-300 mb-1.5 flex items-center gap-1">
+              <MessageSquare className="w-3.5 h-3.5 text-blue-400" />
+              Audit Rationale / Explanation Note
             </label>
             <textarea
               rows={2}
               value={comment}
               onChange={(e) => setComment(e.target.value)}
-              className="w-full bg-slate-800 border border-slate-700 rounded-md px-3 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-blue-500"
-              placeholder="Provide reason for approval or resolution steps taken..."
+              className="w-full bg-slate-950/80 border border-slate-700/80 rounded-xl px-3.5 py-2 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all font-sans"
+              placeholder="State rationale for audit compliance (e.g. 'Verified bank credit UTR statement')..."
             />
           </div>
 
-          <div className="flex justify-end">
+          {/* Action Submit */}
+          <div className="flex justify-end pt-1">
             <button
               type="submit"
               disabled={isSubmitting}
-              className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-500 active:bg-blue-700 text-white text-xs font-semibold rounded-md transition-colors disabled:opacity-50"
+              className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 active:from-blue-700 active:to-indigo-700 text-white text-xs font-bold rounded-xl shadow-lg shadow-blue-600/30 transition-all duration-200 disabled:opacity-50"
             >
               <Send className="w-3.5 h-3.5" />
-              {isSubmitting ? 'Recording Decision...' : 'Submit Irreversible Decision'}
+              {isSubmitting ? 'Recording Audit Event...' : 'Sign Off & Commit Review Action'}
             </button>
           </div>
         </form>
