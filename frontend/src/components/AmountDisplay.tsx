@@ -14,30 +14,34 @@ export const AmountDisplay: React.FC<AmountDisplayProps> = ({
   isDiscrepancy = false,
 }) => {
   if (amount === null || amount === undefined || amount === '') {
-    return <span className="text-slate-500 font-mono">-</span>;
+    return <span className="text-slate-500 font-mono font-tabular">-</span>;
   }
 
   const num = typeof amount === 'number' ? amount : parseFloat(amount);
-  const formatted = isNaN(num)
-    ? String(amount)
-    : new Intl.NumberFormat('en-IN', {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2,
-      }).format(num);
+  if (isNaN(num)) {
+    return <span className={`font-mono font-tabular ${className}`}>{String(amount)}</span>;
+  }
+
+  const isNegative = num < 0;
+  const absFormatted = new Intl.NumberFormat('en-IN', {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(Math.abs(num));
 
   const symbol = currency === 'INR' ? '₹' : currency;
 
+  let colorClass = 'text-white';
+  if (isDiscrepancy) {
+    if (Math.abs(num) > 0.001) {
+      colorClass = 'text-rose-400 font-bold';
+    } else {
+      colorClass = 'text-emerald-400 font-bold';
+    }
+  }
+
   return (
-    <span
-      className={`font-mono font-medium ${
-        isDiscrepancy && num > 0
-          ? 'text-rose-400 font-bold'
-          : isDiscrepancy && num === 0
-          ? 'text-emerald-400'
-          : 'text-slate-200'
-      } ${className}`}
-    >
-      {symbol} {formatted}
+    <span className={`font-mono font-tabular ${colorClass} ${className}`}>
+      {isNegative ? `-${symbol}${absFormatted}` : `${symbol}${absFormatted}`}
     </span>
   );
 };

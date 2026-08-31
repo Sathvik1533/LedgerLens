@@ -8,61 +8,62 @@ interface StatusMeta {
   text: string;
   border: string;
   icon: React.ElementType;
-  dot: string;
 }
 
-const STATUS_CONFIG: Record<DecisionStatus, StatusMeta> = {
+const STATUS_CONFIG: Record<string, StatusMeta> = {
   needs_review: {
     label: 'Needs Review',
-    bg: 'bg-amber-950/40',
+    bg: 'bg-warning-subtle',
     text: 'text-amber-300',
-    border: 'border-amber-500/40',
+    border: 'border-warning-border',
     icon: AlertTriangle,
-    dot: 'bg-amber-400 animate-pulse',
   },
   auto_reconciled: {
     label: 'Auto Reconciled',
-    bg: 'bg-emerald-950/40',
+    bg: 'bg-resolved-subtle',
     text: 'text-emerald-300',
-    border: 'border-emerald-500/40',
+    border: 'border-resolved-border',
     icon: CheckCircle2,
-    dot: 'bg-emerald-400',
+  },
+  approved: {
+    label: 'Human Approved',
+    bg: 'bg-resolved-subtle',
+    text: 'text-emerald-300',
+    border: 'border-resolved-border',
+    icon: CheckCircle2,
   },
   rejected: {
     label: 'Human Rejected',
-    bg: 'bg-rose-950/40',
+    bg: 'bg-critical-subtle',
     text: 'text-rose-300',
-    border: 'border-rose-500/40',
+    border: 'border-critical-border',
     icon: XCircle,
-    dot: 'bg-rose-400',
   },
   unresolved: {
     label: 'Unresolved',
-    bg: 'bg-slate-800/80',
+    bg: 'bg-surface-alt',
     text: 'text-slate-300',
-    border: 'border-slate-700',
+    border: 'border-border-strong',
     icon: HelpCircle,
-    dot: 'bg-slate-400',
   },
 };
 
 export const StatusBadge: React.FC<{ status: DecisionStatus | string }> = ({ status }) => {
-  const config = STATUS_CONFIG[status as DecisionStatus] || {
-    label: status,
-    bg: 'bg-slate-800',
+  const config = STATUS_CONFIG[status] || {
+    label: status.replace(/_/g, ' '),
+    bg: 'bg-surface-alt',
     text: 'text-slate-300',
-    border: 'border-slate-700',
+    border: 'border-border-strong',
     icon: HelpCircle,
-    dot: 'bg-slate-400',
   };
 
   const Icon = config.icon;
 
   return (
     <span
-      className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-semibold border ${config.bg} ${config.text} ${config.border} shadow-sm`}
+      className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-semibold border ${config.bg} ${config.text} ${config.border}`}
     >
-      <Icon className="w-3.5 h-3.5 shrink-0" />
+      <Icon className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
       <span>{config.label}</span>
     </span>
   );
