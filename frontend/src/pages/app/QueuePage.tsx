@@ -143,7 +143,7 @@ const QueuePage: React.FC = () => {
       <div className="flex flex-col lg:flex-row gap-8 items-start">
         
         {/* Left Sidebar: Advanced Filtering (Sticky) */}
-        <div className="w-full lg:w-64 shrink-0 bg-white border border-rule-300 rounded-xl p-5 shadow-sm sticky top-28">
+        <div className="w-full lg:w-64 shrink-0 bg-white border border-rule-300 rounded-xl p-5 shadow-sm sticky top-28 max-h-[calc(100vh-8rem)] overflow-y-auto" data-lenis-prevent="true">
           <div className="flex items-center gap-2 mb-6 text-ink-900 font-semibold border-b border-rule-300 pb-3">
             <Filter className="w-4 h-4" />
             <span className="font-display">Refine Queue</span>

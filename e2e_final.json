@@ -1,92 +1,192 @@
 {
-  "routes": {
-    "/": {
-      "status": 200,
-      "blank": false,
-      "errors": 0,
-      "axe_violations": 1
+  "routes": [],
+  "computed_fonts": {
+    "heading": "Fraunces, serif",
+    "body": "\"DM Sans\", sans-serif",
+    "mono": "\"DM Mono\", monospace"
+  },
+  "queue_interactions": {
+    "critical_rows_sample": [
+      "Critical\n\t\n\nSettlement received but expected bank credit is missing.\n\npay_001050\n\u2022\nMissing Bank Credit\n\t\u20b96,496.50\t",
+      "Critical\n\t\n\nSettlement received but expected bank credit is missing.\n\npay_001050\n\u2022\nMissing Bank Credit\n\t\u20b96,496.50\t",
+      "Critical\n\t\n\nSettlement received but expected bank credit is missing.\n\npay_001050\n\u2022\nMissing Bank Credit\n\t\u20b96,496.50\t"
+    ],
+    "high_rows_sample": [
+      "High\n\t\n\nMultiple bank statement credits reference the same batch ID.\n\npay_001057\n\u2022\nDuplicate Bank Credit\n\t\u20b99,849.00\t",
+      "High\n\t\n\nMultiple bank statement credits reference the same batch ID.\n\npay_001057\n\u2022\nDuplicate Bank Credit\n\t\u20b99,849.00\t",
+      "High\n\t\n\nMultiple bank statement credits reference the same batch ID.\n\npay_001057\n\u2022\nDuplicate Bank Credit\n\t\u20b99,849.00\t"
+    ]
+  },
+  "case_workflow": {},
+  "accessibility": {
+    "Desktop: /": {
+      "violations": 1,
+      "passes": 20,
+      "incomplete": 1,
+      "details": [
+        {
+          "id": "color-contrast",
+          "impact": "serious"
+        }
+      ]
     },
-    "/how-it-works": {
-      "status": 200,
-      "blank": false,
-      "errors": 0,
-      "axe_violations": 1
+    "Desktop: /app/queue": {
+      "violations": 2,
+      "passes": 29,
+      "incomplete": 1,
+      "details": [
+        {
+          "id": "color-contrast",
+          "impact": "serious"
+        },
+        {
+          "id": "link-name",
+          "impact": "serious"
+        }
+      ]
     },
-    "/evidence": {
-      "status": 200,
-      "blank": false,
-      "errors": 0,
-      "axe_violations": 1
+    "Desktop: /app/case/264548b2-c896-42b7-a2a4-c0f3f0f614b9": {
+      "violations": 3,
+      "passes": 29,
+      "incomplete": 1,
+      "details": [
+        {
+          "id": "color-contrast",
+          "impact": "serious"
+        },
+        {
+          "id": "link-name",
+          "impact": "serious"
+        },
+        {
+          "id": "page-has-heading-one",
+          "impact": "moderate"
+        }
+      ]
     },
-    "/evaluation": {
-      "status": 200,
-      "blank": false,
-      "errors": 0,
-      "axe_violations": 1
+    "Desktop: /app/audit": {
+      "violations": 2,
+      "passes": 23,
+      "incomplete": 0,
+      "details": [
+        {
+          "id": "color-contrast",
+          "impact": "serious"
+        },
+        {
+          "id": "link-name",
+          "impact": "serious"
+        }
+      ]
     },
-    "/docs": {
-      "status": 200,
-      "blank": false,
-      "errors": 0,
-      "axe_violations": 1
+    "Desktop: /app/settings": {
+      "violations": 4,
+      "passes": 22,
+      "incomplete": 1,
+      "details": [
+        {
+          "id": "color-contrast",
+          "impact": "serious"
+        },
+        {
+          "id": "heading-order",
+          "impact": "moderate"
+        },
+        {
+          "id": "label",
+          "impact": "critical"
+        },
+        {
+          "id": "link-name",
+          "impact": "serious"
+        }
+      ]
     },
-    "/about": {
-      "status": 200,
-      "blank": false,
-      "errors": 0,
-      "axe_violations": 1
+    "Mobile: /": {
+      "violations": 1,
+      "passes": 20,
+      "incomplete": 1,
+      "details": [
+        {
+          "id": "color-contrast",
+          "impact": "serious"
+        }
+      ]
     },
-    "/app": {
-      "status": 200,
-      "blank": false,
-      "errors": 0,
-      "axe_violations": 2
+    "Mobile: /app/queue": {
+      "violations": 2,
+      "passes": 29,
+      "incomplete": 1,
+      "details": [
+        {
+          "id": "color-contrast",
+          "impact": "serious"
+        },
+        {
+          "id": "link-name",
+          "impact": "serious"
+        }
+      ]
     },
-    "/app/dashboard": {
-      "status": 200,
-      "blank": false,
-      "errors": 0,
-      "axe_violations": 2
+    "Mobile: /app/case/264548b2-c896-42b7-a2a4-c0f3f0f614b9": {
+      "violations": 3,
+      "passes": 30,
+      "incomplete": 1,
+      "details": [
+        {
+          "id": "color-contrast",
+          "impact": "serious"
+        },
+        {
+          "id": "link-name",
+          "impact": "serious"
+        },
+        {
+          "id": "page-has-heading-one",
+          "impact": "moderate"
+        }
+      ]
     },
-    "/app/queue": {
-      "status": 200,
-      "blank": false,
-      "errors": 0,
-      "axe_violations": 2
+    "Mobile: /app/audit": {
+      "violations": 2,
+      "passes": 24,
+      "incomplete": 0,
+      "details": [
+        {
+          "id": "color-contrast",
+          "impact": "serious"
+        },
+        {
+          "id": "link-name",
+          "impact": "serious"
+        }
+      ]
     },
-    "/app/ingestion": {
-      "status": 200,
-      "blank": false,
-      "errors": 0,
-      "axe_violations": 3
-    },
-    "/app/audit": {
-      "status": 200,
-      "blank": false,
-      "errors": 0,
-      "axe_violations": 2
-    },
-    "/app/policies": {
-      "status": 200,
-      "blank": false,
-      "errors": 0,
-      "axe_violations": 3
-    },
-    "/app/settings": {
-      "status": 200,
-      "blank": false,
-      "errors": 0,
-      "axe_violations": 4
+    "Mobile: /app/settings": {
+      "violations": 4,
+      "passes": 23,
+      "incomplete": 1,
+      "details": [
+        {
+          "id": "color-contrast",
+          "impact": "serious"
+        },
+        {
+          "id": "heading-order",
+          "impact": "moderate"
+        },
+        {
+          "id": "label",
+          "impact": "critical"
+        },
+        {
+          "id": "link-name",
+          "impact": "serious"
+        }
+      ]
     }
   },
-  "queue": {
-    "initial": 100,
-    "critical": 24,
-    "high": 76
-  },
-  "case": {
-    "url": "http://localhost:5173/app/case/264548b2-c896-42b7-a2a4-c0f3f0f614b9",
-    "evidence_visible": false
-  },
-  "mobile_dashboard_loaded": true
+  "errors": [
+    "Traceback (most recent call last):\n  File \"/Users/k.sathvik/razorpay-ai-finance-controller/e2e_comprehensive.py\", line 89, in run\n    await sidebar.focus()\n  File \"/Users/k.sathvik/.pyenv/versions/3.11.15/lib/python3.11/site-packages/playwright/async_api/_generated.py\", line 19083, in focus\n    await self._impl_obj.focus(timeout=to_milliseconds(timeout))\n  File \"/Users/k.sathvik/.pyenv/versions/3.11.15/lib/python3.11/site-packages/playwright/_impl/_locator.py\", line 405, in focus\n    return await self._frame.focus(self._selector, strict=True, **params)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/Users/k.sathvik/.pyenv/versions/3.11.15/lib/python3.11/site-packages/playwright/_impl/_frame.py\", line 731, in focus\n    await self._channel.send(\"focus\", self._timeout, locals_to_params(locals()))\n  File \"/Users/k.sathvik/.pyenv/versions/3.11.15/lib/python3.11/site-packages/playwright/_impl/_connection.py\", line 76, in send\n    return await self._connection.wrap_api_call(\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/Users/k.sathvik/.pyenv/versions/3.11.15/lib/python3.11/site-packages/playwright/_impl/_connection.py\", line 632, in wrap_api_call\n    raise rewrite_error(error, f\"{parsed_st['apiName']}: {error}\") from None\nplaywright._impl._errors.TimeoutError: Locator.focus: Timeout 30000ms exceeded.\nCall log:\n  - waiting for locator(\".overflow-y-auto\").first\n\n"
+  ]
 }
