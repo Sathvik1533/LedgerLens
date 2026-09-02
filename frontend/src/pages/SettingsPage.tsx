@@ -182,13 +182,13 @@ export const SettingsPage: React.FC = () => {
             <div className="flex items-center gap-2 border-b border-rule-300 pb-3">
               <Server className="w-4 h-4 text-source-blue" />
               <h3 className="text-sm font-semibold text-ink-900 uppercase tracking-wider">
-                System Telemetry
+                System Architecture & Capabilities (Static Info)
               </h3>
             </div>
 
             <div className="space-y-2.5 text-xs font-mono">
               <div className="flex justify-between text-ink-700">
-                <span>Database Engine:</span>
+                <span>Configured Target DB:</span>
                 <span className="text-matched-green font-semibold">PostgreSQL 16</span>
               </div>
               <div className="flex justify-between text-ink-700">
@@ -200,8 +200,8 @@ export const SettingsPage: React.FC = () => {
                 <span className="text-ink-900">pgvector 0.7+</span>
               </div>
               <div className="flex justify-between text-ink-700">
-                <span>Active Feed Pipeline:</span>
-                <span className="text-matched-green">● 4 Feeds Live</span>
+                <span>Supported Feeds (Configured):</span>
+                <span className="text-matched-green">4 Active</span>
               </div>
             </div>
           </div>

@@ -49,9 +49,9 @@ export default function EvaluationPage() {
         {/* Bento Grid Metrics */}
         <motion.div variants={STAGGER} initial="hidden" whileInView="show" viewport={{ once: true, margin: "-100px" }} className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
            {[
-             { label: 'Throughput', value: '> 1,000 rps', icon: Activity, color: 'text-source-blue' },
-             { label: 'Accuracy', value: '100% Precision', icon: ShieldCheck, color: 'text-matched-green' },
-             { label: 'False Positives', value: '0', icon: Database, color: 'text-ink-900' }
+             { label: 'Throughput', value: 'O(N) Complexity', icon: Activity, color: 'text-source-blue' },
+             { label: 'Accuracy', value: 'Penny-Exact Math', icon: ShieldCheck, color: 'text-matched-green' },
+             { label: 'False Positives', value: 'Strict Float-Free', icon: Database, color: 'text-ink-900' }
            ].map((metric, i) => (
              <motion.div key={i} variants={FADE_UP} className="bg-white border border-rule-300 rounded-2xl p-8 shadow-sm hover:shadow-card hover:border-source-blue/30 transition-all group">
                <metric.icon className={`w-6 h-6 mb-4 ${metric.color} opacity-80 group-hover:opacity-100 transition-opacity`} />

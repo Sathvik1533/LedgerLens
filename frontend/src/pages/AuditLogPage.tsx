@@ -1,25 +1,39 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Search, Shield, RefreshCw, GitCommit, User } from 'lucide-react';
 import { CustomSelect } from '../components/CustomSelect';
+import { fetchAllAuditTrail } from '../api/client';
+import { AuditEventItem } from '../types/api';
 
-const mockAuditEvents = [
-  { id: 'evt_1', timestamp: '2026-08-31T19:22:51Z', actor: 'concurrent_reviewer_bob', type: 'human_rejected', case_id: 'ab9a5b51', batch_id: '0a4830c6', prev: 'needs_review', next: 'rejected' },
-  { id: 'evt_2', timestamp: '2026-08-31T19:10:30Z', actor: 'concurrent_reviewer_bob', type: 'human_rejected', case_id: '9c92804a', batch_id: '0a4830c6', prev: 'needs_review', next: 'rejected' },
-  { id: 'evt_3', timestamp: '2026-08-31T19:08:30Z', actor: 'concurrent_reviewer_bob', type: 'human_rejected', case_id: '3656d3a3', batch_id: '0a4830c6', prev: 'needs_review', next: 'rejected' },
-  { id: 'evt_4', timestamp: '2026-08-31T17:34:33Z', actor: 'concurrent_analyst_02', type: 'human_rejected', case_id: 'ffbe97e2', batch_id: '0a4830c6', prev: 'needs_review', next: 'rejected' },
-];
 
 export const AuditLogPage = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedActor, setSelectedActor] = useState('all');
   const [selectedType, setSelectedType] = useState('all');
+  const [events, setEvents] = useState<AuditEventItem[]>([]);
+  
+
+  const loadAudit = async () => {
+    
+    try {
+      const data = await fetchAllAuditTrail(100);
+      setEvents(data || []);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      
+    }
+  };
+
+  useEffect(() => {
+    loadAudit();
+  }, []);
 
   const filteredEvents = useMemo(() => {
-    let result = mockAuditEvents;
-    if (searchQuery) result = result.filter(e => e.case_id.includes(searchQuery) || e.batch_id.includes(searchQuery));
+    let result = events;
+    if (searchQuery) result = result.filter(e => (e.case_id || "").includes(searchQuery) || (e.batch_id || "").includes(searchQuery));
     if (selectedActor !== 'all') result = result.filter(e => e.actor === selectedActor);
-    if (selectedType !== 'all') result = result.filter(e => e.type === selectedType);
+    if (selectedType !== 'all') result = result.filter(e => e.event_type === selectedType);
     return result;
   }, [searchQuery, selectedActor, selectedType]);
 
@@ -40,7 +54,7 @@ export const AuditLogPage = () => {
           <div className="px-3 py-1.5 bg-paper-1 border border-rule-300 rounded text-xs font-mono text-ink-700 flex items-center gap-2">
             <Shield className="w-3.5 h-3.5 text-matched-green" /> Cryptographic CAS
           </div>
-          <button className="px-3 py-1.5 bg-white border border-rule-300 rounded text-xs font-semibold text-ink-900 shadow-sm hover:bg-paper-0 transition-colors flex items-center gap-2">
+          <button onClick={loadAudit} className="px-3 py-1.5 bg-white border border-rule-300 rounded text-xs font-semibold text-ink-900 shadow-sm hover:bg-paper-0 transition-colors flex items-center gap-2">
             <RefreshCw className="w-3.5 h-3.5" /> Refresh Audit
           </button>
         </div>
@@ -91,20 +105,20 @@ export const AuditLogPage = () => {
               <div className="flex-1 bg-white border border-rule-300 rounded-xl p-5 shadow-sm group-hover:shadow-card transition-shadow">
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center gap-2">
-                    <span className="font-mono text-xs font-semibold text-ledger-vermilion">{evt.type}</span>
+                    <span className="font-mono text-xs font-semibold text-ledger-vermilion">{evt.event_type}</span>
                     <span className="text-rule-300">|</span>
                     <span className="inline-flex items-center gap-1.5 text-xs text-ink-700 bg-paper-1 px-2 py-0.5 rounded-full border border-rule-300"><User className="w-3 h-3" /> {evt.actor}</span>
                   </div>
-                  <span className="font-mono text-[10px] text-ink-700">{evt.timestamp}</span>
+                  <span className="font-mono text-[10px] text-ink-700">{new Date(evt.occurred_at).toLocaleString()}</span>
                 </div>
                 <div className="flex items-center gap-2 font-mono text-[11px] text-ink-700">
-                  <span>Case: <span className="text-ink-900">{evt.case_id}</span></span>
-                  <span className="text-rule-300">&rarr;</span>
-                  <span>Batch: <span className="text-ink-900">{evt.batch_id}</span></span>
+                  {evt.case_id && <span>Case: <span className="text-ink-900">{evt.case_id.substring(0,8)}</span></span>}
+                  {evt.case_id && evt.batch_id && <span className="text-rule-300">&rarr;</span>}
+                  {evt.batch_id && <span>Batch: <span className="text-ink-900">{evt.batch_id.substring(0,8)}</span></span>}
                   <div className="flex-1" />
-                  <span className="text-advisory-amber font-semibold">{evt.prev}</span>
-                  <span className="text-rule-300">&rarr;</span>
-                  <span className="text-ledger-vermilion font-semibold">{evt.next}</span>
+                  {evt.previous_status && <span className="text-advisory-amber font-semibold">{evt.previous_status}</span>}
+                  {evt.previous_status && evt.new_status && <span className="text-rule-300">&rarr;</span>}
+                  {evt.new_status && <span className="text-ledger-vermilion font-semibold">{evt.new_status}</span>}
                 </div>
               </div>
             </motion.div>
