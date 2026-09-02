@@ -42,3 +42,57 @@ def run_investigation(
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
+
+
+class PolicyQueryRequest(BaseModel):
+    query: str
+    top_k: int = 4
+
+
+@router.get(
+    "/policies",
+    response_model=dict,
+    status_code=status.HTTP_200_OK,
+    summary="Get loaded RAG policy corpus documents",
+)
+def get_policy_corpus():
+    from backend.app.rag.retriever import CORPUS_DIR, CORPUS_VERSION, GROUNDING_FLOOR
+    documents = []
+    for md_file in sorted(CORPUS_DIR.glob("*.md")):
+        content = md_file.read_text(encoding="utf-8")
+        documents.append({
+            "filename": md_file.name,
+            "title": md_file.name.replace("_", " ").replace(".md", "").title(),
+            "content": content,
+            "line_count": len(content.splitlines()),
+        })
+    return {
+        "corpus_version": CORPUS_VERSION,
+        "grounding_floor": GROUNDING_FLOOR,
+        "documents": documents,
+    }
+
+
+@router.post(
+    "/query",
+    response_model=dict,
+    status_code=status.HTTP_200_OK,
+    summary="Direct semantic search against policy corpus with grounding floor",
+)
+def query_policies(body: PolicyQueryRequest):
+    chunks = _retriever.retrieve(query=body.query, top_k=body.top_k)
+    return {
+        "query": body.query,
+        "grounding_floor": _retriever.retrieve.__closure__[0].cell_contents if hasattr(_retriever.retrieve, '__closure__') and _retriever.retrieve.__closure__ else 0.35,
+        "matched_chunks": [
+            {
+                "source_file": c.source_file,
+                "line_start": c.line_start,
+                "line_end": c.line_end,
+                "text": c.text,
+                "similarity_score": c.similarity_score,
+                "is_grounded": c.similarity_score >= 0.35,
+            }
+            for c in chunks
+        ]
+    }

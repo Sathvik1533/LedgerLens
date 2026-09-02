@@ -3,6 +3,7 @@ from decimal import Decimal
 from typing import List, Optional
 from sqlalchemy.orm import Session
 
+from backend.app.models.ingestion import IngestionBatchModel
 from backend.app.domain.matcher import DeterministicReconciliationEngine
 from backend.app.repositories.reconciliation_repo import ReconciliationRepository
 from backend.app.schemas.reconciliation import ReconciliationSummaryResponse, ReconciliationCaseResponse
@@ -14,7 +15,21 @@ class ReconciliationService:
         self.engine = DeterministicReconciliationEngine()
 
     def execute_reconciliation(self, batch_id: Optional[uuid.UUID] = None) -> ReconciliationSummaryResponse:
-        active_batch_id = batch_id or uuid.uuid4()
+        if batch_id:
+            active_batch_id = batch_id
+        else:
+            latest_batch = self.db.query(IngestionBatchModel).order_by(IngestionBatchModel.created_at.desc()).first()
+            if latest_batch:
+                active_batch_id = latest_batch.id
+            else:
+                new_batch = IngestionBatchModel(
+                    idempotency_key=f"recon-run-{uuid.uuid4()}",
+                    source_tables=["payments", "settlements", "refunds", "bank_credits"],
+                    batch_status="completed",
+                )
+                self.db.add(new_batch)
+                self.db.flush()
+                active_batch_id = new_batch.id
 
         payments, settlements, refunds, bank_credits = self.repo.get_all_normalized_records()
 

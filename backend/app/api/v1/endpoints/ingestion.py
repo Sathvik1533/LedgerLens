@@ -95,3 +95,50 @@ async def ingest_bank_credits_csv(
         return service.process_bank_credit_csv(file_content=content, filename=file.filename, custom_idempotency_key=x_idempotency_key)
     except ValueError as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+
+@router.get(
+    "/status",
+    response_model=dict,
+    status_code=status.HTTP_200_OK,
+    summary="Get status of ingestion feeds and recent batches",
+)
+def get_ingestion_status(db: Session = Depends(get_db)):
+    from sqlalchemy import select, func
+    from backend.app.models.payment import PaymentModel
+    from backend.app.models.settlement import SettlementModel
+    from backend.app.models.refund import RefundModel
+    from backend.app.models.bank_credit import BankCreditModel
+    from backend.app.models.ingestion import IngestionBatchModel
+    
+    pay_count = db.execute(select(func.count()).select_from(PaymentModel)).scalar() or 0
+    set_count = db.execute(select(func.count()).select_from(SettlementModel)).scalar() or 0
+    ref_count = db.execute(select(func.count()).select_from(RefundModel)).scalar() or 0
+    bnk_count = db.execute(select(func.count()).select_from(BankCreditModel)).scalar() or 0
+    
+    batches = db.execute(
+        select(IngestionBatchModel).order_by(IngestionBatchModel.submitted_at.desc()).limit(20)
+    ).scalars().all()
+    
+    return {
+        "feeds": {
+            "payments": {"name": "Captured Payments", "count": pay_count, "status": "active", "source": "API / Webhook / CSV"},
+            "settlements": {"name": "Gateway Settlements", "count": set_count, "status": "active", "source": "Gateway Settlement Batch"},
+            "refunds": {"name": "Customer Refunds", "count": ref_count, "status": "active", "source": "Refund Lifecycle Events"},
+            "bank_credits": {"name": "Bank Statement Credits", "count": bnk_count, "status": "active", "source": "Core Banking UTR Statement"},
+        },
+        "batches": [
+            {
+                "id": str(b.id),
+                "idempotency_key": b.idempotency_key,
+                "batch_status": b.batch_status,
+                "source_filename": b.source_filename,
+                "source_tables": b.source_tables,
+                "row_count_submitted": b.row_count_submitted,
+                "row_count_accepted": b.row_count_accepted,
+                "row_count_rejected": b.row_count_rejected,
+                "submitted_at": b.submitted_at.isoformat() if b.submitted_at else None,
+                "completed_at": b.completed_at.isoformat() if b.completed_at else None,
+            }
+            for b in batches
+        ]
+    }

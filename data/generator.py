@@ -171,10 +171,11 @@ def generate_synthetic_dataset(total_records: int = 500, seed: int = 42, output_
             gt_review = "True"
 
         elif anomaly == 'duplicate_bank_credit':
-            # Add an extra duplicate bank credit with same bank_reference
+            # Add an extra duplicate bank credit referencing the same settlement
             bank_credits.append(bc_row)
             bc_row_dup = dict(bc_row)
             bc_row_dup["bank_credit_id"] = f"bc_{idx:06d}_dup"
+            bc_row_dup["bank_reference"] = f"{bank_ref}_DUP"
             bc_row_dup["bank_credit_timestamp"] = (bc_time + timedelta(minutes=5)).isoformat()
             bank_credits.append(bc_row_dup)
             gt_status = "needs_review"

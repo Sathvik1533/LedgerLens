@@ -1,69 +1,50 @@
 import React from 'react';
-import { AlertTriangle, CheckCircle2, XCircle, HelpCircle } from 'lucide-react';
 import { DecisionStatus } from '../types/api';
 
 interface StatusMeta {
   label: string;
-  bg: string;
-  text: string;
-  border: string;
-  icon: React.ElementType;
+  dotColor: string;
+  textColor: string;
 }
 
 const STATUS_CONFIG: Record<string, StatusMeta> = {
   needs_review: {
     label: 'Needs Review',
-    bg: 'bg-warning-subtle',
-    text: 'text-amber-300',
-    border: 'border-warning-border',
-    icon: AlertTriangle,
+    dotColor: 'bg-amber-400',
+    textColor: 'text-advisory-amber',
   },
   auto_reconciled: {
     label: 'Auto Reconciled',
-    bg: 'bg-resolved-subtle',
-    text: 'text-emerald-300',
-    border: 'border-resolved-border',
-    icon: CheckCircle2,
+    dotColor: 'bg-emerald-400',
+    textColor: 'text-matched-green',
   },
   approved: {
-    label: 'Human Approved',
-    bg: 'bg-resolved-subtle',
-    text: 'text-emerald-300',
-    border: 'border-resolved-border',
-    icon: CheckCircle2,
+    label: 'Approved',
+    dotColor: 'bg-emerald-400',
+    textColor: 'text-matched-green',
   },
   rejected: {
-    label: 'Human Rejected',
-    bg: 'bg-critical-subtle',
-    text: 'text-rose-300',
-    border: 'border-critical-border',
-    icon: XCircle,
+    label: 'Rejected',
+    dotColor: 'bg-rose-400',
+    textColor: 'text-ink-900',
   },
   unresolved: {
     label: 'Unresolved',
-    bg: 'bg-surface-alt',
-    text: 'text-slate-300',
-    border: 'border-border-strong',
-    icon: HelpCircle,
+    dotColor: 'bg-slate-400',
+    textColor: 'text-ink-700',
   },
 };
 
 export const StatusBadge: React.FC<{ status: DecisionStatus | string }> = ({ status }) => {
   const config = STATUS_CONFIG[status] || {
     label: status.replace(/_/g, ' '),
-    bg: 'bg-surface-alt',
-    text: 'text-slate-300',
-    border: 'border-border-strong',
-    icon: HelpCircle,
+    dotColor: 'bg-slate-400',
+    textColor: 'text-ink-900',
   };
 
-  const Icon = config.icon;
-
   return (
-    <span
-      className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-semibold border ${config.bg} ${config.text} ${config.border}`}
-    >
-      <Icon className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
+    <span className={`inline-flex items-center gap-1.5 font-mono text-[11px] font-medium ${config.textColor}`}>
+      <span className={`w-1.5 h-1.5 rounded-full ${config.dotColor} shrink-0`} aria-hidden="true" />
       <span>{config.label}</span>
     </span>
   );

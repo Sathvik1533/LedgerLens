@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useMemo } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import {
   Search,
   ArrowRight,
   AlertCircle,
-  Clock,
   ArrowUpDown,
   AlertTriangle,
   AlertOctagon,
@@ -15,7 +15,6 @@ import { ReviewQueueItem } from '../types/api';
 import { fetchReviewQueue } from '../api/client';
 import { AmountDisplay } from '../components/AmountDisplay';
 import { ExceptionBadge } from '../components/ExceptionBadge';
-import { StatusBadge } from '../components/StatusBadge';
 import { QueueTableSkeleton } from '../components/SkeletonLoaders';
 import { EmptyState } from '../components/EmptyState';
 
@@ -63,7 +62,7 @@ function getSeverity(item: ReviewQueueItem): { label: string; color: string; bg:
   if (item.exception_type === 'amount_mismatch' || item.exception_type === 'duplicate_payment' || disc > 500) {
     return {
       label: 'Critical',
-      color: 'text-rose-300',
+      color: 'text-ink-900',
       bg: 'bg-critical-subtle',
       border: 'border-critical-border',
       icon: AlertOctagon,
@@ -71,35 +70,21 @@ function getSeverity(item: ReviewQueueItem): { label: string; color: string; bg:
   }
   return {
     label: 'High',
-    color: 'text-amber-300',
+    color: 'text-advisory-amber',
     bg: 'bg-warning-subtle',
     border: 'border-warning-border',
     icon: AlertTriangle,
   };
 }
 
-function formatRelativeTime(timestamp: string | null): string {
-  if (!timestamp) return 'Recent';
-  try {
-    const d = new Date(timestamp);
-    if (isNaN(d.getTime())) return 'Recent';
-    const diffMs = Date.now() - d.getTime();
-    const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
-    if (diffHours < 1) {
-      const diffMins = Math.floor(diffMs / (1000 * 60));
-      return `${Math.max(1, diffMins)}m ago`;
-    }
-    if (diffHours < 24) return `${diffHours}h ago`;
-    return `${Math.floor(diffHours / 24)}d ago`;
-  } catch {
-    return 'Recent';
-  }
-}
+export const ReviewQueuePage: React.FC<{ onSelectCase?: (caseId: string) => void }> = ({ onSelectCase }) => {
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const initialCategory = searchParams.get('type') || 'all';
 
-export const ReviewQueuePage: React.FC<{ onSelectCase: (caseId: string) => void }> = ({ onSelectCase }) => {
   const [cases, setCases] = useState<ReviewQueueItem[]>([]);
   const [totalAmountAtRisk, setTotalAmountAtRisk] = useState<string>('0.00');
-  const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  const [selectedCategory, setSelectedCategory] = useState<string>(initialCategory);
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [selectedSeverity, setSelectedSeverity] = useState<string>('all');
   const [sortBy, setSortBy] = useState<'discrepancy' | 'amount' | 'age'>('discrepancy');
@@ -130,6 +115,13 @@ export const ReviewQueuePage: React.FC<{ onSelectCase: (caseId: string) => void 
     navigator.clipboard.writeText(id);
     setCopiedId(id);
     setTimeout(() => setCopiedId(null), 1500);
+  };
+
+  const handleRowClick = (caseId: string) => {
+    if (onSelectCase) {
+      onSelectCase(caseId);
+    }
+    navigate(`/exceptions/${caseId}`);
   };
 
   const processedCases = useMemo(() => {
@@ -173,45 +165,48 @@ export const ReviewQueuePage: React.FC<{ onSelectCase: (caseId: string) => void 
   }, [cases, searchQuery, selectedSeverity, sortBy]);
 
   return (
-    <div className="space-y-6">
-      {/* 1. Header & Context Summary Strip */}
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 border-b border-border-subtle pb-6">
-        <div>
-          <div className="flex items-center gap-3">
-            <h1 className="text-xl md:text-2xl font-extrabold text-white tracking-tight">
-              Exception Control Room
-            </h1>
-            <span className="px-2.5 py-0.5 rounded-full text-xs font-mono font-bold bg-amber-950/60 border border-amber-500/40 text-amber-300">
-              {cases.length} Needs Review
+    <div className="space-y-6 max-w-7xl mx-auto font-sans">
+      {/* 1. Context & Section Header Strip */}
+      <div className="space-y-2 border-b border-rule-300 pb-4">
+        <div className="flex items-center gap-2">
+          <span className="text-[11px] font-mono font-bold uppercase tracking-widest text-source-blue bg-source-blue/10 border border-source-blue px-2.5 py-0.5 rounded-full">
+            02 &mdash; OPERATIONAL EXCEPTION QUEUE
+          </span>
+          <span className="text-ink-700">&bull;</span>
+          <span className="text-xs text-ink-700 font-mono">HUMAN-IN-THE-LOOP TRIAGE</span>
+        </div>
+
+        <div className="flex flex-col sm:flex-row sm:items-baseline sm:justify-between gap-2">
+          <h1 className="text-xl sm:text-2xl font-bold text-ink-900 tracking-tight">
+            Exception Control Room
+          </h1>
+          <div className="text-xs text-ink-700 font-sans flex items-center gap-2">
+            <span className="text-ink-900 font-medium">{cases.length} cases need review</span>
+            <span>&bull;</span>
+            <span className="text-ledger-vermilion font-medium font-mono">
+              <AmountDisplay amount={totalAmountAtRisk} /> total exposure
             </span>
           </div>
-          <p className="text-xs md:text-sm text-slate-400 mt-1 flex items-center gap-2">
-            <span>{cases.length} cases require human intervention</span>
-            <span className="text-slate-600">&bull;</span>
-            <span className="text-slate-300 font-semibold flex items-center gap-1">
-              Total Capital at Risk: <AmountDisplay amount={totalAmountAtRisk} className="text-rose-400 font-bold" />
-            </span>
-          </p>
         </div>
       </div>
 
-      {/* 2. Compact Filter Strip */}
-      <div className="bg-surface border border-border-strong rounded-xl p-3.5 flex flex-wrap items-center justify-between gap-3 shadow-panel">
-        <div className="flex flex-wrap items-center gap-3 flex-1 min-w-[280px]">
+      {/* 2. Unified Filter Toolbar */}
+      <div className="control-panel rounded-xl p-2.5 flex flex-wrap items-center justify-between gap-3 shadow-none">
+        <div className="flex flex-wrap items-center gap-2.5 flex-1 min-w-[280px]">
           {/* Search Box */}
           <div className="relative flex-1 min-w-[220px]">
-            <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" aria-hidden="true" />
+            <Search className="w-3.5 h-3.5 text-ink-700 absolute left-3 top-1/2 -translate-y-1/2" aria-hidden="true" />
             <input
               type="text"
-              placeholder="Search Payment ID / Case ID..."
+              placeholder="Filter by Payment ID or Case UUID..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-surface-alt border border-border-strong rounded-lg pl-9 pr-8 py-1.5 text-xs text-white placeholder-slate-500 focus-ring"
+              className="w-full bg-paper-1 border border-rule-300 focus:border-source-blue rounded-lg pl-9 pr-7 py-2 text-xs text-ink-900 placeholder-[#829BB8]/60 focus:outline-none font-sans transition"
             />
             {searchQuery && (
               <button
                 onClick={() => setSearchQuery('')}
-                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white"
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-ink-700 hover:text-ink-900"
                 aria-label="Clear search"
               >
                 <X className="w-3.5 h-3.5" />
@@ -223,26 +218,26 @@ export const ReviewQueuePage: React.FC<{ onSelectCase: (caseId: string) => void 
           <select
             value={selectedCategory}
             onChange={(e) => setSelectedCategory(e.target.value)}
-            className="bg-surface-alt border border-border-strong rounded-lg px-3 py-1.5 text-xs text-slate-200 font-medium focus-ring"
+            className="bg-paper-1 border border-rule-300 focus:border-source-blue rounded-lg px-3 py-2 text-xs text-ink-900 focus:outline-none font-sans transition"
             aria-label="Filter by exception category"
           >
             {EXCEPTION_OPTIONS.map((opt) => (
-              <option key={opt.id} value={opt.id} className="bg-surface text-slate-200">
+              <option key={opt.id} value={opt.id} className="bg-paper-1 text-ink-900">
                 {opt.label}
               </option>
             ))}
           </select>
 
-          {/* Severity Filter */}
-          <div className="hidden sm:flex items-center gap-1 bg-surface-alt border border-border-strong rounded-lg p-0.5">
+          {/* Segmented Severity Filter */}
+          <div className="flex items-center bg-paper-1 border border-rule-300 rounded-lg p-1">
             {['all', 'critical', 'high'].map((sev) => (
               <button
                 key={sev}
                 onClick={() => setSelectedSeverity(sev)}
-                className={`px-2.5 py-1 rounded-md text-[11px] font-semibold capitalize transition ${
+                className={`px-3 py-1 rounded-md text-xs font-sans capitalize transition ${
                   selectedSeverity === sev
-                    ? 'bg-blue-600 text-white shadow-sm'
-                    : 'text-slate-400 hover:text-slate-200'
+                    ? 'bg-blue-900/60 text-ink-900 font-semibold shadow-sm border border-source-blue'
+                    : 'text-ink-700 hover:text-ink-900'
                 }`}
               >
                 {sev}
@@ -252,39 +247,39 @@ export const ReviewQueuePage: React.FC<{ onSelectCase: (caseId: string) => void 
         </div>
 
         {/* Sort Options */}
-        <div className="flex items-center gap-2 text-xs text-slate-400">
-          <ArrowUpDown className="w-3.5 h-3.5 text-slate-400" aria-hidden="true" />
-          <span className="hidden sm:inline">Sort:</span>
+        <div className="flex items-center gap-2 text-xs text-ink-700 font-sans">
+          <ArrowUpDown className="w-3.5 h-3.5 text-ink-700" aria-hidden="true" />
+          <span className="hidden sm:inline text-ink-700">Sort:</span>
           <select
             value={sortBy}
             onChange={(e) => setSortBy(e.target.value as any)}
-            className="bg-surface-alt border border-border-strong rounded-lg px-2.5 py-1 text-xs text-slate-200 font-medium focus-ring"
+            className="bg-paper-1 border border-rule-300 focus:border-source-blue rounded-lg px-3 py-2 text-xs text-ink-900 focus:outline-none font-sans transition"
             aria-label="Sort queue records"
           >
-            <option value="discrepancy">Discrepancy (High to Low)</option>
-            <option value="amount">Amount at Risk (High to Low)</option>
-            <option value="age">Age (Newest First)</option>
+            <option value="discrepancy" className="bg-paper-1">Discrepancy (High to Low)</option>
+            <option value="amount" className="bg-paper-1">Amount at Risk (High to Low)</option>
+            <option value="age" className="bg-paper-1">Age (Newest First)</option>
           </select>
         </div>
       </div>
 
       {/* 3. Error Banner */}
       {error && (
-        <div className="bg-critical-subtle border border-critical-border rounded-xl p-4 flex items-center justify-between gap-3 text-rose-300 text-xs">
+        <div className="bg-ledger-vermilion/10 border border-ledger-vermilion rounded-md p-3 flex items-center justify-between gap-3 text-ink-900 text-xs font-sans">
           <div className="flex items-center gap-2">
-            <AlertCircle className="w-4 h-4 shrink-0" aria-hidden="true" />
+            <AlertCircle className="w-4 h-4 shrink-0 text-ledger-vermilion" aria-hidden="true" />
             <span>{error}</span>
           </div>
           <button
             onClick={() => loadQueue()}
-            className="px-2.5 py-1 rounded bg-rose-900/50 hover:bg-rose-900 text-white font-semibold"
+            className="px-2.5 py-1 rounded bg-rose-900/60 hover:bg-rose-900 text-ink-900 font-medium transition"
           >
             Retry
           </button>
         </div>
       )}
 
-      {/* 4. Main Queue Table */}
+      {/* 4. Dense Operations Queue Table — EXACTLY 4 COLUMNS */}
       {isLoading ? (
         <QueueTableSkeleton rows={6} />
       ) : cases.length === 0 ? (
@@ -304,106 +299,77 @@ export const ReviewQueuePage: React.FC<{ onSelectCase: (caseId: string) => void 
           }}
         />
       ) : (
-        <div className="bg-surface border border-border-strong rounded-xl overflow-hidden shadow-panel">
+        <div className="control-panel rounded-xl overflow-hidden shadow-none">
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse" aria-label="Exception review queue">
               <thead>
-                <tr className="bg-surface-alt border-b border-border-subtle text-[11px] uppercase tracking-wider font-mono font-bold text-slate-400">
-                  <th scope="col" className="py-3 px-4 w-28">Severity</th>
-                  <th scope="col" className="py-3 px-4">Anomaly Story &amp; Identifiers</th>
-                  <th scope="col" className="py-3 px-4 text-right">At Risk</th>
-                  <th scope="col" className="py-3 px-4 text-right">Discrepancy</th>
-                  <th scope="col" className="py-3 px-4 text-center w-24">Age</th>
-                  <th scope="col" className="py-3 px-4 text-center w-36">Status</th>
-                  <th scope="col" className="py-3 px-4 text-right w-32">Action</th>
+                <tr className="bg-paper-1 border-b border-rule-300 text-[11px] font-semibold text-ink-700 font-sans uppercase tracking-wider">
+                  <th scope="col" className="py-3 px-5 w-28">Severity</th>
+                  <th scope="col" className="py-3 px-5">What Happened &amp; Identifiers</th>
+                  <th scope="col" className="py-3 px-5 text-right w-40">At Risk</th>
+                  <th scope="col" className="py-3 px-5 text-right w-28">Action</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-border-subtle text-xs">
+              <tbody className="divide-y divide-white/[0.04] text-xs">
                 {processedCases.map((item) => {
                   const severity = getSeverity(item);
-                  const SevIcon = severity.icon;
+                  const isCrit = severity.label.toLowerCase() === 'critical';
                   const plainStory = getPlainLanguageSummary(item);
 
                   return (
                     <tr
                       key={item.case_id}
-                      onClick={() => onSelectCase(item.case_id)}
-                      className="hover:bg-surface-hover transition duration-150 cursor-pointer group"
+                      onClick={() => handleRowClick(item.case_id)}
+                      className="hover:bg-source-blue/10 hover:border-l-2 hover:border-l-blue-400 transition-colors cursor-pointer group"
                     >
                       {/* 1. Severity */}
-                      <td className="py-3.5 px-4 align-top">
+                      <td className="py-4 px-5 align-top">
                         <span
-                          className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-mono font-bold uppercase border ${severity.bg} ${severity.color} ${severity.border}`}
+                          className={`inline-flex items-center gap-1.5 text-xs font-semibold font-sans ${
+                            isCrit ? 'text-ledger-vermilion' : 'text-advisory-amber'
+                          }`}
                         >
-                          <SevIcon className="w-3 h-3" aria-hidden="true" />
-                          {severity.label}
+                          <span className={`w-2 h-2 rounded-full shrink-0 ${isCrit ? 'bg-ledger-vermilion shadow-sm' : 'bg-advisory-amber shadow-sm'}`} />
+                          <span>{isCrit ? 'Critical' : 'High'}</span>
                         </span>
                       </td>
 
-                      {/* 2. Anomaly Story & Identifiers */}
-                      <td className="py-3.5 px-4 align-top space-y-1.5 max-w-md">
-                        <p className="text-xs font-semibold text-white group-hover:text-blue-300 transition leading-snug">
+                      {/* 2. What Happened & Identifiers */}
+                      <td className="py-4 px-5 align-top space-y-1.5">
+                        <p className="text-xs font-semibold text-ink-900 group-hover:text-blue-300 transition-colors leading-snug font-sans">
                           {plainStory}
                         </p>
-                        <div className="flex flex-wrap items-center gap-2 text-[11px] text-slate-400">
+                        <div className="flex flex-wrap items-center gap-2 text-[11px] text-ink-700 font-mono">
                           <button
                             onClick={(e) => copyToClipboard(item.payment_id, e)}
-                            className="font-mono bg-surface-alt px-1.5 py-0.5 rounded border border-border-subtle hover:border-slate-500 text-slate-300 flex items-center gap-1"
+                            className="text-ink-900 hover:text-ink-900 hover:underline inline-flex items-center gap-1 font-mono bg-paper-1 px-1.5 py-0.5 rounded border border-rule-300"
                             title="Click to copy payment ID"
                           >
                             <span>{item.payment_id}</span>
                             {copiedId === item.payment_id ? (
-                              <Check className="w-3 h-3 text-emerald-400" />
+                              <Check className="w-2.5 h-2.5 text-matched-green" />
                             ) : (
-                              <Copy className="w-3 h-3 text-slate-500" />
+                              <Copy className="w-2.5 h-2.5 text-ink-700" />
                             )}
                           </button>
-                          <span className="text-slate-600">&bull;</span>
-                          <span className="font-mono text-slate-400">{item.case_id}</span>
-                          <span className="text-slate-600">&bull;</span>
+                          <span className="text-ink-700">&bull;</span>
+                          <span className="text-ink-700 font-mono text-[10px]">{item.case_id}</span>
+                          <span className="text-ink-700">&bull;</span>
                           <ExceptionBadge type={item.exception_type} size="sm" />
                         </div>
                       </td>
 
                       {/* 3. At Risk */}
-                      <td className="py-3.5 px-4 align-top text-right font-medium">
-                        <AmountDisplay amount={item.amount_at_risk} className="text-slate-200" />
+                      <td className="py-4 px-5 align-top text-right font-medium">
+                        <AmountDisplay amount={item.amount_at_risk} className="text-ink-900 font-semibold text-sm" />
                       </td>
 
-                      {/* 4. Discrepancy */}
-                      <td className="py-3.5 px-4 align-top text-right font-medium">
-                        <AmountDisplay
-                          amount={item.settlement_discrepancy}
-                          isDiscrepancy={true}
-                        />
-                      </td>
-
-                      {/* 5. Age */}
-                      <td className="py-3.5 px-4 align-top text-center text-slate-400 font-mono text-[11px]">
-                        <div className="flex items-center justify-center gap-1">
-                          <Clock className="w-3 h-3 text-slate-500" aria-hidden="true" />
-                          <span>{formatRelativeTime(item.case_opened_at)}</span>
-                        </div>
-                      </td>
-
-                      {/* 6. Status */}
-                      <td className="py-3.5 px-4 align-top text-center">
-                        <StatusBadge status={item.decision_status} />
-                      </td>
-
-                      {/* 7. Action Button */}
-                      <td className="py-3.5 px-4 align-top text-right">
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            onSelectCase(item.case_id);
-                          }}
-                          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-white bg-surface-alt hover:bg-blue-600 border border-border-strong hover:border-blue-500 transition duration-150 shadow-sm focus-ring"
-                          aria-label={`Inspect case ${item.case_id}`}
-                        >
+                      {/* 4. Action (Single Affordance) */}
+                      <td className="py-4 px-5 align-top text-right">
+                        <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-source-blue group-hover:text-blue-300 group-hover:translate-x-0.5 transition-all font-sans bg-source-blue/10 border border-source-blue px-2.5 py-1 rounded-full shadow-sm">
                           <span>Inspect</span>
-                          <ArrowRight className="w-3.5 h-3.5 text-slate-400 group-hover:text-white" aria-hidden="true" />
-                        </button>
+                          <ArrowRight className="w-3 h-3" aria-hidden="true" />
+                        </span>
                       </td>
                     </tr>
                   );
@@ -413,9 +379,9 @@ export const ReviewQueuePage: React.FC<{ onSelectCase: (caseId: string) => void 
           </div>
 
           {/* Table Footer */}
-          <div className="bg-surface-alt border-t border-border-subtle px-6 py-2.5 flex items-center justify-between text-xs text-slate-400 font-mono">
-            <span>Showing {processedCases.length} of {cases.length} cases</span>
-            <span>Deterministic 3-Stage Parity Matcher</span>
+          <div className="bg-paper-1 border-t border-rule-300 px-5 py-3 flex items-center justify-between text-xs text-ink-700 font-sans">
+            <span>Showing {processedCases.length} of {cases.length} records</span>
+            <span className="font-mono text-[11px] text-ink-700">Deterministic 3-Stage Parity Engine</span>
           </div>
         </div>
       )}

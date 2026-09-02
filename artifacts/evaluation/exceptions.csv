@@ -1,0 +1,1 @@
+case_id,payment_id,predicted_status,ground_truth_status,predicted_exception_type,ground_truth_exception_type,payment_amount,expected_net_settlement,reported_net_settlement,discrepancy_amount,is_correctly_classified

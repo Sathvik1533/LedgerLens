@@ -1,40 +1,56 @@
-import { useState } from 'react';
-import { Navbar } from './components/Navbar';
-import { ReviewQueuePage } from './pages/ReviewQueuePage';
-import { CaseDetailPage } from './pages/CaseDetailPage';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 
-export function App() {
-  const [selectedCaseId, setSelectedCaseId] = useState<string | null>(null);
-  const [refreshKey, setRefreshKey] = useState<number>(0);
-  const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
+// Layouts
+import MarketingLayout from './layouts/MarketingLayout';
+import AppLayout from './layouts/AppLayout';
 
-  const handleGlobalRefresh = () => {
-    setIsRefreshing(true);
-    setRefreshKey((k) => k + 1);
-    setTimeout(() => setIsRefreshing(false), 500);
-  };
+// Marketing Pages
+import LandingPage from './pages/marketing/LandingPage';
+import HowItWorksPage from './pages/marketing/HowItWorksPage';
+import EvidencePage from './pages/marketing/EvidencePage';
+import EvaluationPage from './pages/marketing/EvaluationPage';
+import DocsPage from './pages/marketing/DocsPage';
+import AboutPage from './pages/marketing/AboutPage';
 
+// App Pages
+import QueuePage from './pages/app/QueuePage';
+import CasePage from './pages/app/CasePage';
+import { DashboardPage } from './pages/DashboardPage';
+import { IngestionFeedsPage } from './pages/IngestionFeedsPage';
+import { AuditLogPage } from './pages/AuditLogPage';
+import { PolicyKnowledgePage } from './pages/PolicyKnowledgePage';
+import SettingsPage from './pages/SettingsPage';
+
+function App() {
   return (
-    <div className="min-h-screen bg-canvas text-slate-100 flex flex-col antialiased">
-      <Navbar onRefresh={handleGlobalRefresh} isRefreshing={isRefreshing} />
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 py-6 md:py-8">
-        {selectedCaseId ? (
-          <CaseDetailPage
-            key={`case-${selectedCaseId}-${refreshKey}`}
-            caseId={selectedCaseId}
-            onBack={() => setSelectedCaseId(null)}
-          />
-        ) : (
-          <ReviewQueuePage
-            key={`queue-${refreshKey}`}
-            onSelectCase={(id) => setSelectedCaseId(id)}
-          />
-        )}
-      </main>
-      <footer className="border-t border-border-subtle py-4 px-6 text-center text-xs text-slate-500 font-mono">
-        LedgerLens &bull; Financial Reconciliation Control Room &bull; Multi-Source Accounting &bull; Grounded Policy RAG
-      </footer>
-    </div>
+    <BrowserRouter>
+      <Routes>
+        {/* Marketing Site (Public) */}
+        <Route element={<MarketingLayout />}>
+          <Route path="/" element={<LandingPage />} />
+          <Route path="/how-it-works" element={<HowItWorksPage />} />
+          <Route path="/evidence" element={<EvidencePage />} />
+          <Route path="/evaluation" element={<EvaluationPage />} />
+          <Route path="/docs" element={<DocsPage />} />
+          <Route path="/about" element={<AboutPage />} />
+        </Route>
+
+        {/* App Shell (Authenticated Financial Control Room) */}
+        <Route path="/app" element={<AppLayout />}>
+          <Route index element={<Navigate to="/app/queue" replace />} />
+          <Route path="dashboard" element={<DashboardPage />} />
+          <Route path="queue" element={<QueuePage />} />
+          <Route path="case/:caseId" element={<CasePage />} />
+          <Route path="ingestion" element={<IngestionFeedsPage />} />
+          <Route path="audit" element={<AuditLogPage />} />
+          <Route path="policies" element={<PolicyKnowledgePage />} />
+          <Route path="settings" element={<SettingsPage />} />
+        </Route>
+
+        {/* Fallback redirect */}
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </BrowserRouter>
   );
 }
 

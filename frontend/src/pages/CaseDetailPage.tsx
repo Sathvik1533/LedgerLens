@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import {
   ArrowLeft,
   RefreshCw,
@@ -14,17 +15,27 @@ import { MultiSourceCard } from '../components/MultiSourceCard';
 import { ReviewActionForm } from '../components/ReviewActionForm';
 import { AuditTimeline } from '../components/AuditTimeline';
 import { RagCopilotPanel } from '../components/RagCopilotPanel';
-import { StatusBadge } from '../components/StatusBadge';
 import { ExceptionBadge } from '../components/ExceptionBadge';
 import { AmountDisplay } from '../components/AmountDisplay';
 import { CaseWorkspaceSkeleton } from '../components/SkeletonLoaders';
 
 interface CaseDetailPageProps {
-  caseId: string;
-  onBack: () => void;
+  caseId?: string;
+  onBack?: () => void;
 }
 
-export const CaseDetailPage: React.FC<CaseDetailPageProps> = ({ caseId, onBack }) => {
+export const CaseDetailPage: React.FC<CaseDetailPageProps> = ({ caseId: propCaseId, onBack: propOnBack }) => {
+  const params = useParams<{ caseId: string }>();
+  const navigate = useNavigate();
+  const activeCaseId = propCaseId || params.caseId || '';
+
+  const handleBack = () => {
+    if (propOnBack) {
+      propOnBack();
+    } else {
+      navigate('/exceptions');
+    }
+  };
   const [evidence, setEvidence] = useState<CaseEvidenceResponse | null>(null);
   const [auditEvents, setAuditEvents] = useState<AuditEventItem[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -37,8 +48,8 @@ export const CaseDetailPage: React.FC<CaseDetailPageProps> = ({ caseId, onBack }
     setError(null);
     try {
       const [evData, auditData] = await Promise.all([
-        fetchCaseDetail(caseId),
-        fetchCaseAuditTrail(caseId),
+        fetchCaseDetail(activeCaseId),
+        fetchCaseAuditTrail(activeCaseId),
       ]);
       setEvidence(evData);
       setAuditEvents(auditData || []);
@@ -50,11 +61,13 @@ export const CaseDetailPage: React.FC<CaseDetailPageProps> = ({ caseId, onBack }
   };
 
   useEffect(() => {
-    loadCaseData();
-  }, [caseId]);
+    if (activeCaseId) {
+      loadCaseData();
+    }
+  }, [activeCaseId]);
 
   const copyCaseId = () => {
-    navigator.clipboard.writeText(caseId);
+    navigator.clipboard.writeText(activeCaseId);
     setCopied(true);
     setTimeout(() => setCopied(false), 1500);
   };
@@ -70,13 +83,13 @@ export const CaseDetailPage: React.FC<CaseDetailPageProps> = ({ caseId, onBack }
 
   if (error || !evidence) {
     return (
-      <div className="bg-surface border border-critical-border rounded-xl p-8 text-center space-y-4 shadow-panel">
-        <AlertCircle className="w-10 h-10 text-rose-400 mx-auto" aria-hidden="true" />
-        <h3 className="text-base font-bold text-white">Reconciliation Case Unreachable</h3>
-        <p className="text-xs text-rose-300 max-w-md mx-auto">{error || 'Case records could not be retrieved from PostgreSQL database.'}</p>
+      <div className="bg-paper-1 border border-ledger-vermilion rounded-xl p-8 text-center space-y-4 shadow-sm font-sans">
+        <AlertCircle className="w-10 h-10 text-ledger-vermilion mx-auto" aria-hidden="true" />
+        <h3 className="text-base font-semibold text-ink-900">Reconciliation Case Unreachable</h3>
+        <p className="text-xs text-ink-900 max-w-md mx-auto">{error || 'Case records could not be retrieved from database.'}</p>
         <button
-          onClick={onBack}
-          className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold rounded-lg shadow transition focus-ring"
+          onClick={handleBack}
+          className="inline-flex items-center gap-2 px-4 py-2 bg-paper-1 hover:bg-paper-0 text-ink-900 text-xs font-semibold rounded shadow transition"
         >
           <ArrowLeft className="w-4 h-4" aria-hidden="true" />
           <span>Return to Queue</span>
@@ -86,54 +99,63 @@ export const CaseDetailPage: React.FC<CaseDetailPageProps> = ({ caseId, onBack }
   }
 
   return (
-    <div className="space-y-6">
-      {/* Top Breadcrumb & Summary Header */}
-      <div className="bg-surface border border-border-strong rounded-xl p-4 flex flex-wrap items-center justify-between gap-4 shadow-panel">
-        <div className="flex flex-wrap items-center gap-3.5">
-          <button
-            onClick={onBack}
-            className="p-2 rounded-lg bg-surface-alt hover:bg-surface-hover border border-border-strong text-slate-300 transition focus-ring"
-            aria-label="Return to review queue"
-            title="Return to review queue"
-          >
-            <ArrowLeft className="w-4 h-4" aria-hidden="true" />
-          </button>
-
-          <div>
-            <div className="flex flex-wrap items-center gap-2.5">
-              <span className="text-xs font-mono font-bold text-slate-400">CASE:</span>
-              <button
-                onClick={copyCaseId}
-                className="font-mono text-sm font-bold text-white hover:text-blue-300 flex items-center gap-1.5 focus-ring rounded"
-                title="Click to copy case ID"
-              >
-                <span>{evidence.case_id}</span>
-                {copied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5 text-slate-400" />}
-              </button>
-              <ExceptionBadge type={evidence.exception_type} size="sm" />
-              <StatusBadge status={evidence.decision_status} />
-            </div>
-            <p className="text-xs text-slate-400 mt-0.5 font-mono">
-              Payment ID: {evidence.payment_id} &bull; Currency: {evidence.currency}
-            </p>
-          </div>
+    <div className="space-y-6 max-w-7xl mx-auto font-sans">
+      {/* 1. Context & Section Header Strip */}
+      <div className="space-y-2 border-b border-rule-300 pb-4">
+        <div className="flex items-center gap-2">
+          <span className="text-[11px] font-mono font-bold uppercase tracking-widest text-source-blue bg-source-blue/10 border border-source-blue px-2.5 py-0.5 rounded-full">
+            03 &mdash; CASE INVESTIGATION WORKSPACE
+          </span>
+          <span className="text-ink-700">&bull;</span>
+          <span className="text-xs text-ink-700 font-mono">3-COLUMN RECONCILIATION TERMINAL</span>
         </div>
 
-        {/* Right Header Badges */}
-        <div className="flex items-center gap-3">
-          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-mono bg-surface-alt border border-border-strong text-slate-300">
-            <Lock className="w-3.5 h-3.5 text-blue-400" aria-hidden="true" />
-            <span>Version: v{evidence.version}</span>
-          </span>
+        <div className="flex flex-wrap items-center justify-between gap-3 pt-1">
+          <div className="flex items-center gap-4">
+            <button
+              onClick={handleBack}
+              className="flex items-center gap-1.5 text-xs font-semibold text-ink-700 hover:text-ink-900 transition py-1.5 px-3 rounded-full bg-paper-1 hover:bg-paper-1 border border-rule-300"
+              title="Return to review queue"
+            >
+              <ArrowLeft className="w-3.5 h-3.5" aria-hidden="true" />
+              <span>Queue</span>
+            </button>
 
-          <button
-            onClick={loadCaseData}
-            className="p-2 rounded-lg bg-surface-alt hover:bg-surface-hover border border-border-strong text-slate-300 transition focus-ring"
-            aria-label="Refresh case data"
-            title="Refresh case data"
-          >
-            <RefreshCw className="w-4 h-4" aria-hidden="true" />
-          </button>
+            <div>
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="text-[11px] font-semibold text-ink-700 font-mono">CASE:</span>
+                <button
+                  onClick={copyCaseId}
+                  className="text-xs font-semibold text-ink-900 hover:text-ink-900 flex items-center gap-1 rounded font-mono bg-paper-1 px-2 py-0.5 border border-rule-300"
+                  title="Click to copy case ID"
+                >
+                  <span>{evidence.case_id}</span>
+                  {copied ? <Check className="w-3 h-3 text-matched-green" /> : <Copy className="w-3 h-3 text-ink-700" />}
+                </button>
+                <ExceptionBadge type={evidence.exception_type} size="sm" />
+              </div>
+              <p className="text-xs text-ink-700 mt-0.5 font-mono">
+                Payment ID: {evidence.payment_id} &bull; Currency: {evidence.currency}
+              </p>
+            </div>
+          </div>
+
+          {/* Right Header Badges */}
+          <div className="flex items-center gap-3">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs bg-paper-1 border border-rule-300 text-ink-700 font-mono">
+              <Lock className="w-3 h-3 text-source-blue" aria-hidden="true" />
+              <span>Version: v{evidence.version}</span>
+            </span>
+
+            <button
+              onClick={loadCaseData}
+              className="p-2 rounded-full bg-paper-1 hover:bg-paper-1 border border-rule-300 text-ink-700 hover:text-ink-900 transition"
+              aria-label="Refresh case data"
+              title="Refresh case data"
+            >
+              <RefreshCw className="w-3.5 h-3.5" aria-hidden="true" />
+            </button>
+          </div>
         </div>
       </div>
 
@@ -141,15 +163,15 @@ export const CaseDetailPage: React.FC<CaseDetailPageProps> = ({ caseId, onBack }
       {successBanner && (
         <div
           role="status"
-          className="rounded-xl bg-resolved-subtle border border-resolved-border p-4 flex items-center justify-between gap-3 text-emerald-200 text-xs shadow-sm"
+          className="rounded-xl bg-matched-green/10 border border-matched-green p-4 flex items-center justify-between gap-3 text-matched-green text-xs shadow-none"
         >
           <div className="flex items-center gap-2.5">
-            <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0" aria-hidden="true" />
+            <CheckCircle2 className="w-4 h-4 text-matched-green shrink-0" aria-hidden="true" />
             <span>{successBanner}</span>
           </div>
           <button
             onClick={() => setSuccessBanner(null)}
-            className="text-xs font-bold text-emerald-400 hover:text-emerald-300 underline"
+            className="text-xs font-semibold text-matched-green hover:text-matched-green underline"
           >
             Dismiss
           </button>
@@ -157,44 +179,44 @@ export const CaseDetailPage: React.FC<CaseDetailPageProps> = ({ caseId, onBack }
       )}
 
       {/* 3-Column Persistent Desktop Workspace */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-        {/* COLUMN 1: Case Context & Audit Timeline (3 cols / ~25% width) */}
-        <div className="lg:col-span-3 space-y-6">
-          <div className="bg-surface border border-border-strong rounded-xl p-5 space-y-4 shadow-panel">
-            <h3 className="text-xs font-bold text-white uppercase tracking-wider border-b border-border-subtle pb-2.5">
-              Financial Context
+      <div className="flex flex-col lg:flex-row gap-5 items-start">
+        {/* COLUMN 1: Case Context & Audit Timeline (w-full lg:w-[22%]) */}
+        <div className="w-full lg:w-[22%] space-y-4 shrink-0">
+          <div className="control-panel rounded-xl p-4 space-y-3 shadow-none">
+            <h3 className="text-xs font-bold text-ink-900 uppercase tracking-wider font-sans border-b border-rule-300 pb-2">
+              Case Metadata
             </h3>
 
-            <div className="space-y-3 text-xs">
+            <div className="space-y-3 text-xs font-sans">
               <div>
-                <span className="text-slate-400 block text-[11px]">Amount at Risk</span>
+                <span className="text-ink-700 block text-[11px] font-sans">Amount at Risk</span>
                 <AmountDisplay
                   amount={evidence.payment?.amount || evidence.expected_net_settlement}
-                  className="text-lg font-bold text-white"
+                  className="text-lg font-bold text-ink-900 font-mono"
                 />
               </div>
 
               <div>
-                <span className="text-slate-400 block text-[11px]">Calculated Discrepancy</span>
+                <span className="text-ink-700 block text-[11px] font-sans">Calculated Discrepancy</span>
                 <AmountDisplay
                   amount={evidence.settlement_discrepancy}
                   isDiscrepancy={true}
-                  className="text-base font-bold"
+                  className="text-base font-bold font-mono text-ledger-vermilion"
                 />
               </div>
 
-              <div className="pt-2 border-t border-border-subtle space-y-2">
-                <div className="flex justify-between items-center text-slate-300">
-                  <span className="text-slate-400">Exception</span>
-                  <span className="font-mono text-slate-200 font-semibold">{evidence.exception_type}</span>
+              <div className="pt-2 border-t border-rule-300 space-y-2 text-xs">
+                <div className="flex justify-between items-center text-ink-700">
+                  <span>Exception Code</span>
+                  <span className="text-ink-900 font-mono text-xs font-medium">{evidence.exception_type}</span>
                 </div>
-                <div className="flex justify-between items-center text-slate-300">
-                  <span className="text-slate-400">Decision State</span>
-                  <span className="font-mono text-slate-200 font-semibold">{evidence.decision_status}</span>
+                <div className="flex justify-between items-center text-ink-700">
+                  <span>Decision State</span>
+                  <span className="text-ink-900 font-mono text-xs font-medium">{evidence.decision_status}</span>
                 </div>
-                <div className="flex justify-between items-center text-slate-300">
-                  <span className="text-slate-400">Lock Version</span>
-                  <span className="font-mono text-slate-200">v{evidence.version}</span>
+                <div className="flex justify-between items-center text-ink-700">
+                  <span>Lock Version</span>
+                  <span className="text-ink-900 font-mono text-xs font-medium">v{evidence.version}</span>
                 </div>
               </div>
             </div>
@@ -203,14 +225,14 @@ export const CaseDetailPage: React.FC<CaseDetailPageProps> = ({ caseId, onBack }
           <AuditTimeline events={auditEvents} />
         </div>
 
-        {/* COLUMN 2: Evidence Comparison Grid & AI Copilot (5 cols / ~42%) */}
-        <div className="lg:col-span-5 space-y-6">
+        {/* COLUMN 2: Evidence Comparison Grid & Policy AI Drawer (w-full lg:w-[48%]) */}
+        <div className="w-full lg:w-[48%] space-y-4 flex-1">
           <MultiSourceCard evidence={evidence} />
           <RagCopilotPanel caseId={evidence.case_id} autoRun={true} />
         </div>
 
-        {/* COLUMN 3: Sticky Human Decision Panel (4 cols / ~33% width) */}
-        <div className="lg:col-span-4 lg:sticky lg:top-20 space-y-6">
+        {/* COLUMN 3: Sticky Human Decision Panel (w-full lg:w-[30%]) */}
+        <div className="w-full lg:w-[30%] lg:sticky lg:top-14 space-y-4 shrink-0">
           <ReviewActionForm
             evidence={evidence}
             onSuccess={handleReviewSuccess}

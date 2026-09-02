@@ -170,6 +170,35 @@ def get_case_audit_trail(
     ]
 
 
+@router.get(
+    "/audit/all",
+    response_model=list[AuditEventResponse],
+    status_code=status.HTTP_200_OK,
+    summary="Get system-wide append-only audit trail",
+    description="Returns all audit events across all reconciliation cases in reverse chronological order.",
+)
+def get_all_audit_trail(
+    limit: int = Query(100, ge=1, le=1000),
+    offset: int = Query(0, ge=0),
+    db: Session = Depends(get_db),
+):
+    repo = ReviewRepository(db)
+    events = repo.get_all_audit_events(limit=limit, offset=offset)
+    return [
+        AuditEventResponse(
+            id=e.id,
+            event_type=e.event_type,
+            actor=e.actor,
+            case_id=e.case_id,
+            batch_id=e.batch_id,
+            previous_status=e.previous_status,
+            new_status=e.new_status,
+            occurred_at=e.occurred_at,
+        )
+        for e in events
+    ]
+
+
 # ── 4. Case Detail & Multi-Source Facts ──────────────────────────────────────────
 
 @router.get(

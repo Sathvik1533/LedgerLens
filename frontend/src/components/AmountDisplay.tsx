@@ -14,7 +14,7 @@ export const AmountDisplay: React.FC<AmountDisplayProps> = ({
   isDiscrepancy = false,
 }) => {
   if (amount === null || amount === undefined || amount === '') {
-    return <span className="text-slate-500 font-mono font-tabular">-</span>;
+    return <span className="text-ink-700 font-mono font-tabular">-</span>;
   }
 
   const num = typeof amount === 'number' ? amount : parseFloat(amount);
@@ -30,12 +30,12 @@ export const AmountDisplay: React.FC<AmountDisplayProps> = ({
 
   const symbol = currency === 'INR' ? '₹' : currency;
 
-  let colorClass = 'text-white';
+  let colorClass = 'text-ink-900';
   if (isDiscrepancy) {
     if (Math.abs(num) > 0.001) {
-      colorClass = 'text-rose-400 font-bold';
+      colorClass = 'text-ledger-vermilion font-bold';
     } else {
-      colorClass = 'text-emerald-400 font-bold';
+      colorClass = 'text-matched-green font-bold';
     }
   }
 

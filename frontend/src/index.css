@@ -1,39 +1,58 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Fraunces:ital,opsz,wght@0,9..144,100..900;1,9..144,100..900&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
   body {
-    background-color: #080D1A;
-    color: #F8FAFC;
+    @apply bg-paper-0 text-ink-700 font-sans;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    overflow-x: hidden;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    @apply text-ink-900;
   }
 }
 
-/* Tabular numbers for financial accuracy */
+/* Tabular numbers for financial precision */
 .font-tabular {
   font-variant-numeric: tabular-nums;
 }
 
-/* Custom scrollbars for high-density tables */
+/* Card styling conforming to design system tokens */
+.control-panel {
+  @apply bg-paper-1 border border-rule-300 transition-colors duration-150 ease-out;
+}
+
+.control-panel:hover {
+  @apply border-ink-700;
+}
+
+/* Custom scrollbars */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #0F172A;
+  @apply bg-paper-0;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #334155;
-  border-radius: 4px;
+  @apply bg-rule-300 rounded;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #475569;
+  @apply bg-ink-700;
 }
 
-/* Standard focus ring utility */
-.focus-ring {
-  @apply focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900;
+@layer utilities {
+  .focus-ring {
+    @apply outline-none ring-2 ring-transparent ring-offset-2;
+  }
+  .focus-ring:focus-visible {
+    @apply ring-ink-900;
+  }
 }

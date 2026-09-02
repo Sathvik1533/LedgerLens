@@ -1,0 +1,36 @@
+{
+  "benchmark_name": "reconciliation_evaluation_benchmark",
+  "timestamp_utc": null,
+  "dataset": {
+    "total_records": 60,
+    "seed": 42,
+    "sources": [
+      "payments",
+      "settlements",
+      "refunds",
+      "bank_credits"
+    ]
+  },
+  "performance": {
+    "elapsed_seconds": 0.0,
+    "throughput_records_per_sec": 0.0
+  },
+  "accuracy": {
+    "match_rate_pct": 70.0,
+    "precision_auto_reconcile": 100.0,
+    "recall_auto_reconcile": 100.0,
+    "false_approvals": 0,
+    "zero_false_approval_invariant": "PASSED"
+  },
+  "classification_breakdown": {
+    "auto_reconciled": 42,
+    "needs_review": 18,
+    "unresolved": 0,
+    "per_class_recall": {},
+    "confusion_matrix": {}
+  },
+  "financial_summary": {
+    "total_amount_reconciled_inr": "159933.00",
+    "total_amount_at_risk_inr": "70907.00"
+  }
+}

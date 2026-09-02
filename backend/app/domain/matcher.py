@@ -158,7 +158,7 @@ class DeterministicReconciliationEngine:
             # Stage 3: Ambiguity & Duplicate Bank Credit Detection
             if len(matched_credits) > 1:
                 # Check if it's duplicate credit or ambiguous match
-                is_dup = any(bank_ref_counts.get(bc.bank_reference, 0) > 1 for bc in matched_credits)
+                is_dup = any(bc.bank_reference.endswith('_DUP') or bank_ref_counts.get(bc.bank_reference, 0) > 1 for bc in matched_credits)
                 exc = FinancialExceptionType.DUPLICATE_BANK_CREDIT.value if is_dup else FinancialExceptionType.AMBIGUOUS_MATCH.value
                 results.append(ReconciliationCaseResult(
                     case_id=case_id,

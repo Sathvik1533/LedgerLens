@@ -35,5 +35,4 @@ class ConfidenceLevel(str, Enum):
     NOT_APPLICABLE = "not_applicable"
 
 class ConcurrentUpdateError(Exception):
-    """Raised when an optimistic locking check fails during a database update."""
     pass

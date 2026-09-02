@@ -152,6 +152,16 @@ class ReviewRepository:
         )
         return self.db.execute(stmt).scalars().all()
 
+    def get_all_audit_events(self, limit: int = 100, offset: int = 0) -> List[AuditEventModel]:
+        """Returns system-wide append-only audit events, newest-first."""
+        stmt = (
+            select(AuditEventModel)
+            .order_by(AuditEventModel.occurred_at.desc())
+            .limit(limit)
+            .offset(offset)
+        )
+        return self.db.execute(stmt).scalars().all()
+
     def emit_audit_event(
         self,
         event_type: str,

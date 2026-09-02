@@ -7,62 +7,55 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        sans: ['Inter', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
-        mono: ['JetBrains Mono', 'ui-monospace', 'SFMono-Regular', 'Menlo', 'monospace'],
+        sans: ['DM Sans', 'sans-serif'],
+        mono: ['DM Mono', 'monospace'],
+        display: ['Fraunces', 'serif'],
       },
       colors: {
-        canvas: {
-          DEFAULT: '#080D1A',
-          subtle: '#040812',
+        paper: {
+          0: '#FBFAF6',
+          1: '#F1EDE4',
         },
-        surface: {
-          DEFAULT: '#0F172A',
-          alt: '#1E293B',
-          hover: '#182438',
-          active: '#23324D',
+        ink: {
+          900: '#102B42',
+          700: '#334754',
         },
-        border: {
-          subtle: '#1E293B',
-          strong: '#334155',
-          focus: '#3B82F6',
+        rule: {
+          300: '#C9C5BC',
         },
-        brand: {
-          50: '#eff6ff',
-          100: '#dbeafe',
-          400: '#60a5fa',
-          500: '#3b82f6',
-          600: '#2563eb',
-          700: '#1d4ed8',
-          900: '#1e3a8a',
+        source: {
+          blue: '#356A88',
+        },
+        matched: {
+          green: '#3E725E',
+        },
+        ledger: {
+          vermilion: '#C6533C',
         },
         advisory: {
-          DEFAULT: '#0891B2',
-          light: '#06B6D4',
-          subtle: 'rgba(8, 145, 178, 0.12)',
-          border: 'rgba(8, 145, 178, 0.3)',
+          amber: '#B47A43',
         },
-        resolved: {
-          DEFAULT: '#059669',
-          light: '#10B981',
-          subtle: 'rgba(5, 150, 105, 0.12)',
-          border: 'rgba(5, 150, 105, 0.3)',
+        locked: {
+          slate: '#65747A',
         },
-        warning: {
-          DEFAULT: '#D97706',
-          light: '#F59E0B',
-          subtle: 'rgba(217, 119, 6, 0.12)',
-          border: 'rgba(217, 119, 6, 0.3)',
-        },
-        critical: {
-          DEFAULT: '#E11D48',
-          light: '#F43F5E',
-          subtle: 'rgba(225, 29, 72, 0.12)',
-          border: 'rgba(225, 29, 72, 0.3)',
+        audit: {
+          violet: '#6E627D',
         },
       },
+      borderRadius: {
+        'xs': '2px',
+        'sm': '4px',
+        'md': '8px',
+      },
       boxShadow: {
-        'panel': '0 4px 20px -2px rgba(0, 0, 0, 0.45)',
-        'elevated': '0 10px 30px -4px rgba(0, 0, 0, 0.6)',
+        'subtle': '0 1px 2px rgba(0, 0, 0, 0.3)',
+        'card': '0 4px 12px rgba(0, 0, 0, 0.4)',
+      },
+      transitionDuration: {
+        DEFAULT: '180ms',
+      },
+      transitionTimingFunction: {
+        DEFAULT: 'ease-out',
       },
     },
   },

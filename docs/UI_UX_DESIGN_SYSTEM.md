@@ -1,304 +1,369 @@
-# LedgerLens UI/UX Design System Specification
+# LedgerLens Design System (Implementation-Ready)
 
-## 1. Design Thesis
+## 1. Context and Goals
 
-> LedgerLens is a calm, evidence-first control room where finance operators
-> move from risk signal to human decision without losing context.
+**Mission**  
+LedgerLens is a calm, evidence-first control room for finance operators. It helps teams move from risk signal to human decision without losing context.
 
-LedgerLens is designed as a focused investigation workspace for finance and
-payment operations. It rejects consumer fintech gamification, decorative
-dark-mode glow, and generic AI chat bubbles in favor of spatial discipline,
-high data density, and clear evidence inspection.
+**Design intent (one sentence)**  
+Deliver a token-driven, accessible, and consistent UI that feels like a financial operations terminal—not a generic AI dashboard, marketing site, or chat-first copilot.
 
----
+**Non-negotiables**
 
-## 2. Operator Workflow Journey
+- No generic AI/SaaS dashboard tropes (gradients, glowing blobs, glassmorphism, oversized KPI walls).
+- No chat-first AI interfaces; AI is secondary, read-only, and grounded in facts and policies.
+- No arbitrary spacing or typography; all values must come from tokens.
+- No fake live claims, fake operator identities, or unsupported confidence percentages.
 
-The interface structures the finance operator's journey through six
-connected steps:
+**Goals**
 
-```text
-1. See what needs attention (Queue Triage)
-   ↓
-2. Understand why a case was flagged (Case Header & Context)
-   ↓
-3. Compare payment, settlement, refund, and bank evidence (Evidence Grid)
-   ↓
-4. Read optional policy-based guidance (Read-Only AI Advisory Drawer)
-   ↓
-5. Make the human decision (Decision Panel with Optimistic Locking)
-   ↓
-6. See the recorded audit outcome (Audit Trail)
-```
+- Provide implementation-ready guidance for all core components and pages.
+- Ensure consistency, accessibility (WCAG 2.2 AA), and fast delivery across:
+  - Marketing/site layer (landing, how-it-works, evidence, evaluation, docs, about).
+  - App layer (Exception Control Room: queue, case workspace, decision, audit).
+- Make “generic AI vibes” a testable failure condition.
 
 ---
 
-## 3. Information Hierarchy & the Law of Proximity
+## 2. Design Tokens and Foundations
 
-The interface follows the Law of Proximity: items that share a functional
-relationship are grouped tightly, while distinct operational zones are
-separated by clear spatial gutters.
+All component and page rules must refer to these tokens. Raw hex values and arbitrary pixels are prohibited in component specs.
 
-```text
-┌─────────────────────────────────────────────────────────────────────────────┐
-│                          SPATIAL PROXIMITY RULES                            │
-├───────────────────────┬─────────────────────────────────────────────────────┤
-│ 4px–8px Micro-Gap     │ Label to input, icon to label, badge inner padding  │
-│ 16px Stack Spacing    │ Card to card, list item to list item, table rows    │
-│ 24px Panel Padding    │ Internal padding inside case and decision panels    │
-│ 32px Column Clearance │ Gutters between Context, Evidence, and Decision     │
-└───────────────────────┴─────────────────────────────────────────────────────┘
-```
+### 2.1 Color Tokens
 
----
+| Token                 | Value     | Role                                                    |
+|-----------------------|-----------|---------------------------------------------------------|
+| `color.canvas`        | `#080D1A` | Main application backdrop                               |
+| `color.surface.base`  | `#0F172A` | Elevated panels, table headers, case cards              |
+| `color.surface.alt`   | `#1E293B` | Nested source cards (Payment, Settlement, Bank Credit)  |
+| `color.border.subtle` | `#1E293B` | Table row dividers, subtle inner borders                |
+| `color.border.strong` | `#334155` | Outer card frames, interactive container boundaries     |
+| `color.primary`       | `#2563EB` | Active buttons, focused inputs, selection chips         |
+| `color.advisory`      | `#0891B2` | Read-only AI policy copilot, citation tags, info pills  |
+| `color.resolved`      | `#059669` | Approved cases, auto-reconciled matches, zero delta     |
+| `color.needsReview`   | `#D97706` | Exceptions requiring human intervention, warnings       |
+| `color.critical`      | `#E11D48` | High discrepancy amounts, missing files, errors         |
+| `color.text.primary`  | `#FFFFFF` | Main headings, monetary amounts, primary values         |
+| `color.text.secondary`| `#94A3B8` | Field labels, timestamps, secondary identifiers         |
 
-## 4. Strict Spatial System (Base-8 + 4px Micro-Scale)
+**Usage rules**
 
-Every margin, padding, gap, and dimension is locked to an exact mathematical
-scale:
+- Backgrounds must use `color.canvas`, `color.surface.base`, or `color.surface.alt`.
+- Borders must use `color.border.subtle` or `color.border.strong`.
+- Interactive primary elements must use `color.primary`.
+- Advisory AI elements must use `color.advisory` only as an accent, never as a dominant background.
+- Status colors (`resolved`, `needsReview`, `critical`) must be used consistently for their semantic roles.
 
-- `space-1` (`4px`): Micro-gap (icon-to-text gap, badge inner padding).
-- `space-2` (`8px`): Tight grouping (form label to input, title to subtitle).
-- `space-3` (`12px`): Compact element padding (filter chips, dropdown triggers).
-- `space-4` (`16px`): Standard stack spacing (evidence card gaps, list rows).
-- `space-6` (`24px`): Panel interior padding (case cards, decision container).
-- `space-8` (`32px`): Major column gutters, section headers, screen padding.
+### 2.2 Typography Tokens
 
----
+| Token                 | Value                                      |
+|-----------------------|--------------------------------------------|
+| `font.family.ui`      | `Inter, system-ui, sans-serif`             |
+| `font.family.mono`    | `JetBrains Mono, monospace`                |
+| `font.weight.base`    | `400`                                      |
+| `font.weight.medium`  | `500`                                      |
+| `font.weight.semibold`| `600`                                      |
+| `font.weight.bold`    | `700`                                      |
+| `font.size.base`      | `16px`                                     |
+| `font.lineHeight.base`| `1.5` (24px at 16px base)                  |
 
-## 5. Typography
+**Type scale (UI)**
 
-- **Interface Typography**: `Inter` / system UI sans-serif (`400` body, `500`
-  labels, `600` headers, `700` titles).
-- **Tabular Monospace**: `JetBrains Mono` with
-  `font-variant-numeric: tabular-nums` applied to:
-  - Monetary values (`₹488.20`);
-  - Transaction and order identifiers (`ord_synth_004`, `pay_synth_004`);
-  - Bank UTR numbers (`UTR99887711`);
-  - Timestamps and relative age (`2h ago`);
-  - Version numbers (`v1`, `expected_version=1`).
+- `text-xs`: 12px
+- `text-sm`: 14px
+- `text-md`: 16px
+- `text-lg`: 18px
+- `text-xl`: 20px
+- `text-2xl`: 24px
+- `text-3xl`: 30px
 
----
+**Tabular monospace usage**
 
-## 6. LedgerLens Semantic Color System
+`font.family.mono` with `font-variant-numeric: tabular-nums` must be used for:
 
-- **App Canvas** (`#080D1A`): Main application backdrop.
-- **Card Surface** (`#0F172A`): Elevated panels, table headers, case cards.
-- **Card Surface Alt** (`#1E293B`): Nested source cards (Payment, Settlement).
-- **Border Subtle** (`#1E293B`): Table row dividers, subtle inner borders.
-- **Border Strong** (`#334155`): Outer card frames, interactive boundaries.
-- **Primary Interaction** (`#2563EB`): Active buttons, focused inputs.
-- **Advisory AI** (`#0891B2`): Read-only AI policy copilot, citation tags.
-- **Resolved State** (`#059669`): Approved cases, auto-reconciled matches.
-- **Needs Review** (`#D97706`): Exceptions requiring human intervention.
-- **Critical Risk** (`#E11D48`): High discrepancy amounts, missing files.
-- **Text Primary** (`#FFFFFF`): Main headings, monetary amounts, values.
-- **Text Secondary** (`#94A3B8`): Field labels, timestamps, identifiers.
+- Monetary values (`₹488.20`)
+- Transaction and order identifiers (`ord_synth_004`, `pay_synth_004`)
+- Bank UTR numbers (`UTR99887711`)
+- Timestamps and relative age (`2h ago`)
+- Version numbers (`v1`, `expected_version=1`)
 
----
+### 2.3 Spacing Tokens (Base-8 + 4px Micro-Scale)
 
-## 7. Exception Queue UX
+| Token       | Value | Applied Context                                              |
+|-------------|-------|--------------------------------------------------------------|
+| `space-1`   | 4px   | Micro-gap (icon-to-text, badge inner padding)                |
+| `space-2`   | 8px   | Tight grouping (label-to-input, title-to-subtitle)           |
+| `space-3`   | 12px  | Compact element padding (filter chips, dropdown triggers)    |
+| `space-4`   | 16px  | Standard stack spacing (card gaps, list rows, table cells)   |
+| `space-6`   | 24px  | Panel interior padding (case cards, decision container)      |
+| `space-8`   | 32px  | Major column gutters, section headers, screen container      |
 
-The exception queue is the primary work surface of the application:
+**Rules**
 
-1. **Header & Context Strip**:
-   - Header shows the compact LedgerLens mark (`Candidate 2`), title
-     `Exception Control Room`, and supported source pill
-     (`Supports 4 financial data sources`).
-   - Context strip displays live totals from `ReviewQueueResponse`:
-     `N cases need review · ₹X.XX total at risk`.
-   - Oversized decorative KPI cards are prohibited.
+- All margins, paddings, and gaps must use these tokens.
+- Arbitrary values (13px, 19px, 27px, etc.) are prohibited.
 
-2. **Filter Strip**:
-   - Search input (Order ID, Payment ID, UTR).
-   - Exception category dropdown (`amount_mismatch`, `missing_settlement`, etc.).
-   - Severity filters and sorting controls.
+### 2.4 Radius, Shadow, and Motion Tokens
 
-3. **Table Construction**:
-   - Primary line displays **what happened in plain language**
-     (e.g., *"Bank credited ₹400.00, but ₹488.20 was expected."*).
-   - Secondary line displays identifiers and technical exception badge
-     (`amount_mismatch`).
-   - Right-aligned monetary values in tabular monospace font.
+| Token          | Value                              |
+|----------------|------------------------------------|
+| `radius.xs`    | 2px                                |
+| `radius.sm`    | 4px                                |
+| `radius.md`    | 8px                                |
+| `shadow.subtle`| `0 1px 2px rgba(0,0,0,0.3)`       |
+| `shadow.card`  | `0 4px 12px rgba(0,0,0,0.4)`      |
+| `motion.duration` | `150ms–220ms`                   |
+| `motion.easing`   | `ease-out`                      |
 
-> **Wireframe data note:** Counts, amounts, identifiers, and timestamps shown
-> below are illustrative examples. The implemented interface must render live
-> queue data only from supported backend API responses.
+**Motion rules**
 
-```text
-┌─────────────────────────────────────────────────────────────────────────────┐
-│ [Compact Mark] LedgerLens  Control Room   [Supports 4 data sources] [Sync]  │
-├─────────────────────────────────────────────────────────────────────────────┤
-│ EXCEPTION CONTROL ROOM                                                      │
-│ 18 cases need review · ₹48,920.00 total at risk                             │
-│                                                                             │
-│ ┌─ FILTER STRIP ──────────────────────────────────────────────────────────┐ │
-│ │ [Search Order / Payment / UTR...] [Cat: All ▾] [Sev: All ▾] [Status: All]││
-│ └─────────────────────────────────────────────────────────────────────────┘ │
-│                                                                             │
-│ ┌─ QUEUE TABLE (Sorted by Severity & Age) ────────────────────────────────┐ │
-│ │ SEVERITY │ WHAT HAPPENED & IDENTIFIERS           │ AT RISK   │ ACTION   │ │
-│ ├──────────┼───────────────────────────────────────┼───────────┼──────────┤ │
-│ │ [Crit]   │ Bank credited ₹400.00, expected ₹488  │ ₹488.20   │ [Open]   │ │
-│ │          │ pay_004 · order_004 (Example)         │           │          │ │
-│ ├──────────┼───────────────────────────────────────┼───────────┼──────────┤ │
-│ │ [High]   │ Payment captured, no settlement file  │ ₹1,250.00 │ [Open]   │ │
-│ │          │ pay_012 · order_012 (Example)         │           │          │ │
-│ └─────────────────────────────────────────────────────────────────────────┘ │
-└─────────────────────────────────────────────────────────────────────────────┘
-```
+- Motion is triggered only by state changes (drawer toggle, submit, conflict banner).
+- Duration must be within `150ms–220ms` with `ease-out`.
+- Perpetual animations, glowing borders, bouncing/floating cards, and animated gradients are prohibited.
 
 ---
 
-## 8. Case Workspace UX (3-Column Desktop Structure)
+## 3. Component-Level Rules
 
-On desktop ($\ge 1280\text{px}$), the workspace maintains a persistent 3-column
-layout so context, evidence, and decision controls remain visible
-simultaneously without tab switching:
+### 3.1 Exception Queue Table
 
-```text
-┌─────────────────────────────────────────────────────────────────────────────┐
-│ [Back to Queue] Case #case_004 [High] [Needs Review] Version: v1 [Refresh]  │
-├───────────────────────┬─────────────────────────────┬───────────────────────┤
-│ 1. CASE CONTEXT       │ 2. EVIDENCE COMPARISON      │ 3. DECISION PANEL     │
-├───────────────────────┼─────────────────────────────┼───────────────────────┤
-│ Total at Risk:        │ "Why this was flagged:"     │ Current State:        │
-│ ₹488.20               │ Bank credited ₹400.00, but  │ [ Needs Review ]      │
-│                       │ ₹488.20 was expected.       │                       │
-│ Discrepancy:          ├─────────────────────────────┤ Reviewer Identity:    │
-│ -₹88.20               │ ┌─ PAYMENT ───────────────┐ │ [ Reviewer ID/Email ] │
-│                       │ │ Gross: ₹500.00          │ │                       │
-│ Opened:               │ │ Net Expected: ₹488.20   │ │ Decision Action: *    │
-│ 2 hours ago           │ └─────────────────────────┘ │ (o) Approve           │
-│                       │ ┌─ SETTLEMENT ────────────┐ │ ( ) Reject            │
-│ Identifiers:          │ │ Reported Net: ₹488.20   │ │ ( ) Mark Unresolved   │
-│ • Pay: pay_004        │ └─────────────────────────┘ │                       │
-│ • Set: set_004        │ ┌─ BANK CREDIT ───────────┐ │ Rationale / Reason: * │
-│ • UTR: UTR99887711    │ │ Credited: ₹400.00       │ │ ┌───────────────────┐ │
-│                       │ └─────────────────────────┘ │ │ Fee variance.     │ │
-│ Technical Code:       │                             │ └───────────────────┘ │
-│ `amount_mismatch`     │ ┌─ POLICY ADVISORY ───────┐ │                       │
-│                       │ │ Root Cause: Bank fee    │ │ Expected Version: 1   │
-│ ┌─ AUDIT SUMMARY ───┐ │ │ Policy: Sec 4.2 SLA     │ │ [ Submit Decision ]   │
-│ │ • 14:10 Ingested  │ │ └─────────────────────────┘ │                       │
-│ └───────────────────┘ │                             │ Collision Safe (Lock) │
-└───────────────────────┴─────────────────────────────┴───────────────────────┘
-```
+**Context and goals**  
+The Exception Queue is the primary work surface. It must read as a dense financial operations table, not a marketing hero.
 
-### Responsive Viewport Rules
+**Anatomy**
 
-- **Desktop** ($\ge 1280\text{px}$): 3 persistent columns: Context (22%) \|
-  Evidence (48%) \| Decision (30%).
-- **Tablet** ($768\text{px} - 1279\text{px}$): 2 columns: Evidence &
-  Context (65%) \| Decision (35%).
-- **Mobile** ($< 768\text{px}$): 1 column stacked: Case Context $\rightarrow$
-  Evidence Grid $\rightarrow$ Policy AI Drawer $\rightarrow$ Sticky Decision.
+- Context strip: live totals (`N cases need review · ₹X.XX total at risk`).
+- Filter strip: search input, category dropdown, severity filters, sort controls.
+- Table:
+  - Header row.
+  - Data rows with:
+    - Severity indicator.
+    - Plain-language anomaly summary (line 1).
+    - Identifiers + exception badge (line 2).
+    - Right-aligned monetary values (tabular monospace).
+    - Action link/button (`Inspect`).
 
----
+**Variants**
 
-## 9. Read-Only AI Policy Drawer
+- Severity: `critical`, `high`, `medium`, `low` (mapped to `color.critical`, `color.needsReview`, etc.).
+- Status: `needsReview`, `resolved`, `escalated`.
 
-The policy investigation assistant is visually secondary and placed below
-the evidence comparison cards:
+**States**
 
-- **Heading**: Lucide `Sparkles` icon with label:
-  `Policy-based explanation (read-only)`.
-- **Fact Extraction**: Displays verified database facts (amounts, timestamps).
-- **Root Cause & Guidance**: Explains the discrepancy and recommends
-  operational actions based on local policy files.
-- **Policy Citations**: Expandable cards quoting source documents and
-  section numbers.
-- **Confidence Indicator**: Relies strictly on backend boolean `is_confident`.
-- **Strict Boundary**: The AI container contains no decision controls. Human
-  review actions remain in the separate Decision Panel.
+- `default`: clear row separation with `color.border.subtle`.
+- `hover`: subtle background shift on `color.surface.alt` with visible row highlight.
+- `focus-visible`: focused row or action must show `focus-visible: ring-2 ring-primary`.
+- `loading`: skeleton rows matching exact geometry.
+- `empty`: centered empty state with icon, headline, and guidance.
 
----
+**Responsive behavior**
 
-## 10. Review & Outcome States
+- Desktop: full table with all columns.
+- Tablet: compress secondary columns, keep anomaly summary and amount visible.
+- Mobile: stack into card-like rows with summary on top, metadata below.
 
-- **Loading State**: Skeleton pulse rows matching exact table and card
-  dimensions. Microcopy: `Loading financial records and audit history...`
-- **No Cases (Empty)**: Centered state with Lucide `ShieldCheck`.
-  Microcopy: `All caught up. Zero financial exceptions require attention.`
-- **Filtered Empty State**: Centered state with Lucide `SlidersHorizontal`.
-  Microcopy: `No exceptions match your active filter criteria.`
-- **Partial Evidence**: Notice card with Lucide `AlertCircle`.
-  Microcopy: `Partial records found. Settlement line item is missing.`
-- **Decision Success**: Inline confirmation banner with Lucide `CheckCircle2`.
-  Microcopy: `Case resolved. Decision and rationale recorded in audit trail.`
-- **HTTP 409 Conflict**: Alert banner with Lucide `AlertTriangle`.
-  Microcopy: `Another reviewer updated this case first. Please refresh.`
-  Action: `[Refresh Case]`.
-- **Audit Update**: Highlights newly appended event in the chronological audit
-  list with actor badge and timestamp.
+**Keyboard, pointer, touch**
+
+- `Tab` navigates through interactive elements (search, filters, row actions).
+- `Enter`/`Space` on a focused row opens the case.
+- Pointer hover highlights the row.
+- Touch: rows must be tappable with adequate padding (`space-4` vertical minimum).
+
+**Spacing and typography**
+
+- Table cell vertical padding: `space-2`–`space-4`.
+- Filter strip gaps: `space-2`–`space-3`.
+- Anomaly summary: `text-sm` or `text-md`, `font.family.ui`.
+- Monetary values: `font.family.mono`, `tabular-nums`.
+
+**Long-content, overflow, empty-state**
+
+- Anomaly summary must truncate with ellipsis after 2 lines on small screens.
+- Identifiers must truncate gracefully with tooltip on hover/focus.
+- Empty state: “All caught up. Zero financial exceptions require attention right now.” with `ShieldCheck` icon.
+
+**Accessibility acceptance criteria**
+
+- All interactive elements reachable via keyboard with visible focus ring.
+- Color is not the only signal for severity/status; text labels and icons must be present.
+- Contrast between text and background meets WCAG 2.2 AA.
+
+**Anti-patterns**
+
+- Oversized KPI cards pushing the queue below the fold.
+- Decorative gradients or glowing effects around the table.
+- Using color alone to indicate severity.
 
 ---
 
-## 11. Motion Principles
+### 3.2 Filter Bar (Search, Category, Severity, Sort)
 
-- **State-Change Transitions Only**: Motion is triggered strictly when data
-  state changes (opening an accordion drawer, submitting a decision, or
-  receiving a conflict).
-- **Duration & Easing**: `150ms–220ms` with `ease-out`.
-- **Prohibited Motion**: Zero perpetual animations, zero glowing borders, zero
-  bouncing or floating cards, and zero animated gradients.
+**Context and goals**  
+Compact, high-density filter toolbar for the Exception Queue.
+
+**Anatomy**
+
+- Search input (Order ID / Payment ID / UTR).
+- Category dropdown (`amount_mismatch`, `missing_settlement`, etc.).
+- Severity filter (chips or dropdown).
+- Sort control (discrepancy, amount, age).
+
+**States**
+
+- `default`: clear borders (`color.border.subtle`).
+- `hover`: border color shifts to `color.border.strong`.
+- `focus-visible`: ring-2 `color.primary`.
+- `disabled`: reduced opacity, no interaction.
+- `error`: red border (`color.critical`) with error message.
+
+**Responsive behavior**
+
+- Desktop: single row with compact inputs.
+- Tablet/mobile: wrap into multiple rows, keep search and category most prominent.
+
+**Keyboard, pointer, touch**
+
+- All inputs and selects must be focusable and operable via keyboard.
+- Dropdowns must be navigable with arrow keys.
+- Touch targets minimum 44x44px.
+
+**Spacing and typography**
+
+- Gaps between controls: `space-2`–`space-3`.
+- Input padding: `space-3` vertical, `space-4` horizontal.
+- Labels and placeholders: `text-sm`, `font.family.ui`.
+
+**Accessibility**
+
+- Labels must be associated with inputs (`htmlFor` / `id`).
+- Error messages must be linked via `aria-describedby`.
+
+**Anti-patterns**
+
+- Overly large, marketing-style filter sections.
+- Hidden filters behind “More” buttons without clear indication.
 
 ---
 
-## 12. Accessibility Requirements to Implement & Verify
+### 3.3 Case Workspace (3-Column Desktop Layout)
 
-- **Keyboard Navigation**: Full logical `Tab` order through filters, table
-  rows (`Enter`/`Space` opens case), and decision forms.
-- **Visible Focus Indicators**: High-contrast
-  `focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none`
-  on all interactive elements.
-- **Semantic HTML Controls**: Explicit `<label htmlFor="...">`, `<fieldset>`,
-  `<legend>`, and `<button>` elements.
-- **Multi-Signal Status**: Status and severity are communicated through text
-  labels (`Critical`, `High`, `Needs Review`), icons, and color.
-- **Screen Reader ARIA**:
-  - `role="alert"` and `aria-live="assertive"` on HTTP 409 collision notices.
-  - `aria-live="polite"` on queue count updates.
-  - `aria-describedby` linking decision inputs to the expected-version warning.
-- **Responsive Reflow**: Preserves readability and functionality down to
-  `320px` width without horizontal content clipping.
+**Context and goals**  
+Persistent 3-column investigative layout for desktop (≥1280px): Context | Evidence | Decision.
+
+**Anatomy**
+
+- Header: case ID, severity, status, version, refresh action.
+- Column 1 (22–25%): Case Context & Audit.
+- Column 2 (42–48%): Evidence Comparison & Policy AI.
+- Column 3 (30–33%): Human Decision Panel.
+
+**Variants**
+
+- Desktop: 3 columns.
+- Tablet: 2 columns (Context+Evidence | Decision).
+- Mobile: single stacked column.
+
+**States**
+
+- `default`: clear column separation with `space-8` gutters.
+- `loading`: skeleton layout matching column structure.
+- `error`: error banner at top of workspace.
+
+**Keyboard, pointer, touch**
+
+- Tab order: header → left column → center column → right column.
+- All interactive elements within columns must be keyboard accessible.
+
+**Spacing and typography**
+
+- Column gutters: `space-8`.
+- Panel internal padding: `space-6`.
+- Headings: `text-lg`–`text-xl`, `font.weight.semibold`.
+- Body: `text-sm`–`text-md`.
+
+**Accessibility**
+
+- Landmarks: use `aside` for side columns, `main` for evidence.
+- Headings must reflect hierarchy.
+
+**Anti-patterns**
+
+- Collapsing core evidence behind tabs.
+- Making AI the central focus instead of evidence.
 
 ---
 
-## 13. Lucide Functional Icon System
+## 4. Accessibility Requirements and Testable Acceptance Criteria
 
-Functional iconography uses Lucide SVG icons with `aria-hidden="true"`.
-Emojis are prohibited in functional UI controls.
+**Target**: WCAG 2.2 AA.
 
-- **Payment Captured**: `ReceiptText`
-- **Settlement File**: `Landmark`
-- **Customer Refund**: `RotateCcw`
-- **Bank Credit / UTR**: `Building2`
-- **Reconciliation Evidence**: `Scale`
-- **Exception / Anomaly**: `AlertTriangle`
-- **Critical Severity**: `AlertOctagon`
-- **Human Review Action**: `UserCheck`
-- **Audit Trail**: `History`
-- **Live Sync / Refresh**: `RefreshCw`
-- **Advisory Policy AI**: `Sparkles`
+**Keyboard-first interactions**
+
+- All interactive elements must be reachable and operable via keyboard alone.
+- Focus order must be logical and follow visual layout.
+
+**Focus-visible**
+
+- All interactive elements must have visible focus indicators:
+  - `focus-visible: ring-2 ring-primary outline-none`.
+
+**Contrast constraints**
+
+- Text/background contrast must meet WCAG 2.2 AA.
+- Status colors must be paired with text labels and icons.
+
+**Testable criteria**
+
+- “All interactive elements must be reachable via Tab with visible focus ring.”
+- “No information is conveyed by color alone.”
+- “All form inputs have associated labels.”
 
 ---
 
-## 14. Visual Anti-Patterns (Prohibited in LedgerLens)
+## 5. Content and Tone Standards
 
-1. **Generic Dark SaaS Dashboards**: No dark templates filled with purple
-   gradients or blurred glowing orbs.
-2. **Oversized KPI Walls**: No row of 4 large cards with floating percentages
-   that push the actual exception queue below the fold.
-3. **Decorative Glassmorphism**: No heavy frosted glass overlays that impair
-   text legibility.
-4. **Arbitrary Spacing**: No random margins (`13px`, `19px`, `27px`); strict
-   Base-8 scale enforced.
-5. **Chat-First AI Interfaces**: No chat bubbles or open conversational inputs;
-   AI output is rendered as structured inspection notes.
-6. **Hidden Evidence Behind Tabs**: Core evidence (Payment, Settlement, Refund,
-   Bank Credit) is visible simultaneously.
-7. **Fabricated Live Claims**: No fake operator identities or unverified "live"
-   claims without real authentication.
-8. **Unsupported Confidence Percentages**: AI confidence uses the verified
-   boolean `is_confident` rather than invented percentage scores.
+**Tone**: concise, confident, implementation-focused.
+
+**Examples**
+
+- Anomaly summary:  
+  “Bank credited ₹400.00, but ₹488.20 was expected.”
+- Empty state:  
+  “All caught up. Zero financial exceptions require attention right now.”
+- Conflict banner:  
+  “Another reviewer updated this case first. Your action was not saved. Please refresh.”
+
+**Prohibited**
+
+- Marketing fluff (“AI-powered magic”, “revolutionary”, etc.).
+- Vague labels (“Process”, “Action”) without context.
+
+---
+
+## 6. Anti-Patterns and Prohibited Implementations
+
+- Generic dark SaaS dashboards with gradients/glow.
+- Oversized KPI walls pushing the queue below the fold.
+- Chat-first AI interfaces.
+- Hidden evidence behind tabs.
+- Fake live claims and unsupported confidence percentages.
+- Arbitrary spacing (13px, 19px, 27px).
+
+---
+
+## 7. QA Checklist
+
+**For components**
+
+- [ ] Uses only defined color, typography, and spacing tokens.
+- [ ] All states defined and implemented (default, hover, focus-visible, active, disabled, loading, error).
+- [ ] Keyboard, pointer, and touch behavior verified.
+- [ ] Accessibility criteria met (focus, contrast, labels).
+- [ ] Responsive behavior verified (desktop/tablet/mobile).
+
+**For pages**
+
+- [ ] Structure matches the design system layout.
+- [ ] Narrative is clear (problem, solution, proof).
+- [ ] No generic AI/SaaS patterns present.
+- [ ] All components conform to their specs.

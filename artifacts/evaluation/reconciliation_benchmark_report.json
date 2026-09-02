@@ -1,0 +1,27 @@
+{
+  "timestamp": "2026-08-31T17:44:28.122788+00:00",
+  "dataset_size": 60,
+  "total_submitted": 61,
+  "total_accepted": 60,
+  "total_rejected": 1,
+  "match_rate_percentage": 70.0,
+  "precision_auto_reconcile": 100.0,
+  "recall_auto_reconcile": 100.0,
+  "false_approvals": 0,
+  "zero_false_approval_invariant": "PASSED",
+  "summary": {
+    "auto_reconciled_count": 42,
+    "needs_review_count": 18,
+    "unresolved_count": 0,
+    "total_amount_reconciled_inr": "159933.00",
+    "total_amount_at_risk_inr": "70907.00"
+  },
+  "exception_type_distribution": {
+    "amount_mismatch": 4,
+    "missing_bank_credit": 4,
+    "partial_refund_not_reflected": 3,
+    "fee_mismatch": 3,
+    "duplicate_payment": 2,
+    "missing_settlement": 2
+  }
+}

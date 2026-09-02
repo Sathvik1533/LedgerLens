@@ -123,3 +123,69 @@ export interface InvestigationResult {
   is_confident: boolean;
 }
 
+export interface ReconciliationStats {
+  total_payments_count: number;
+  total_settlements_count: number;
+  total_refunds_count: number;
+  total_bank_credits_count: number;
+  total_cases: number;
+  auto_reconciled_count: number;
+  needs_review_count: number;
+  unresolved_count: number;
+  match_rate_percentage: number;
+  total_amount_reconciled: string;
+  total_amount_at_risk: string;
+  exception_breakdown: Record<string, number>;
+}
+
+export interface FeedInfo {
+  name: string;
+  count: number;
+  status: string;
+  source: string;
+}
+
+export interface IngestionBatchItem {
+  id: string;
+  idempotency_key: string;
+  batch_status: string;
+  source_filename: string;
+  source_tables: string[];
+  row_count_submitted: number;
+  row_count_accepted: number;
+  row_count_rejected: number;
+  submitted_at: string | null;
+  completed_at: string | null;
+}
+
+export interface IngestionStatusResponse {
+  feeds: Record<string, FeedInfo>;
+  batches: IngestionBatchItem[];
+}
+
+export interface PolicyDocument {
+  filename: string;
+  title: string;
+  content: string;
+  line_count: number;
+}
+
+export interface PolicyCorpusResponse {
+  corpus_version: string;
+  grounding_floor: number;
+  documents: PolicyDocument[];
+}
+
+export interface PolicySearchResult {
+  query: string;
+  grounding_floor: number;
+  matched_chunks: Array<{
+    source_file: string;
+    line_start: number;
+    line_end: number;
+    text: string;
+    similarity_score: number;
+    is_grounded: boolean;
+  }>;
+}
+
