@@ -239,7 +239,7 @@ export const DashboardPage: React.FC = () => {
               </div>
               <button
                 onClick={() => navigate('/app/queue')}
-                className="text-xs text-source-blue hover:text-blue-300 font-medium font-sans flex items-center gap-1 transition"
+                className="text-xs text-source-blue hover:text-source-blue/80 font-medium font-sans flex items-center gap-1 transition"
               >
                 <span>Inspect in Control Room</span>
                 <ArrowRight className="w-3 h-3" />
@@ -257,7 +257,7 @@ export const DashboardPage: React.FC = () => {
             <div className="flex items-center gap-1.5">
               <span className="w-2.5 h-2.5 rounded-full bg-ledger-vermilion/80" />
               <span className="w-2.5 h-2.5 rounded-full bg-advisory-amber/80" />
-              <span className="w-2.5 h-2.5 rounded-full bg-emerald-500/80" />
+              <span className="w-2.5 h-2.5 rounded-full bg-matched-green" />
             </div>
             <span className="text-[11px] font-mono text-ink-700 uppercase tracking-wider ml-2">
               LEDGERLENS // RECONCILIATION COMMAND CENTER
@@ -265,7 +265,7 @@ export const DashboardPage: React.FC = () => {
           </div>
 
           <div className="flex items-center gap-2">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+            <span className="w-1.5 h-1.5 rounded-full bg-matched-green animate-pulse" />
             <span className="text-[10px] font-mono font-medium text-matched-green uppercase tracking-wider">
               Signals are live
             </span>
@@ -290,7 +290,7 @@ export const DashboardPage: React.FC = () => {
                 Order IDs, customer capture timestamps, gross amounts in INR, and payment status states.
               </p>
               <div className="text-[10px] font-mono text-matched-green flex items-center gap-1 pt-1">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 inline-block" />
+                <span className="w-1.5 h-1.5 rounded-full bg-matched-green inline-block" />
                 <span>Ingested &amp; Normalized</span>
               </div>
             </div>
@@ -299,10 +299,10 @@ export const DashboardPage: React.FC = () => {
             <div className="bg-paper-1 border border-rule-300 hover:border-source-blue rounded-lg p-4 space-y-2 transition">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2 text-xs font-semibold text-ink-900">
-                  <FileSpreadsheet className="w-4 h-4 text-sky-400" />
+                  <FileSpreadsheet className="w-4 h-4 text-source-blue" />
                   <span>2. Gateway Settlements</span>
                 </div>
-                <span className="font-mono text-xs font-bold text-sky-400 bg-sky-950/60 border border-sky-500/20 px-2 py-0.5 rounded">
+                <span className="font-mono text-xs font-bold text-source-blue bg-source-blue/10 border border-source-blue/20 px-2 py-0.5 rounded">
                   {stats?.total_settlements_count || 0}
                 </span>
               </div>
@@ -310,7 +310,7 @@ export const DashboardPage: React.FC = () => {
                 Reported gross, contractual 2% fees + 18% GST formula, net payouts, and batch IDs.
               </p>
               <div className="text-[10px] font-mono text-matched-green flex items-center gap-1 pt-1">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 inline-block" />
+                <span className="w-1.5 h-1.5 rounded-full bg-matched-green inline-block" />
                 <span>Contract Formula Verified</span>
               </div>
             </div>
@@ -319,10 +319,10 @@ export const DashboardPage: React.FC = () => {
             <div className="bg-paper-1 border border-rule-300 hover:border-source-blue rounded-lg p-4 space-y-2 transition">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2 text-xs font-semibold text-ink-900">
-                  <Building2 className="w-4 h-4 text-indigo-400" />
+                  <Building2 className="w-4 h-4 text-ink-900" />
                   <span>3. Bank Statement Credits</span>
                 </div>
-                <span className="font-mono text-xs font-bold text-indigo-400 bg-indigo-950/60 border border-indigo-500/20 px-2 py-0.5 rounded">
+                <span className="font-mono text-xs font-bold text-ink-900 bg-ink-900/10 border border-ink-900/20 px-2 py-0.5 rounded">
                   {stats?.total_bank_credits_count || 0}
                 </span>
               </div>
@@ -330,7 +330,7 @@ export const DashboardPage: React.FC = () => {
                 Core banking NEFT/RTGS UTR numbers, credited ledger amounts, and bank narrations.
               </p>
               <div className="text-[10px] font-mono text-matched-green flex items-center gap-1 pt-1">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 inline-block" />
+                <span className="w-1.5 h-1.5 rounded-full bg-matched-green inline-block" />
                 <span>Double-Credit Guarded</span>
               </div>
             </div>
@@ -350,7 +350,7 @@ export const DashboardPage: React.FC = () => {
             </div>
             <button
               onClick={() => navigate('/app/queue')}
-              className="text-xs text-source-blue hover:text-blue-300 font-medium font-sans flex items-center gap-1"
+              className="text-xs text-source-blue hover:text-source-blue/80 font-medium font-sans flex items-center gap-1"
             >
               <span>View All in Control Room</span>
               <ArrowRight className="w-3.5 h-3.5" />
@@ -367,14 +367,14 @@ export const DashboardPage: React.FC = () => {
                   className="bg-paper-1 hover:bg-paper-1 border border-rule-300 hover:border-source-blue rounded-lg p-4 space-y-2 cursor-pointer transition shadow-sm group"
                 >
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-semibold text-ink-900 group-hover:text-blue-300 transition">
+                    <span className="text-xs font-semibold text-ink-900 group-hover:text-source-blue/80 transition">
                       {meta.label}
                     </span>
                     <span
                       className={`font-mono text-xs font-bold px-2 py-0.5 rounded ${
                         count > 0
                           ? meta.severity === 'critical'
-                            ? 'bg-ledger-vermilion/10 text-ink-900 border border-ledger-vermilion'
+                            ? 'bg-ledger-vermilion/10 text-ledger-vermilion border border-ledger-vermilion'
                             : 'bg-advisory-amber/10 text-advisory-amber border border-advisory-amber'
                           : 'bg-paper-1 text-ink-700'
                       }`}

@@ -1,58 +1,93 @@
-@import url('https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Fraunces:ital,opsz,wght@0,9..144,100..900;1,9..144,100..900&display=swap');
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
   body {
-    @apply bg-paper-0 text-ink-700 font-sans;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    overflow-x: hidden;
-  }
-  h1, h2, h3, h4, h5, h6 {
-    @apply text-ink-900;
+    @apply bg-paper-0 text-ink-900 antialiased font-sans;
   }
 }
 
-/* Tabular numbers for financial precision */
-.font-tabular {
-  font-variant-numeric: tabular-nums;
-}
+@layer utilities {
+  .shadow-subtle {
+    box-shadow: 0 1px 2px rgba(16, 43, 66, 0.05);
+  }
+  
+  .shadow-card {
+    box-shadow: 0 4px 12px rgba(16, 43, 66, 0.08), 0 1px 2px rgba(16, 43, 66, 0.04);
+  }
 
-/* Card styling conforming to design system tokens */
-.control-panel {
-  @apply bg-paper-1 border border-rule-300 transition-colors duration-150 ease-out;
-}
+  /* Shimmer Button Pattern (INTERACTION-PATTERNS.md 4.2: CSS @keyframes) */
+  .animate-shimmer {
+    background: linear-gradient(
+      120deg,
+      transparent 20%,
+      rgba(255, 255, 255, 0.2) 50%,
+      transparent 80%
+    );
+    background-size: 200% auto;
+    animation: shimmer 2.5s linear infinite;
+  }
+  
+  @keyframes shimmer {
+    to {
+      background-position: 200% center;
+    }
+  }
 
-.control-panel:hover {
-  @apply border-ink-700;
-}
-
-/* Custom scrollbars */
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-
-::-webkit-scrollbar-track {
-  @apply bg-paper-0;
-}
-
-::-webkit-scrollbar-thumb {
-  @apply bg-rule-300 rounded;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  @apply bg-ink-700;
+  /* Border Beam Pattern (INTERACTION-PATTERNS.md 4.2: CSS @keyframes) */
+  .border-beam {
+    position: relative;
+  }
+  .border-beam::before {
+    content: '';
+    position: absolute;
+    inset: -1px;
+    border-radius: inherit;
+    padding: 1px;
+    background: conic-gradient(
+      from var(--border-angle),
+      transparent 70%,
+      #356A88 100%
+    );
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+    animation: border-beam-spin 4s linear infinite;
+  }
+  
+  @property --border-angle {
+    syntax: "<angle>";
+    inherits: true;
+    initial-value: 0turn;
+  }
+  
+  @keyframes border-beam-spin {
+    to {
+      --border-angle: 1turn;
+    }
+  }
 }
 
 @layer utilities {
   .focus-ring {
-    @apply outline-none ring-2 ring-transparent ring-offset-2;
+    @apply focus:outline-none focus-visible:ring-2 focus-visible:ring-source-blue/50 focus-visible:ring-offset-2 focus-visible:ring-offset-paper-0 transition-shadow;
   }
-  .focus-ring:focus-visible {
-    @apply ring-ink-900;
+}
+
+@layer utilities {
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 4px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: #C9C5BC;
+    border-radius: 4px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: #829BB8;
   }
 }

@@ -150,7 +150,7 @@ export default function LandingPage() {
           </motion.p>
 
           <motion.div variants={FADE_UP} className="flex items-center justify-center space-x-4">
-            <Link to="/app/queue" className="group px-7 py-3.5 bg-ink-900 text-white font-semibold rounded-md shadow-card hover:bg-ink-700 transition-all flex items-center space-x-2 active:scale-95">
+            <Link to="/app/queue" className="group px-7 py-3.5 bg-ink-900 text-white font-semibold rounded-md shadow-card hover:bg-ink-700 transition-all relative overflow-hidden animate-shimmer flex items-center space-x-2 active:scale-95">
               <span>Open Control Room</span>
               <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </Link>
