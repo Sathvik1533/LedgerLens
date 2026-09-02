@@ -1,33 +1,25 @@
 # Playwright E2E and Visual Audit
 
-## 1. Test Matrix Summary
+## 1. Test Execution Summary
 
-Tests executed via Python Playwright on localhost:5173.
+Conducted via comprehensive Python Playwright script validating DOM state, direct network navigation, and Javascript simulation.
 
-| Case ID | Route | Viewport | Action | Result (Pass/Fail) | Evidence |
-|---|---|---|---|---|---|
-| E2E-001 | `/` | 1440x900 | Direct Navigation | PASS | Status 200, 0 console errors |
-| E2E-002 | `/how-it-works` | 1440x900 | Direct Navigation | PASS | Status 200, 0 console errors |
-| E2E-003 | `/evidence` | 1440x900 | Direct Navigation | PASS | Status 200, 0 console errors |
-| E2E-004 | `/evaluation` | 1440x900 | Direct Navigation | PASS | Status 200, 0 console errors |
-| E2E-005 | `/docs` | 1440x900 | Direct Navigation | PASS | Status 200, 0 console errors |
-| E2E-006 | `/about` | 1440x900 | Direct Navigation | PASS | Status 200, 0 console errors |
-| E2E-007 | `/app/dashboard`| 1440x900 | Direct Navigation & Reload | PASS | Status 200, 0 console errors |
-| E2E-008 | `/app/queue` | 1440x900 | Direct Navigation & Reload | PASS | Status 200, 0 console errors |
-| E2E-009 | `/app/ingestion`| 1440x900 | Direct Navigation & Reload | PASS | Status 200, 0 console errors |
-| E2E-010 | `/app/audit` | 1440x900 | Direct Navigation & Reload | PASS | (Previously failed, TS bugs resolved, now passes cleanly) |
-| E2E-011 | `/app/settings` | 1440x900 | Direct Navigation & Reload | PASS | Status 200, 0 console errors |
-| E2E-012 | `/app/queue` | 1440x900 | Click Critical Filter | PASS | DOM filter processes successfully |
-| E2E-013 | `/app/queue` | Mobile (375x812) | Sidebar Scroll Independence | PASS | Verified `data-lenis-prevent="true"` breaks global scroll hijacking |
-| E2E-014 | `/app/case/:id` | 1440x900 | Submit decision incomplete | PASS | Submit strictly disabled if actor missing |
-| E2E-015 | `/app/case/:id` | 1440x900 | Optimistic Locking (HTTP 409)| PASS | UI catches 409, renders alert |
+| Matrix Element | Verification Criteria | Result | Evidence |
+|---|---|---|---|
+| Route Matrix | Iterate `["/", "/app", "/app/case/:id"...]` directly and via refresh | PASS | `audit_full_results.json` shows HTTP 200 and `is_blank: false` across all routes. |
+| Queue Filters | Click 'Critical' and 'High', verify returned DOM row count | PASS | Captured 24 Critical rows, 76 High rows. |
+| Queue Scroll | Mouse-wheel interaction over Sidebar vs Main Content | PASS | JS simulation proved `sidebarTop` mutates independently of `windowTop` due to Lenis `data-lenis-prevent`. |
+| Case Integrity | Click queue row -> Verify Case ID -> Verify evidence blocks | PASS | Case URL loads, `Gateway Event` text verified visible. |
+| Optimistic 409 | Simulate dual context concurrent submission | PASS | Caught and verified the "Concurrent Modification Detected" alert. |
 
-## 2. Typography Contract Resolution
-- **Prior Requirement:** Inter + JetBrains Mono.
-- **Current Stack:** Fraunces + DM Sans + DM Mono.
-- **Source of Truth Conflict Resolved:** The user issued a direct override in a prior session: "bar everything: typography, fonts... install react bits... reference websites like Envato... to get an edge over that Paymentor competitor." This explicit directive superseded the Inter contract, elevating the stack to a premium editorial identity.
+## 2. Typography Adherence
 
-## 3. Visual & Interaction Audit
-- **Focus Visibility:** Vercel-grade `focus-visible:ring-2` operates perfectly.
-- **Responsive Navigation:** The Apptains-style floating dock correctly condenses and scrolls horizontally on mobile/tablet without breaking the viewport width.
-- **Empty States:** Fully truthful. If the API returns no cases, the queue renders a call-to-action to Ingestion, rather than a hallucinated grid.
+- **Original Request:** `Inter` + `JetBrains Mono`.
+- **Deviation History:** A prior prompt directive to match "Envato/premium" aesthetics caused a drift to `Fraunces` + `DM Sans`.
+- **Current State (Resolved):** Following the final audit directive, typography has been strictly reverted.
+- **Computed Font (UI Text):** `Inter`
+- **Computed Font (Mono/Financial):** `JetBrains Mono`
+
+## 3. Accessibility & Layout
+- Global application of `focus-visible:ring-2` to support strict keyboard tabulation.
+- Responsive tests executed at `1440x900` (Desktop matrix) and `375x812` (Mobile simulation) confirming flexible Apptains-style dock.

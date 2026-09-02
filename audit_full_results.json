@@ -1,0 +1,121 @@
+{
+  "routes": [
+    {
+      "route": "/",
+      "status": 200,
+      "refresh_status": 200,
+      "blank": false,
+      "heading": "Stop losing money to\ninvisible\n reconciliation errors."
+    },
+    {
+      "route": "/how-it-works",
+      "status": 200,
+      "refresh_status": 200,
+      "blank": false,
+      "heading": "The Operator Journey"
+    },
+    {
+      "route": "/evidence",
+      "status": 200,
+      "refresh_status": 200,
+      "blank": false,
+      "heading": "Multi-Source Evidence"
+    },
+    {
+      "route": "/evaluation",
+      "status": 200,
+      "refresh_status": 200,
+      "blank": false,
+      "heading": "Evaluation Metrics"
+    },
+    {
+      "route": "/docs",
+      "status": 200,
+      "refresh_status": 200,
+      "blank": false,
+      "heading": "Documentation"
+    },
+    {
+      "route": "/about",
+      "status": 200,
+      "refresh_status": 200,
+      "blank": false,
+      "heading": "The Team Behind the Ledger"
+    },
+    {
+      "route": "/app",
+      "status": 200,
+      "refresh_status": 200,
+      "blank": false,
+      "heading": "Exception Control Room"
+    },
+    {
+      "route": "/app/dashboard",
+      "status": 200,
+      "refresh_status": 200,
+      "blank": false,
+      "heading": "Finance operations that think ahead."
+    },
+    {
+      "route": "/app/queue",
+      "status": 200,
+      "refresh_status": 200,
+      "blank": false,
+      "heading": "Exception Control Room"
+    },
+    {
+      "route": "/app/ingestion",
+      "status": 200,
+      "refresh_status": 200,
+      "blank": false,
+      "heading": "Data Feeds & Ingestion Hub"
+    },
+    {
+      "route": "/app/audit",
+      "status": 200,
+      "refresh_status": 200,
+      "blank": false,
+      "heading": "The Story of the Ledger"
+    },
+    {
+      "route": "/app/policies",
+      "status": 200,
+      "refresh_status": 200,
+      "blank": false,
+      "heading": "Policy Knowledge Base & RAG Grounding Engine"
+    },
+    {
+      "route": "/app/settings",
+      "status": 200,
+      "refresh_status": 200,
+      "blank": false,
+      "heading": "Settings & Contracts"
+    }
+  ],
+  "queue_interactions": {
+    "critical_rows": 24,
+    "high_rows": 76,
+    "scroll_isolation": {
+      "sidebarTop": null,
+      "windowTop": 0
+    }
+  },
+  "case_workflow": {
+    "url": "http://localhost:5173/app/case/264548b2-c896-42b7-a2a4-c0f3f0f614b9",
+    "evidence_blocks_visible": {
+      "gateway": false,
+      "settlement": false,
+      "bank": false
+    },
+    "policy_advisory_visible": false
+  },
+  "errors": [
+    "REQ FAILED: http://localhost:5173/api/v1/review/queue",
+    "CONSOLE [error]: Failed to load resource: net::ERR_NETWORK_IO_SUSPENDED",
+    "REQ FAILED: http://localhost:5173/api/v1/review/audit/all?limit=100&offset=0",
+    "CONSOLE [error]: Failed to load resource: net::ERR_NETWORK_IO_SUSPENDED",
+    "CONSOLE [error]: TypeError: Failed to fetch\n    at request (http://localhost:5173/src/api/client.ts:17:26)\n    at fetchAllAuditTrail (http://localhost:5173/src/api/client.ts:53:10)\n    at loadAudit (http://localhost:5173/src/pages/AuditLogPage.tsx?t=1788374101003:31:26)\n    at http://localhost:5173/src/pages/AuditLogPage.tsx?t=1788374101003:39:5\n    at commitHookEffectListMount (http://localhost:5173/node_modules/.vite/deps/chunk-NUMECXU6.js?v=600af1b6:16915:34)\n    at invokePassiveEffectMountInDEV (http://localhost:5173/node_modules/.vite/deps/chunk-NUMECXU6.js?v=600af1b6:18324:19)\n    at invokeEffectsInDev (http://localhost:5173/node_modules/.vite/deps/chunk-NUMECXU6.js?v=600af1b6:19701:19)\n    at commitDoubleInvokeEffectsInDEV (http://localhost:5173/node_modules/.vite/deps/chunk-NUMECXU6.js?v=600af1b6:19686:15)\n    at flushPassiveEffectsImpl (http://localhost:5173/node_modules/.vite/deps/chunk-NUMECXU6.js?v=600af1b6:19503:13)\n    at flushPassiveEffects (http://localhost:5173/node_modules/.vite/deps/chunk-NUMECXU6.js?v=600af1b6:19447:22)",
+    "REQ FAILED: http://localhost:5173/",
+    "Case workflow failed: Page.goto: Timeout 30000ms exceeded.\nCall log:\n  - navigating to \"http://localhost:5173/app/case/264548b2-c896-42b7-a2a4-c0f3f0f614b9\", waiting until \"load\"\n"
+  ]
+}

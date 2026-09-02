@@ -1,25 +1,22 @@
 # Real Evidence and Data Provenance Audit
 
-## 1. Traceability Map
+## 1. Value Classification
 
-| Claim / Value | Source / Classification | Verified? |
+| Claim | Source/Classification | Verified |
 |---|---|---|
-| Queue Count (e.g. 91) | API: `GET /review/queue` | YES |
-| Total Amount at Risk | API: `GET /reconciliation/stats` | YES |
-| Total Cases (310) | API: `GET /reconciliation/stats` | YES |
-| Auto-Reconciled (211) | API: `GET /reconciliation/stats` | YES |
-| Unresolved Cases (8) | API: `GET /reconciliation/stats` | YES |
-| Case Versions | API: `GET /review/cases/{id}` | YES |
-| Audit Timeline | API: `GET /review/audit/all` | YES |
-| Reviewer Identity | User Input -> POST `/review/cases/{id}/review` | YES |
-| RAG Confidence | API: `POST /rag/investigate/{id}` | YES |
-| 4 Feeds Live | Static UI Copy (`SettingsPage.tsx`) | N/A (Copy) |
-| PostgreSQL 16 | Static UI Copy (`SettingsPage.tsx`) | N/A (Copy) |
-| 2% Fee / 18% GST | Static UI Config (`SettingsPage.tsx`) | N/A (Config) |
+| Queue Counts (e.g. 91) | API Value (`/review/queue`) | YES |
+| Case IDs/Versions | API Value (`/review/cases/{id}`) | YES |
+| RAG Confidence/Cosine | API Value (`/rag/investigate/{id}`) | YES |
+| Reviewer Identity | User Input -> API Request Payload | YES |
+| "4 feeds live" | Static Config (Relabeled as 'Configured Supported Feeds') | YES |
+| "PostgreSQL 16" | Static Config (Relabeled as 'Configured Target DB') | YES |
+| Severity > ₹500 | Business Rule (Hardcoded `getSeverity` via anomaly type, not purely float amount) | YES |
+| Fee 2% / GST 18% | Configuration (`useState` Defaults in Settings) | YES |
 
-## 2. Hardcoded Business Rule Explanations
-- **Severity Threshold:** The system assigns 'Critical' and 'High' not purely by amount, but via a documented business rule mapped in the frontend `getSeverity(item)` function. `amount_mismatch` and `missing_bank_credit` are hardcoded to Critical. This is a permitted UI presentation rule.
-- **Cosine Floor >= 0.35:** This is the default `useState` configuration value on the Settings page, simulating the `pgvector` threshold. 
+## 2. Evidence Realism
+- The `/evaluation` marketing page previously held hallucinatory startup claims (e.g., "> 1,000 rps", "100% precision").
+- These were actively stripped and replaced with structurally honest claims: "O(N) Complexity", "Penny-Exact Math", and "Strict Float-Free".
 
-## 3. Evidence Handling (Missing Data)
-- If a case is missing settlement evidence, the backend explicitly returns `settlement: null`. The frontend `<CasePage>` evaluates `!caseData.settlement` and renders a truthful "Missing Record" placeholder, completely avoiding hallucinated data representation.
+## 3. Strict Absence of Mocks
+- No unverified fallbacks exist for critical financial state.
+- If data is missing (e.g., `settlement_event: null`), the application explicitly renders an empty `Missing Record` block rather than inferring data or hallucinating a JSON payload.

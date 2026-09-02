@@ -1,0 +1,92 @@
+{
+  "routes": {
+    "/": {
+      "status": 200,
+      "blank": false,
+      "errors": 0,
+      "axe_violations": 1
+    },
+    "/how-it-works": {
+      "status": 200,
+      "blank": false,
+      "errors": 0,
+      "axe_violations": 1
+    },
+    "/evidence": {
+      "status": 200,
+      "blank": false,
+      "errors": 0,
+      "axe_violations": 1
+    },
+    "/evaluation": {
+      "status": 200,
+      "blank": false,
+      "errors": 0,
+      "axe_violations": 1
+    },
+    "/docs": {
+      "status": 200,
+      "blank": false,
+      "errors": 0,
+      "axe_violations": 1
+    },
+    "/about": {
+      "status": 200,
+      "blank": false,
+      "errors": 0,
+      "axe_violations": 1
+    },
+    "/app": {
+      "status": 200,
+      "blank": false,
+      "errors": 0,
+      "axe_violations": 2
+    },
+    "/app/dashboard": {
+      "status": 200,
+      "blank": false,
+      "errors": 0,
+      "axe_violations": 2
+    },
+    "/app/queue": {
+      "status": 200,
+      "blank": false,
+      "errors": 0,
+      "axe_violations": 2
+    },
+    "/app/ingestion": {
+      "status": 200,
+      "blank": false,
+      "errors": 0,
+      "axe_violations": 3
+    },
+    "/app/audit": {
+      "status": 200,
+      "blank": false,
+      "errors": 0,
+      "axe_violations": 2
+    },
+    "/app/policies": {
+      "status": 200,
+      "blank": false,
+      "errors": 0,
+      "axe_violations": 3
+    },
+    "/app/settings": {
+      "status": 200,
+      "blank": false,
+      "errors": 0,
+      "axe_violations": 4
+    }
+  },
+  "queue": {
+    "initial": 100,
+    "critical": 24,
+    "high": 76
+  },
+  "case": {
+    "url": "http://localhost:5173/app/case/264548b2-c896-42b7-a2a4-c0f3f0f614b9",
+    "evidence_visible": false
+  },
+  "mobile_dashboard_loaded": true
+}
