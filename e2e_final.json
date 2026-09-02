@@ -1,9 +1,75 @@
 {
-  "routes": [],
+  "routes": [
+    {
+      "route": "/",
+      "heading": "Stop losing money to\ninvisible\n reconciliation errors.",
+      "blank": false
+    },
+    {
+      "route": "/how-it-works",
+      "heading": "The Operator Journey",
+      "blank": false
+    },
+    {
+      "route": "/evidence",
+      "heading": "Multi-Source Evidence",
+      "blank": false
+    },
+    {
+      "route": "/evaluation",
+      "heading": "Evaluation Metrics",
+      "blank": false
+    },
+    {
+      "route": "/docs",
+      "heading": "Documentation",
+      "blank": false
+    },
+    {
+      "route": "/about",
+      "heading": "The Team Behind the Ledger",
+      "blank": false
+    },
+    {
+      "route": "/app",
+      "heading": "Exception Control Room",
+      "blank": false
+    },
+    {
+      "route": "/app/dashboard",
+      "heading": "Finance operations that think ahead.",
+      "blank": false
+    },
+    {
+      "route": "/app/queue",
+      "heading": "Exception Control Room",
+      "blank": false
+    },
+    {
+      "route": "/app/ingestion",
+      "heading": "Data Feeds & Ingestion Hub",
+      "blank": false
+    },
+    {
+      "route": "/app/audit",
+      "heading": "The Story of the Ledger",
+      "blank": false
+    },
+    {
+      "route": "/app/policies",
+      "heading": "Policy Knowledge Base & RAG Grounding Engine",
+      "blank": false
+    },
+    {
+      "route": "/app/settings",
+      "heading": "Settings & Contracts",
+      "blank": false
+    }
+  ],
   "computed_fonts": {
-    "heading": "Fraunces, serif",
-    "body": "\"DM Sans\", sans-serif",
-    "mono": "\"DM Mono\", monospace"
+    "heading": "Inter, sans-serif",
+    "body": "Inter, sans-serif",
+    "money": "\"JetBrains Mono\", monospace"
   },
   "queue_interactions": {
     "critical_rows_sample": [
@@ -15,9 +81,27 @@
       "High\n\t\n\nMultiple bank statement credits reference the same batch ID.\n\npay_001057\n\u2022\nDuplicate Bank Credit\n\t\u20b99,849.00\t",
       "High\n\t\n\nMultiple bank statement credits reference the same batch ID.\n\npay_001057\n\u2022\nDuplicate Bank Credit\n\t\u20b99,849.00\t",
       "High\n\t\n\nMultiple bank statement credits reference the same batch ID.\n\npay_001057\n\u2022\nDuplicate Bank Credit\n\t\u20b99,849.00\t"
-    ]
+    ],
+    "real_scroll_test": {
+      "before": {
+        "sidebar": 0,
+        "window": 0
+      },
+      "after": {
+        "sidebar": 0,
+        "window": 500
+      }
+    }
   },
-  "case_workflow": {},
+  "case_workflow": {
+    "url": "http://localhost:5173/app/case/264548b2-c896-42b7-a2a4-c0f3f0f614b9",
+    "evidence_blocks_visible": {
+      "gateway": true,
+      "settlement": true,
+      "bank": true
+    },
+    "policy_advisory_visible": false
+  },
   "accessibility": {
     "Desktop: /": {
       "violations": 1,
@@ -42,25 +126,6 @@
         {
           "id": "link-name",
           "impact": "serious"
-        }
-      ]
-    },
-    "Desktop: /app/case/264548b2-c896-42b7-a2a4-c0f3f0f614b9": {
-      "violations": 3,
-      "passes": 29,
-      "incomplete": 1,
-      "details": [
-        {
-          "id": "color-contrast",
-          "impact": "serious"
-        },
-        {
-          "id": "link-name",
-          "impact": "serious"
-        },
-        {
-          "id": "page-has-heading-one",
-          "impact": "moderate"
         }
       ]
     },
@@ -128,25 +193,6 @@
         }
       ]
     },
-    "Mobile: /app/case/264548b2-c896-42b7-a2a4-c0f3f0f614b9": {
-      "violations": 3,
-      "passes": 30,
-      "incomplete": 1,
-      "details": [
-        {
-          "id": "color-contrast",
-          "impact": "serious"
-        },
-        {
-          "id": "link-name",
-          "impact": "serious"
-        },
-        {
-          "id": "page-has-heading-one",
-          "impact": "moderate"
-        }
-      ]
-    },
     "Mobile: /app/audit": {
       "violations": 2,
       "passes": 24,
@@ -184,9 +230,28 @@
           "impact": "serious"
         }
       ]
+    },
+    "Desktop: /app/case/:id": {
+      "violations": 3,
+      "passes": 17,
+      "incomplete": 0,
+      "details": [
+        {
+          "id": "color-contrast",
+          "impact": "serious"
+        },
+        {
+          "id": "link-name",
+          "impact": "serious"
+        },
+        {
+          "id": "page-has-heading-one",
+          "impact": "moderate"
+        }
+      ]
     }
   },
   "errors": [
-    "Traceback (most recent call last):\n  File \"/Users/k.sathvik/razorpay-ai-finance-controller/e2e_comprehensive.py\", line 89, in run\n    await sidebar.focus()\n  File \"/Users/k.sathvik/.pyenv/versions/3.11.15/lib/python3.11/site-packages/playwright/async_api/_generated.py\", line 19083, in focus\n    await self._impl_obj.focus(timeout=to_milliseconds(timeout))\n  File \"/Users/k.sathvik/.pyenv/versions/3.11.15/lib/python3.11/site-packages/playwright/_impl/_locator.py\", line 405, in focus\n    return await self._frame.focus(self._selector, strict=True, **params)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/Users/k.sathvik/.pyenv/versions/3.11.15/lib/python3.11/site-packages/playwright/_impl/_frame.py\", line 731, in focus\n    await self._channel.send(\"focus\", self._timeout, locals_to_params(locals()))\n  File \"/Users/k.sathvik/.pyenv/versions/3.11.15/lib/python3.11/site-packages/playwright/_impl/_connection.py\", line 76, in send\n    return await self._connection.wrap_api_call(\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/Users/k.sathvik/.pyenv/versions/3.11.15/lib/python3.11/site-packages/playwright/_impl/_connection.py\", line 632, in wrap_api_call\n    raise rewrite_error(error, f\"{parsed_st['apiName']}: {error}\") from None\nplaywright._impl._errors.TimeoutError: Locator.focus: Timeout 30000ms exceeded.\nCall log:\n  - waiting for locator(\".overflow-y-auto\").first\n\n"
+    "Traceback (most recent call last):\n  File \"/Users/k.sathvik/razorpay-ai-finance-controller/e2e_comprehensive.py\", line 160, in run\n    await page_b.fill('input[placeholder*=\"e.g. j.doe\"]', \"parallel_user\")\n  File \"/Users/k.sathvik/.pyenv/versions/3.11.15/lib/python3.11/site-packages/playwright/async_api/_generated.py\", line 11250, in fill\n    await self._impl_obj.fill(\n  File \"/Users/k.sathvik/.pyenv/versions/3.11.15/lib/python3.11/site-packages/playwright/_impl/_page.py\", line 928, in fill\n    return await self._main_frame.fill(**locals_to_params(locals()))\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/Users/k.sathvik/.pyenv/versions/3.11.15/lib/python3.11/site-packages/playwright/_impl/_frame.py\", line 636, in fill\n    await self._fill(**locals_to_params(locals()))\n  File \"/Users/k.sathvik/.pyenv/versions/3.11.15/lib/python3.11/site-packages/playwright/_impl/_frame.py\", line 648, in _fill\n    await self._channel.send(\"fill\", self._timeout, locals_to_params(locals()))\n  File \"/Users/k.sathvik/.pyenv/versions/3.11.15/lib/python3.11/site-packages/playwright/_impl/_connection.py\", line 76, in send\n    return await self._connection.wrap_api_call(\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/Users/k.sathvik/.pyenv/versions/3.11.15/lib/python3.11/site-packages/playwright/_impl/_connection.py\", line 632, in wrap_api_call\n    raise rewrite_error(error, f\"{parsed_st['apiName']}: {error}\") from None\nplaywright._impl._errors.TimeoutError: Page.fill: Timeout 30000ms exceeded.\nCall log:\n  - waiting for locator(\"input[placeholder*=\\\"e.g. j.doe\\\"]\")\n\n"
   ]
 }
