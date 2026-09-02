@@ -133,7 +133,7 @@ export default function LandingPage() {
           <motion.div variants={FADE_UP} className="flex items-center justify-center space-x-2 mb-8">
             <span className="text-[10px] font-mono tracking-widest text-ink-700 uppercase border border-rule-300 px-3 py-1 rounded-full bg-white shadow-sm flex items-center gap-2">
               <span className="w-1.5 h-1.5 rounded-full bg-source-blue animate-pulse" />
-              Deterministic 3-Way Parity
+              Automated Financial Matching
             </span>
           </motion.div>
           
@@ -146,7 +146,7 @@ export default function LandingPage() {
           </motion.h1>
           
           <motion.p variants={FADE_UP} className="text-lg text-ink-700 max-w-2xl mx-auto font-sans leading-relaxed mb-10">
-            A deterministic control room that automatically reconciles payments, gateway settlements, refunds, and bank credits—surfacing exceptions directly to your human operators with full audit visibility.
+            A financial control room that automatically reconciles payments, gateway settlements, refunds, and bank credits—surfacing exceptions directly to your human operators with full audit visibility.
           </motion.p>
 
           <motion.div variants={FADE_UP} className="flex items-center justify-center space-x-4">
@@ -155,7 +155,7 @@ export default function LandingPage() {
               <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </Link>
             <Link to="/how-it-works" className="px-7 py-3.5 bg-white text-ink-900 font-semibold rounded-md border border-rule-300 shadow-sm hover:bg-paper-1 transition-all active:scale-95">
-              Read the Whitepaper
+              See How It Works
             </Link>
           </motion.div>
 
@@ -178,7 +178,7 @@ export default function LandingPage() {
             className="text-center mb-20"
           >
             <h2 className="text-4xl font-display font-semibold text-ink-900 mb-4">Engineering over Aesthetics</h2>
-            <p className="text-ink-700 max-w-2xl mx-auto text-lg">No generic dashboards. No vanity AI chatbots. LedgerLens is built on hard database invariants and append-only cryptographic receipts.</p>
+            <p className="text-ink-700 max-w-2xl mx-auto text-lg">No generic dashboards. No vanity AI chatbots. LedgerLens is built on strict financial rules and permanent, time-stamped records.</p>
           </motion.div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -191,9 +191,9 @@ export default function LandingPage() {
               <div className="w-12 h-12 bg-source-blue/10 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
                 <Database className="w-6 h-6 text-source-blue" />
               </div>
-              <h3 className="text-xl font-semibold text-ink-900 font-display mb-3">Deterministic Matching</h3>
+              <h3 className="text-xl font-semibold text-ink-900 font-display mb-3">Exact Matching First</h3>
               <p className="text-sm text-ink-700 leading-relaxed font-sans">
-                Grounds AI decisions in hard facts and contractual formulas. Resolves exact matches automatically and safely blocks impossible mathematical leaps.
+                Matches records perfectly based on actual bank data. AI never guesses numbers—it only flags where the math fails.
               </p>
             </motion.div>
 
@@ -226,7 +226,7 @@ export default function LandingPage() {
                 <div className="w-12 h-12 bg-matched-green/10 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
                   <ShieldCheck className="w-6 h-6 text-matched-green" />
                 </div>
-                <h3 className="text-xl font-semibold text-ink-900 font-display mb-3">ACID Audit Logs</h3>
+                <h3 className="text-xl font-semibold text-ink-900 font-display mb-3">Permanent Audit Logs</h3>
                 <p className="text-sm text-ink-700 leading-relaxed font-sans max-w-md">
                   Every action taken by a human reviewer requires mandatory rationale and writes an immutable, append-only receipt to the system ledger.
                 </p>
