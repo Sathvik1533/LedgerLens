@@ -25,10 +25,39 @@
     --color-advisory: #8B5CF6;
     --color-advisory-surface: rgba(139, 92, 246, 0.1);
     --color-focus: rgba(59, 130, 246, 0.5);
+
+    --font-family-primary: 'Plus Jakarta Sans', sans-serif;
+    --font-family-identifier: 'DM Mono', monospace;
+    --font-family-display: 'Fraunces', serif;
+    
+    --font-size-display: 2.25rem;
+    --font-size-page-title: 1.5rem;
+    --font-size-section-title: 1.125rem;
+    --font-size-body: 0.875rem;
+    --font-size-label: 0.75rem;
+    --font-size-caption: 0.625rem;
+    --font-size-metric: 1.875rem;
+    
+    --font-weight-regular: 400;
+    --font-weight-medium: 500;
+    --font-weight-semibold: 600;
+    --font-weight-bold: 700;
+    
+    --line-height-display: 1.1;
+    --line-height-heading: 1.25;
+    --line-height-body: 1.5;
+    
+    --letter-spacing-display: -0.02em;
+    --letter-spacing-heading: -0.01em;
   }
   
   body {
     background-color: var(--color-canvas);
     color: var(--color-text-primary);
+    font-family: var(--font-family-primary);
   }
 }
+
+  .font-mono {
+    font-variant-numeric: tabular-nums;
+  }

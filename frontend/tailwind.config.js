@@ -7,9 +7,9 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        sans: ['Inter', 'sans-serif'],
-        mono: ['Geist Mono', 'monospace'],
-        display: ['Manrope', 'sans-serif'],
+        sans: ['var(--font-family-primary)'],
+        mono: ['var(--font-family-identifier)'],
+        display: ['var(--font-family-display)'],
       },
       colors: {
         canvas: 'var(--color-canvas)',
