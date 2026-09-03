@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import { CaseEvidenceResponse, HumanReviewRequest } from '../types/api';
 import { submitCaseReview, ApiError } from '../api/client';
+import { Tooltip } from './Tooltip';
 
 interface ReviewActionFormProps {
   evidence: CaseEvidenceResponse;
@@ -94,7 +95,9 @@ export const ReviewActionForm: React.FC<ReviewActionFormProps> = ({
           <div className="flex items-start gap-2">
             <AlertTriangle className="w-4 h-4 text-ledger-vermilion shrink-0 mt-0.5" aria-hidden="true" />
             <div className="space-y-1 flex-1">
-              <span className="font-semibold text-ink-700">Stale Version Conflict (HTTP 409)</span>
+              <Tooltip content="Your action was not saved because someone updated this case first.">
+                <span tabIndex={0} className="font-semibold text-ink-700 focus-ring">Case changed by another reviewer</span>
+              </Tooltip>
               <p className="text-ink-700 leading-snug">{errorMsg}</p>
             </div>
           </div>
@@ -250,11 +253,15 @@ export const ReviewActionForm: React.FC<ReviewActionFormProps> = ({
 
         {/* Optimistic Locking Notice */}
         <div className="flex items-center justify-between text-[10px] text-ink-700 font-mono">
-          <span className="flex items-center gap-1">
+          <Tooltip content="The version used to prevent overwriting another reviewer's update.">
+          <span tabIndex={0} className="flex items-center gap-1 focus-ring">
             <Lock className="w-3 h-3 text-source-blue" aria-hidden="true" />
-            Expected Version: {evidence.version}
+            Case version: {evidence.version}
           </span>
-          <span className="text-ink-700">Atomic CAS</span>
+          </Tooltip>
+          <Tooltip content="Prevents one reviewer from overwriting a newer decision.">
+          <span tabIndex={0} className="text-ink-700 focus-ring">Safe update protection</span>
+          </Tooltip>
         </div>
 
         {/* Submit Button */}

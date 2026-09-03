@@ -14,24 +14,13 @@ import { ReviewQueueItem } from '../../types/api';
 import { fetchReviewQueue } from '../../api/client';
 import { AmountDisplay } from '../../components/AmountDisplay';
 import { AnimatedCounter } from '../../components/AnimatedCounter';
-import { ExceptionBadge } from '../../components/ExceptionBadge';
+import { ExceptionBadge, EXCEPTION_CONFIG } from '../../components/ExceptionBadge';
+import { Tooltip } from '../../components/Tooltip';
 import { QueueTableSkeleton } from '../../components/SkeletonLoaders';
 import { EmptyState } from '../../components/EmptyState';
 import { CustomSelect } from '../../components/CustomSelect';
 
-const getPlainLanguageSummary = (item: ReviewQueueItem) => {
-  switch (item.exception_type) {
-    case 'amount_mismatch': return "Amount mismatch between gateway settlement and internal capture.";
-    case 'fee_mismatch': return "Gateway deducted incorrect MDR fee or GST tax rate.";
-    case 'missing_settlement': return "Payment captured but settlement record was never received.";
-    case 'missing_bank_credit': return "Settlement received but expected bank credit is missing.";
-    case 'duplicate_payment': return "Multiple payment captures share the exact same reference.";
-    case 'duplicate_bank_credit': return "Multiple bank statement credits reference the same batch ID.";
-    case 'partial_refund_not_reflected': return "Refund was processed but settlement payout was not adjusted.";
-    case 'ambiguous_match': return "Multiple candidate records matched transaction criteria.";
-    default: return "Manual investigation required for financial discrepancy.";
-  }
-};
+;
 
 const getSeverity = (item: ReviewQueueItem) => {
   if (item.exception_type === 'amount_mismatch' || item.exception_type === 'missing_bank_credit') {
@@ -133,9 +122,11 @@ const QueuePage: React.FC = () => {
             <ShieldAlert className="w-5 h-5 text-ledger-vermilion" />
             <span className="text-sm font-medium">{error}</span>
           </div>
-          <button onClick={loadQueue} className="px-4 py-2 bg-white border border-ledger-vermilion text-ledger-vermilion rounded text-xs font-semibold shadow-sm hover:bg-paper-0 transition-colors flex items-center gap-2">
+          <Tooltip content="Refresh the queue data from the server">
+          <button onClick={loadQueue} className="px-4 py-2 bg-white border border-ledger-vermilion text-ledger-vermilion rounded text-xs font-semibold shadow-sm hover:bg-paper-0 transition-colors flex items-center gap-2 focus-ring">
             <RefreshCw className="w-3.5 h-3.5" /> Retry Connection
           </button>
+          </Tooltip>
         </div>
       )}
 
@@ -258,16 +249,19 @@ const QueuePage: React.FC = () => {
                             </td>
                             <td className="py-4 px-5 align-top space-y-1.5">
                               <p className="text-sm font-semibold text-ink-900 leading-snug group-hover:text-source-blue transition-colors">
-                                {getPlainLanguageSummary(item)}
+                                {(item.exception_type && EXCEPTION_CONFIG[item.exception_type]) ? EXCEPTION_CONFIG[item.exception_type].explanation : 'Manual investigation required for financial discrepancy.'}
                               </p>
                               <div className="flex flex-wrap items-center gap-2 text-[10px] font-mono text-ink-700">
+                                <Tooltip content="Copy Payment ID to clipboard">
                                 <button
                                   onClick={(e) => copyToClipboard(item.payment_id, e)}
-                                  className="inline-flex items-center gap-1 bg-paper-0 border border-rule-300 px-1.5 py-0.5 rounded shadow-sm hover:bg-paper-1 hover:text-ink-900 transition-colors"
+                                  className="inline-flex items-center gap-1 bg-paper-0 border border-rule-300 px-1.5 py-0.5 rounded shadow-sm hover:bg-paper-1 hover:text-ink-900 transition-colors focus-ring"
+                                  aria-label={`Copy payment ID ${item.payment_id}`}
                                 >
                                   <span>{item.payment_id}</span>
                                   {copiedId === item.payment_id ? <Check className="w-2.5 h-2.5 text-matched-green" /> : <Copy className="w-2.5 h-2.5 opacity-60" />}
                                 </button>
+                                </Tooltip>
                                 <span className="opacity-50">&bull;</span>
                                 <ExceptionBadge type={item.exception_type} size="sm" />
                               </div>

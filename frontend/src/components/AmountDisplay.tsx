@@ -1,4 +1,5 @@
 import React from 'react';
+import { Tooltip } from './Tooltip';
 
 interface AmountDisplayProps {
   amount: string | number | null | undefined;
@@ -39,9 +40,23 @@ export const AmountDisplay: React.FC<AmountDisplayProps> = ({
     }
   }
 
-  return (
-    <span className={`font-mono font-tabular ${colorClass} ${className}`}>
+  const content = (
+    <span tabIndex={0} className={`focus-ring inline-block font-mono font-tabular ${colorClass} ${className}`}>
       {isNegative ? `-${symbol}${absFormatted}` : `${symbol}${absFormatted}`}
     </span>
   );
+
+  if (isDiscrepancy) {
+    const tooltipText = Math.abs(num) > 0.001 
+      ? 'The exact mathematical difference between expected and received amounts.'
+      : 'Values match exactly with zero discrepancy.';
+    
+    return (
+      <Tooltip content={tooltipText}>
+        {content}
+      </Tooltip>
+    );
+  }
+
+  return content;
 };

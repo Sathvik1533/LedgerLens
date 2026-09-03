@@ -1,6 +1,8 @@
 import { useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import Lenis from 'lenis';
+import { TooltipProvider } from './components/Tooltip';
+
 
 // Layouts
 import MarketingLayout from './layouts/MarketingLayout';
@@ -46,6 +48,7 @@ function App() {
   }, []);
 
   return (
+    <TooltipProvider>
     <BrowserRouter>
       <Routes>
         {/* Marketing Site (Public) */}
@@ -74,6 +77,7 @@ function App() {
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>
+    </TooltipProvider>
   );
 }
 

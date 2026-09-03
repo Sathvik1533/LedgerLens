@@ -8,10 +8,11 @@ import {
   AlertCircle,
   FileText,
   ShieldCheck,
-  HelpCircle,
+  
 } from 'lucide-react';
 import { InvestigationResult } from '../types/api';
 import { investigateCase } from '../api/client';
+import { Tooltip } from './Tooltip';
 import { CitationCard } from './CitationCard';
 
 interface RagCopilotPanelProps {
@@ -74,8 +75,10 @@ export const RagCopilotPanel: React.FC<RagCopilotPanelProps> = ({ caseId, autoRu
 
         <div className="flex items-center gap-2">
           {result && (
+            <Tooltip content="Whether the advisory explanation is sufficiently supported by retrieved policy evidence.">
             <span
-              className={`hidden sm:inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold border ${
+              tabIndex={0}
+              className={`focus-ring hidden sm:inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold border ${
                 result.is_confident
                   ? 'bg-resolved-subtle text-matched-green border-resolved-border'
                   : 'bg-warning-subtle text-advisory-amber border-warning-border'
@@ -84,15 +87,16 @@ export const RagCopilotPanel: React.FC<RagCopilotPanelProps> = ({ caseId, autoRu
               {result.is_confident ? (
                 <>
                   <ShieldCheck className="w-3 h-3 text-matched-green" aria-hidden="true" />
-                  <span>Grounded (Cosine &ge; 0.35)</span>
+                  <span>Evidence grounding</span>
                 </>
               ) : (
                 <>
-                  <HelpCircle className="w-3 h-3 text-advisory-amber" aria-hidden="true" />
-                  <span>Low Grounding Confidence</span>
+                  <AlertCircle className="w-3 h-3 text-advisory-amber" aria-hidden="true" />
+                  <span>Evidence grounding (Low)</span>
                 </>
               )}
             </span>
+            </Tooltip>
           )}
           {isExpanded ? (
             <ChevronUp className="w-4 h-4 text-ink-700" aria-hidden="true" />
@@ -170,7 +174,7 @@ export const RagCopilotPanel: React.FC<RagCopilotPanelProps> = ({ caseId, autoRu
 
               {/* Read-Only Disclaimer */}
               <div className="pt-2 border-t border-border-subtle text-[11px] text-ink-700 italic">
-                Notice: Policy guidance is read-only advice. Financial resolution decisions are executed by authorized human reviewers in the Decision Panel.
+                Policy guidance is read-only. You remain in control.
               </div>
             </div>
           ) : (

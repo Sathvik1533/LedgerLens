@@ -1,6 +1,7 @@
 import { useState, useMemo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Search, Shield, RefreshCw, GitCommit, User } from 'lucide-react';
+import { Tooltip } from '../components/Tooltip';
 import { CustomSelect } from '../components/CustomSelect';
 import { fetchAllAuditTrail } from '../api/client';
 import { AuditEventItem } from '../types/api';
@@ -52,7 +53,7 @@ export const AuditLogPage = () => {
         </div>
         <div className="flex items-center gap-3 shrink-0">
           <div className="px-3 py-1.5 bg-paper-1 border border-rule-300 rounded text-xs font-mono text-ink-700 flex items-center gap-2">
-            <Shield className="w-3.5 h-3.5 text-matched-green" /> Cryptographic CAS
+            <Shield className="w-3.5 h-3.5 text-matched-green" /> Permanent Record
           </div>
           <button onClick={loadAudit} className="px-3 py-1.5 bg-white border border-rule-300 rounded text-xs font-semibold text-ink-900 shadow-sm hover:bg-paper-0 transition-colors flex items-center gap-2">
             <RefreshCw className="w-3.5 h-3.5" /> Refresh Audit
@@ -105,7 +106,9 @@ export const AuditLogPage = () => {
               <div className="flex-1 bg-white border border-rule-300 rounded-xl p-5 shadow-sm group-hover:shadow-card transition-shadow">
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center gap-2">
-                    <span className="font-mono text-xs font-semibold text-ledger-vermilion">{evt.event_type}</span>
+                    <Tooltip content="The system event type recorded in the database.">
+                      <span tabIndex={0} className="font-mono text-xs font-semibold text-ledger-vermilion focus-ring">{evt.event_type}</span>
+                    </Tooltip>
                     <span className="text-rule-300">|</span>
                     <span className="inline-flex items-center gap-1.5 text-xs text-ink-700 bg-paper-1 px-2 py-0.5 rounded-full border border-rule-300"><User className="w-3 h-3" /> {evt.actor}</span>
                   </div>
