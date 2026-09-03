@@ -34,7 +34,7 @@ export const CustomSelect: React.FC<CustomSelectProps> = ({ value, onChange, opt
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full flex items-center justify-between bg-paper-0 border border-rule-300 rounded-md px-3 py-2 text-sm text-ink-900 focus:outline-none focus:border-ink-900 focus-visible:ring-2 focus-visible:ring-ink-900/20 focus-visible:border-ink-900 transition-all transition-colors shadow-sm"
+        className="w-full flex items-center justify-between bg-paper-0 border border-rule-300 rounded-md px-3 py-2 text-sm text-ink-900 focus:outline-none focus:border-ink-900 focus-visible:ring-2 focus-visible:ring-ink-900/20 focus-visible:border-ink-900 transition-all transition-colors shadow-none"
       >
         <span>{selectedOption.label}</span>
         <ChevronDown className={`w-4 h-4 text-ink-700 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
@@ -47,7 +47,7 @@ export const CustomSelect: React.FC<CustomSelectProps> = ({ value, onChange, opt
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
             transition={{ duration: 0.15 }}
-            className="absolute z-50 w-full mt-1 bg-white border border-rule-300 rounded-md shadow-card overflow-hidden"
+            className="absolute z-50 w-full mt-1 bg-white border border-rule-300 rounded-md shadow-none overflow-hidden"
           >
             <div className="max-h-60 overflow-y-auto py-1 custom-scrollbar" data-lenis-prevent="true">
               {options.map((option) => (

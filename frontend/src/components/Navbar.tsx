@@ -91,7 +91,7 @@ export const Navbar: React.FC<{ onRefresh?: () => void; isRefreshing?: boolean }
                   {isActive && (
                     <motion.div
                       layoutId="navbar-indicator"
-                      className="absolute inset-0 rounded-full bg-paper-1 border border-source-blue -z-10 shadow-sm"
+                      className="absolute inset-0 rounded-full bg-paper-1 border border-source-blue -z-10 shadow-none"
                       transition={{ type: 'spring', stiffness: 380, damping: 30 }}
                     />
                   )}
@@ -105,7 +105,7 @@ export const Navbar: React.FC<{ onRefresh?: () => void; isRefreshing?: boolean }
         <div className="flex items-center gap-3">
           {/* Feed Sync Indicator */}
           <div className="hidden sm:flex items-center gap-2 px-3 py-1 rounded-full bg-paper-1 border border-rule-300 text-xs text-ink-700 font-sans">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse shadow-sm" />
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse shadow-none" />
             <span className="text-ink-900 font-medium">4 Feeds Live</span>
           </div>
 

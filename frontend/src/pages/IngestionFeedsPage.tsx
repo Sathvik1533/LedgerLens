@@ -86,7 +86,7 @@ export const IngestionFeedsPage: React.FC = () => {
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6 pb-6 border-b border-rule-300">
           <div>
             <div className="flex items-center gap-2 mb-3">
-              <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-ink-700 border border-rule-300 px-2 py-0.5 rounded shadow-sm bg-white">
+              <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-ink-700 border border-rule-300 px-2 py-0.5 rounded shadow-none bg-white">
                 04 &mdash; MULTI-SOURCE INGESTION ENGINE
               </span>
               <span className="text-ink-700">&bull;</span>
@@ -104,7 +104,7 @@ export const IngestionFeedsPage: React.FC = () => {
           <div>
             <button
               onClick={loadStatus}
-              className="flex items-center gap-2 px-4 py-2 bg-white hover:bg-paper-1 border border-rule-300 text-ink-900 rounded-md text-xs font-semibold shadow-sm transition active:scale-[0.98]"
+              className="flex items-center gap-2 px-4 py-2 bg-white hover:bg-paper-1 border border-rule-300 text-ink-900 rounded-md text-xs font-semibold shadow-none transition active:scale-[0.98]"
             >
               <RefreshCw className="w-3.5 h-3.5" />
               <span>Refresh Ledger State</span>
@@ -116,7 +116,7 @@ export const IngestionFeedsPage: React.FC = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           
           {/* Main Upload Form Card */}
-          <div className="lg:col-span-2 bg-white border border-rule-300 rounded-xl p-8 shadow-sm">
+          <div className="lg:col-span-2 bg-white border border-rule-300 rounded-xl p-8 shadow-none">
             <div className="flex items-center justify-between border-b border-rule-300 pb-4 mb-6">
               <div className="flex items-center gap-2">
                 <UploadCloud className="w-5 h-5 text-source-blue" />
@@ -146,7 +146,7 @@ export const IngestionFeedsPage: React.FC = () => {
                         onClick={() => setSelectedFeed(feed.id as any)}
                         className={`flex flex-col items-center justify-center gap-2 p-3 rounded-lg border transition-all ${
                           isActive
-                            ? 'bg-ink-900 border-ink-900 text-white shadow-md'
+                            ? 'bg-ink-900 border-ink-900 text-white shadow-none'
                             : 'bg-white border-rule-300 text-ink-700 hover:bg-paper-0 hover:border-ink-700'
                         }`}
                       >
@@ -208,7 +208,7 @@ export const IngestionFeedsPage: React.FC = () => {
 
               {/* Upload Feedback Alerts */}
               {uploadResult && (
-                <div className="p-4 rounded-md bg-matched-green/10 border border-matched-green text-sm text-matched-green flex items-start gap-3 shadow-sm">
+                <div className="p-4 rounded-md bg-matched-green/10 border border-matched-green text-sm text-matched-green flex items-start gap-3 shadow-none">
                   <CheckCircle2 className="w-5 h-5 shrink-0 mt-0.5" />
                   <div>
                     <span className="font-semibold block mb-1">Batch Ingested Successfully</span>
@@ -221,7 +221,7 @@ export const IngestionFeedsPage: React.FC = () => {
               )}
 
               {uploadError && (
-                <div className="p-4 rounded-md bg-ledger-vermilion/10 border border-ledger-vermilion text-sm text-ink-900 flex items-start gap-3 shadow-sm">
+                <div className="p-4 rounded-md bg-ledger-vermilion/10 border border-ledger-vermilion text-sm text-ink-900 flex items-start gap-3 shadow-none">
                   <AlertCircle className="w-5 h-5 text-ledger-vermilion shrink-0 mt-0.5" />
                   <span className="font-medium">{uploadError}</span>
                 </div>
@@ -231,7 +231,7 @@ export const IngestionFeedsPage: React.FC = () => {
               <button
                 type="submit"
                 disabled={isUploading || !file}
-                className="w-full h-11 rounded-md bg-ink-900 text-white font-semibold text-sm transition-all disabled:opacity-50 hover:bg-ink-700 active:scale-[0.99] flex items-center justify-center gap-2 shadow-card"
+                className="w-full h-11 rounded-md bg-ink-900 text-white font-semibold text-sm transition-all disabled:opacity-50 hover:bg-ink-700 active:scale-[0.99] flex items-center justify-center gap-2 shadow-none"
               >
                 {isUploading ? (
                   <>
@@ -249,7 +249,7 @@ export const IngestionFeedsPage: React.FC = () => {
           </div>
 
           {/* Educational Sidebar Card */}
-          <div className="bg-white border border-rule-300 rounded-xl p-6 shadow-sm h-fit space-y-6">
+          <div className="bg-white border border-rule-300 rounded-xl p-6 shadow-none h-fit space-y-6">
             <div className="flex items-center gap-2 border-b border-rule-300 pb-4">
               <Shield className="w-4 h-4 text-ink-900" />
               <h2 className="text-xs font-bold text-ink-900 uppercase tracking-widest font-mono">
@@ -284,7 +284,7 @@ export const IngestionFeedsPage: React.FC = () => {
 
         {/* History Table */}
         {statusData && statusData.batches.length > 0 && (
-          <div className="bg-white border border-rule-300 rounded-xl shadow-sm overflow-hidden mt-8">
+          <div className="bg-white border border-rule-300 rounded-xl shadow-none overflow-hidden mt-8">
             <div className="p-6 border-b border-rule-300 flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <Database className="w-4 h-4 text-ink-900" />

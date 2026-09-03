@@ -21,7 +21,7 @@ export default function MarketingLayout() {
             <Link to="/about" className={isActive('/about')}>About</Link>
           </div>
           <div className="flex items-center space-x-4">
-            <Link to="/app/queue" className="px-5 py-2 bg-ink-900 text-white font-semibold text-sm rounded shadow-sm hover:bg-ink-700 transition-colors">
+            <Link to="/app/queue" className="px-5 py-2 bg-ink-900 text-white font-semibold text-sm rounded shadow-none hover:bg-ink-700 transition-colors">
               Open App
             </Link>
           </div>

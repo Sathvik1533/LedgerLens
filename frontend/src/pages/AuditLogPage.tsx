@@ -41,7 +41,7 @@ export const AuditLogPage = () => {
   return (
     <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="flex-1 p-6 lg:p-10 max-w-5xl mx-auto w-full font-sans">
       <div className="flex items-center gap-2 mb-3">
-        <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-ink-700 border border-rule-300 px-2 py-0.5 rounded shadow-sm bg-white">05 &mdash; IMMUTABLE COMPLIANCE LEDGER</span>
+        <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-ink-700 border border-rule-300 px-2 py-0.5 rounded shadow-none bg-white">05 &mdash; IMMUTABLE COMPLIANCE LEDGER</span>
       </div>
 
       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6 pb-6 border-b border-rule-300 mb-8">
@@ -55,7 +55,7 @@ export const AuditLogPage = () => {
           <div className="px-3 py-1.5 bg-paper-1 border border-rule-300 rounded text-xs font-mono text-ink-700 flex items-center gap-2">
             <Shield className="w-3.5 h-3.5 text-matched-green" /> Permanent Record
           </div>
-          <button onClick={loadAudit} className="px-3 py-1.5 bg-white border border-rule-300 rounded text-xs font-semibold text-ink-900 shadow-sm hover:bg-paper-0 transition-colors flex items-center gap-2">
+          <button onClick={loadAudit} className="px-3 py-1.5 bg-white border border-rule-300 rounded text-xs font-semibold text-ink-900 shadow-none hover:bg-paper-0 transition-colors flex items-center gap-2">
             <RefreshCw className="w-3.5 h-3.5" /> Refresh Audit
           </button>
         </div>
@@ -69,7 +69,7 @@ export const AuditLogPage = () => {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search by Case UUID, Batch ID, or Actor..."
-            className="w-full bg-white border border-rule-300 rounded-md pl-9 pr-3 py-2 text-sm text-ink-900 placeholder-ink-700/50 focus:outline-none focus:border-source-blue focus-visible:ring-2 focus-visible:ring-source-blue/20 focus-visible:border-source-blue transition-all shadow-sm font-mono"
+            className="w-full bg-white border border-rule-300 rounded-md pl-9 pr-3 py-2 text-sm text-ink-900 placeholder-ink-700/50 focus:outline-none focus:border-source-blue focus-visible:ring-2 focus-visible:ring-source-blue/20 focus-visible:border-source-blue transition-all shadow-none font-mono"
           />
         </div>
         <div className="w-full md:w-48 shrink-0">
@@ -100,10 +100,10 @@ export const AuditLogPage = () => {
         <AnimatePresence>
           {filteredEvents.map((evt) => (
             <motion.div key={evt.id} initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} className="relative flex items-start gap-6 group">
-              <div className="w-10 h-10 rounded-full bg-white border-2 border-rule-300 flex items-center justify-center z-10 group-hover:border-source-blue transition-colors shadow-sm shrink-0 mt-1">
+              <div className="w-10 h-10 rounded-full bg-white border-2 border-rule-300 flex items-center justify-center z-10 group-hover:border-source-blue transition-colors shadow-none shrink-0 mt-1">
                 <GitCommit className="w-4 h-4 text-ink-700 group-hover:text-source-blue" />
               </div>
-              <div className="flex-1 bg-white border border-rule-300 rounded-xl p-5 shadow-sm group-hover:shadow-card transition-shadow">
+              <div className="flex-1 bg-white border border-rule-300 rounded-xl p-5 shadow-none group-hover:shadow-none transition-shadow">
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center gap-2">
                     <Tooltip content="The system event type recorded in the database.">

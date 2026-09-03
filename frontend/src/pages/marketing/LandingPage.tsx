@@ -27,7 +27,7 @@ const AnimatedTerminal = () => {
   }, []);
 
   return (
-    <div className="w-full max-w-4xl mx-auto mt-16 bg-white border border-rule-300 rounded-xl shadow-card overflow-hidden relative">
+    <div className="w-full max-w-4xl mx-auto mt-16 bg-white border border-rule-300 rounded-xl shadow-none overflow-hidden relative">
       {/* Mac/Browser Header */}
       <div className="h-10 border-b border-rule-300 bg-paper-1 flex items-center px-4 gap-2">
         <div className="flex gap-1.5">
@@ -131,7 +131,7 @@ export default function LandingPage() {
           className="max-w-4xl mx-auto text-center"
         >
           <motion.div variants={FADE_UP} className="flex items-center justify-center space-x-2 mb-8">
-            <span className="text-[10px] font-mono tracking-widest text-ink-700 uppercase border border-rule-300 px-3 py-1 rounded-full bg-white shadow-sm flex items-center gap-2">
+            <span className="text-[10px] font-mono tracking-widest text-ink-700 uppercase border border-rule-300 px-3 py-1 rounded-full bg-white shadow-none flex items-center gap-2">
               <span className="w-1.5 h-1.5 rounded-full bg-source-blue animate-pulse" />
               Automated Financial Matching
             </span>
@@ -150,11 +150,11 @@ export default function LandingPage() {
           </motion.p>
 
           <motion.div variants={FADE_UP} className="flex items-center justify-center space-x-4">
-            <Link to="/app/queue" className="group px-7 py-3.5 bg-ink-900 text-white font-semibold rounded-md shadow-card hover:bg-ink-700 transition-all relative overflow-hidden animate-shimmer flex items-center space-x-2 active:scale-95">
+            <Link to="/app/queue" className="group px-7 py-3.5 bg-ink-900 text-white font-semibold rounded-md shadow-none hover:bg-ink-700 transition-all relative overflow-hidden animate-shimmer flex items-center space-x-2 active:scale-95">
               <span>Open Control Room</span>
               <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </Link>
-            <Link to="/how-it-works" className="px-7 py-3.5 bg-white text-ink-900 font-semibold rounded-md border border-rule-300 shadow-sm hover:bg-paper-1 transition-all active:scale-95">
+            <Link to="/how-it-works" className="px-7 py-3.5 bg-white text-ink-900 font-semibold rounded-md border border-rule-300 shadow-none hover:bg-paper-1 transition-all active:scale-95">
               See How It Works
             </Link>
           </motion.div>
@@ -186,7 +186,7 @@ export default function LandingPage() {
             {/* Card 1 */}
             <motion.div 
               whileHover={{ y: -5 }}
-              className="bg-white border border-rule-300 rounded-2xl p-8 shadow-sm hover:shadow-card transition-all duration-300 group"
+              className="bg-white border border-rule-300 rounded-2xl p-8 shadow-none hover:shadow-none transition-all duration-300 group"
             >
               <div className="w-12 h-12 bg-source-blue/10 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
                 <Database className="w-6 h-6 text-source-blue" />
@@ -200,7 +200,7 @@ export default function LandingPage() {
             {/* Card 2 */}
             <motion.div 
               whileHover={{ y: -5 }}
-              className="bg-white border border-rule-300 rounded-2xl p-8 shadow-sm hover:shadow-card transition-all duration-300 group md:col-span-2 relative overflow-hidden"
+              className="bg-white border border-rule-300 rounded-2xl p-8 shadow-none hover:shadow-none transition-all duration-300 group md:col-span-2 relative overflow-hidden"
             >
               <div className="relative z-10">
                 <div className="w-12 h-12 bg-ledger-vermilion/10 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
@@ -220,7 +220,7 @@ export default function LandingPage() {
             {/* Card 3 */}
             <motion.div 
               whileHover={{ y: -5 }}
-              className="bg-white border border-rule-300 rounded-2xl p-8 shadow-sm hover:shadow-card transition-all duration-300 group md:col-span-2 relative overflow-hidden"
+              className="bg-white border border-rule-300 rounded-2xl p-8 shadow-none hover:shadow-none transition-all duration-300 group md:col-span-2 relative overflow-hidden"
             >
                <div className="relative z-10">
                 <div className="w-12 h-12 bg-matched-green/10 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
@@ -236,7 +236,7 @@ export default function LandingPage() {
              {/* Card 4 */}
              <motion.div 
               whileHover={{ y: -5 }}
-              className="bg-ink-900 text-white border border-ink-700 rounded-2xl p-8 shadow-card transition-all duration-300 group flex flex-col justify-between"
+              className="bg-ink-900 text-white border border-ink-700 rounded-2xl p-8 shadow-none transition-all duration-300 group flex flex-col justify-between"
             >
               <div>
                 <h3 className="text-xl font-semibold font-display mb-3">Ready to deploy?</h3>

@@ -165,7 +165,7 @@ export const PolicyKnowledgePage: React.FC = () => {
                 {searchResult.matched_chunks.map((chunk, i) => (
                   <div
                     key={i}
-                    className="bg-paper-1 border border-rule-300 hover:border-source-blue rounded-lg p-4 space-y-2 text-xs transition shadow-sm"
+                    className="bg-paper-1 border border-rule-300 hover:border-source-blue rounded-lg p-4 space-y-2 text-xs transition shadow-none"
                   >
                     <div className="flex items-center justify-between">
                       <span className="font-mono text-[11px] text-source-blue font-semibold">
@@ -201,7 +201,7 @@ export const PolicyKnowledgePage: React.FC = () => {
                   onClick={() => setSelectedDoc(doc)}
                   className={`w-full p-3 rounded-lg text-left text-xs transition flex items-center justify-between border ${
                     selectedDoc?.filename === doc.filename
-                      ? 'bg-source-blue/10 text-ink-900 border-source-blue font-semibold shadow-sm'
+                      ? 'bg-source-blue/10 text-ink-900 border-source-blue font-semibold shadow-none'
                       : 'bg-paper-1 text-ink-700 hover:text-ink-900 border-rule-300 hover:bg-paper-1'
                   }`}
                 >

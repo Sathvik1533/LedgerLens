@@ -94,7 +94,7 @@ const QueuePage: React.FC = () => {
       className="flex-1 p-6 lg:p-10 max-w-7xl mx-auto w-full space-y-8 font-sans"
     >
       <div className="flex items-center gap-2 mb-3">
-        <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-ink-700 border border-rule-300 px-2 py-0.5 rounded shadow-sm bg-white">
+        <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-ink-700 border border-rule-300 px-2 py-0.5 rounded shadow-none bg-white">
           02 &mdash; OPERATIONAL EXCEPTION QUEUE
         </span>
       </div>
@@ -108,7 +108,7 @@ const QueuePage: React.FC = () => {
             {processedCases.length} anomalies flagged by the deterministic engine requiring human review. Select a case below to inspect source evidence and enforce ledger policy.
           </p>
         </div>
-        <div className="flex flex-col items-end bg-white px-5 py-4 border border-rule-300 rounded-lg shadow-sm">
+        <div className="flex flex-col items-end bg-white px-5 py-4 border border-rule-300 rounded-lg shadow-none">
           <span className="text-[10px] font-mono text-ink-700 uppercase tracking-widest mb-1">Total Exposure</span>
           <div className="text-2xl font-mono font-medium text-ledger-vermilion flex items-center">
             ₹<AnimatedCounter value={totalAmountAtRisk} />.00
@@ -117,13 +117,13 @@ const QueuePage: React.FC = () => {
       </div>
 
       {error && (
-        <div className="bg-ledger-vermilion/10 border border-ledger-vermilion rounded-lg p-4 flex items-center justify-between text-ink-900 shadow-sm">
+        <div className="bg-ledger-vermilion/10 border border-ledger-vermilion rounded-lg p-4 flex items-center justify-between text-ink-900 shadow-none">
           <div className="flex items-center gap-3">
             <ShieldAlert className="w-5 h-5 text-ledger-vermilion" />
             <span className="text-sm font-medium">{error}</span>
           </div>
           <Tooltip content="Refresh the queue data from the server">
-          <button onClick={loadQueue} className="px-4 py-2 bg-white border border-ledger-vermilion text-ledger-vermilion rounded text-xs font-semibold shadow-sm hover:bg-paper-0 transition-colors flex items-center gap-2 focus-ring">
+          <button onClick={loadQueue} className="px-4 py-2 bg-white border border-ledger-vermilion text-ledger-vermilion rounded text-xs font-semibold shadow-none hover:bg-paper-0 transition-colors flex items-center gap-2 focus-ring">
             <RefreshCw className="w-3.5 h-3.5" /> Retry Connection
           </button>
           </Tooltip>
@@ -134,7 +134,7 @@ const QueuePage: React.FC = () => {
       <div className="flex flex-col lg:flex-row gap-8 items-start">
         
         {/* Left Sidebar: Advanced Filtering (Sticky) */}
-        <div className="w-full lg:w-64 shrink-0 bg-white border border-rule-300 rounded-xl p-5 shadow-sm sticky top-28 max-h-[calc(100vh-8rem)] overflow-y-auto overscroll-contain" data-lenis-prevent="true">
+        <div className="w-full lg:w-64 shrink-0 bg-white border border-rule-300 rounded-xl p-5 shadow-none sticky top-28 max-h-[calc(100vh-8rem)] overflow-y-auto overscroll-contain" data-lenis-prevent="true">
           <div className="flex items-center gap-2 mb-6 text-ink-900 font-semibold border-b border-rule-300 pb-3">
             <Filter className="w-4 h-4" />
             <span className="font-display">Refine Queue</span>
@@ -211,7 +211,7 @@ const QueuePage: React.FC = () => {
           ) : processedCases.length === 0 ? (
             <EmptyState type="filtered_empty" actionLabel="Reset Active Filters" onAction={() => { setSearchQuery(''); setSelectedCategory('all'); setSelectedSeverity('all'); }} />
           ) : (
-            <div className="bg-white border border-rule-300 rounded-xl shadow-sm overflow-hidden">
+            <div className="bg-white border border-rule-300 rounded-xl shadow-none overflow-hidden">
               <div className="overflow-x-auto">
                 <table className="w-full text-left border-collapse">
                   <thead>
@@ -241,7 +241,7 @@ const QueuePage: React.FC = () => {
                           >
                             <td className="py-4 px-5 align-top">
                               <span className="inline-flex items-center gap-1.5">
-                                <span className={`w-1.5 h-1.5 rounded-full shadow-sm ${isCrit ? 'bg-ledger-vermilion' : 'bg-advisory-amber'}`} />
+                                <span className={`w-1.5 h-1.5 rounded-full shadow-none ${isCrit ? 'bg-ledger-vermilion' : 'bg-advisory-amber'}`} />
                                 <span className={`text-xs font-semibold ${isCrit ? 'text-ledger-vermilion' : 'text-advisory-amber'}`}>
                                   {severity.label}
                                 </span>
@@ -255,7 +255,7 @@ const QueuePage: React.FC = () => {
                                 <Tooltip content="Copy Payment ID to clipboard">
                                 <button
                                   onClick={(e) => copyToClipboard(item.payment_id, e)}
-                                  className="inline-flex items-center gap-1 bg-paper-0 border border-rule-300 px-1.5 py-0.5 rounded shadow-sm hover:bg-paper-1 hover:text-ink-900 transition-colors focus-ring"
+                                  className="inline-flex items-center gap-1 bg-paper-0 border border-rule-300 px-1.5 py-0.5 rounded shadow-none hover:bg-paper-1 hover:text-ink-900 transition-colors focus-ring"
                                   aria-label={`Copy payment ID ${item.payment_id}`}
                                 >
                                   <span>{item.payment_id}</span>

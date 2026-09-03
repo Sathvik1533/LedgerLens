@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
+import { Tooltip } from '../components/Tooltip';
 import {
   CheckCircle2,
   Lock,
@@ -102,7 +103,7 @@ export const SettingsPage: React.FC = () => {
               </div>
               <button
                 type="submit"
-                className="px-4 py-2 bg-ink-900 hover:bg-ink-700 text-white font-semibold focus-ring text-xs rounded transition shadow-sm"
+                className="px-4 py-2 bg-ink-900 hover:bg-ink-700 text-white font-semibold focus-ring text-xs rounded transition shadow-none"
               >
                 Update Contract Rates
               </button>

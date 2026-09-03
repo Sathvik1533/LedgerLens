@@ -13,6 +13,7 @@ import {
 import { fetchReviewQueue, triggerReconciliationRun } from '../api/client';
 import { Logo } from '../components/Logo';
 
+
 export default function AppLayout() {
   const location = useLocation();
   const [queueCount, setQueueCount] = useState<number>(0);
@@ -45,70 +46,61 @@ export default function AppLayout() {
   ];
 
   return (
-    <div className="min-h-screen bg-paper-0 flex flex-col font-sans text-ink-900 selection:bg-source-blue/20 relative">
+    <div className="h-screen bg-paper-0 flex font-sans text-ink-900 selection:bg-source-blue/20 overflow-hidden">
       
-      {/* Apptains-style Floating Glass Navigation Dock */}
-      <div className="w-full border-b border-rule-300 bg-paper-0 flex justify-center px-4 py-3">
-        <motion.nav 
-        initial={{ y: -50, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ type: "spring", stiffness: 300, damping: 25 }}
-        className="flex items-center p-1.5 max-w-full overflow-x-auto no-scrollbar"
-      >
-        <Link to="/" className="flex items-center justify-center w-10 h-10 rounded-full hover:bg-paper-1 transition mr-2 shrink-0 group">
-          <Logo className="w-6 h-6 group-hover:scale-105 transition-transform" />
-        </Link>
+      {/* Direction A: Slim Fixed Sidebar */}
+      <nav className="w-16 md:w-56 shrink-0 border-r border-rule-300 bg-paper-1 flex flex-col justify-between h-full overflow-y-auto overscroll-contain">
         
-        <div className="flex items-center gap-1 md:gap-2 border-l border-rule-300 pl-2 md:pl-3">
-          {navItems.map((item) => {
-            const isActive = location.pathname.startsWith(item.path);
-            const Icon = item.icon;
-            return (
-              <Link
-                key={item.path}
-                to={item.path}
-                className="relative flex items-center px-3 md:px-4 py-2 rounded-full group transition-colors shrink-0"
-              >
-                {isActive && (
-                  <motion.div
-                    layoutId="dock-active"
-                    className="absolute inset-0 bg-ink-900 rounded-full"
-                    transition={{ type: 'spring', stiffness: 400, damping: 30 }}
-                  />
-                )}
-                <div className="relative z-10 flex items-center gap-2">
-                  <Icon className={`w-4 h-4 ${isActive ? 'text-white' : 'text-ink-700 group-hover:text-ink-900 transition-colors'}`} />
-                  <span className={`text-sm font-medium ${isActive ? 'text-white' : 'text-ink-700 group-hover:text-ink-900 transition-colors'} hidden xl:block`}>
+        <div>
+          <div className="h-16 flex items-center justify-center md:justify-start md:px-6 border-b border-rule-300">
+            <Link to="/" className="flex items-center gap-3 group">
+              <Logo className="w-6 h-6 group-hover:scale-105 transition-transform" />
+              <span className="font-display font-bold text-ink-900 hidden md:block tracking-tight">LedgerLens</span>
+            </Link>
+          </div>
+
+          <div className="p-2 md:p-4 space-y-1">
+            {navItems.map((item) => {
+              const isActive = location.pathname.startsWith(item.path);
+              const Icon = item.icon;
+              return (
+                <Link
+                  key={item.path}
+                  to={item.path}
+                  className={`flex items-center justify-center md:justify-start gap-3 px-2 md:px-3 py-2.5 rounded-md transition-colors relative group ${isActive ? 'bg-rule-300 text-ink-900' : 'text-ink-700 hover:bg-paper-0 hover:text-ink-900'}`}
+                >
+                  <Icon className="w-5 h-5 shrink-0" />
+                  <span className="text-sm font-medium hidden md:block">
                     {item.label}
                   </span>
-                </div>
-                {item.badge !== undefined && item.badge > 0 && (
-                  <span className={`relative z-10 ml-2 text-[10px] font-mono px-1.5 py-0.5 rounded-full ${
-                    isActive ? 'bg-white/20 text-white' : 'bg-ledger-vermilion/10 text-ledger-vermilion border border-ledger-vermilion/20'
-                  }`}>
-                    {item.badge}
-                  </span>
-                )}
-              </Link>
-            );
-          })}
+                  {item.badge !== undefined && item.badge > 0 && (
+                    <span className={`hidden md:flex absolute right-2 text-[10px] font-mono px-1.5 py-0.5 rounded-full ${
+                      isActive ? 'bg-white text-ink-900 shadow-none border border-rule-300' : 'bg-ledger-vermilion/10 text-ledger-vermilion border border-ledger-vermilion/20'
+                    }`}>
+                      {item.badge}
+                    </span>
+                  )}
+                </Link>
+              );
+            })}
+          </div>
         </div>
 
-        <div className="border-l border-rule-300 pl-3 ml-2 flex items-center">
+        <div className="p-4 border-t border-rule-300 flex justify-center md:justify-start">
            <button
             onClick={handleTriggerRecon}
             disabled={isRunningRecon}
-            className="group relative flex items-center justify-center w-10 h-10 rounded-full bg-paper-1 border border-rule-300 hover:border-source-blue transition-all disabled:opacity-50"
+            className="flex items-center justify-center md:justify-start gap-2 w-full px-2 md:px-3 py-2 rounded-md bg-paper-0 border border-rule-300 hover:border-source-blue transition-all disabled:opacity-50"
             title="Run Recon Engine (Cmd+E)"
           >
-            <Play className={`w-4 h-4 fill-ink-900 text-ink-900 ${isRunningRecon ? 'animate-pulse' : 'group-hover:text-source-blue group-hover:fill-source-blue'}`} />
+            <Play className={`w-4 h-4 fill-ink-900 text-ink-900 shrink-0 ${isRunningRecon ? 'animate-pulse' : ''}`} />
+            <span className="text-xs font-semibold hidden md:block">Run Recon</span>
           </button>
         </div>
-      </motion.nav>
-      </div>
+      </nav>
 
       {/* Main Workspace */}
-      <main className="flex-1 pb-12 relative flex flex-col bg-paper-0">
+      <main className="flex-1 h-full relative flex flex-col bg-paper-0 overflow-y-auto no-scrollbar">
         <Outlet />
       </main>
     </div>

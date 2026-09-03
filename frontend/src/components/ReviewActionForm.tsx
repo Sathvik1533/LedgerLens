@@ -63,7 +63,7 @@ export const ReviewActionForm: React.FC<ReviewActionFormProps> = ({
   };
 
   return (
-    <div className="bg-paper-1 border border-rule-300 rounded-md p-4 space-y-4 shadow-sm">
+    <div className="bg-paper-1 border border-rule-300 rounded-md p-4 space-y-4 shadow-none">
       {/* Header */}
       <div className="border-b border-rule-300 pb-3 space-y-0.5">
         <div className="flex items-center justify-between gap-2">
@@ -90,7 +90,7 @@ export const ReviewActionForm: React.FC<ReviewActionFormProps> = ({
 
           role="alert"
           aria-live="assertive"
-          className="rounded-md bg-ledger-vermilion/10 border border-ledger-vermilion p-3 space-y-2 text-xs text-ink-900 shadow-sm font-sans"
+          className="rounded-md bg-ledger-vermilion/10 border border-ledger-vermilion p-3 space-y-2 text-xs text-ink-900 shadow-none font-sans"
         >
           <div className="flex items-start gap-2">
             <AlertTriangle className="w-4 h-4 text-ledger-vermilion shrink-0 mt-0.5" aria-hidden="true" />
@@ -104,7 +104,7 @@ export const ReviewActionForm: React.FC<ReviewActionFormProps> = ({
           <button
             type="button"
             onClick={onRefreshCase}
-            className="w-full mt-1.5 py-1.5 px-3 rounded bg-ledger-vermilion hover:bg-ledger-vermilion/80 text-ink-900 font-semibold flex items-center justify-center gap-1.5 border border-ledger-vermilion transition active:scale-[0.98] text-xs shadow-sm"
+            className="w-full mt-1.5 py-1.5 px-3 rounded bg-ledger-vermilion hover:bg-ledger-vermilion/80 text-ink-900 font-semibold flex items-center justify-center gap-1.5 border border-ledger-vermilion transition active:scale-[0.98] text-xs shadow-none"
           >
             <RefreshCw className="w-3 h-3" aria-hidden="true" />
             <span>Refresh Case Data</span>
@@ -268,7 +268,7 @@ export const ReviewActionForm: React.FC<ReviewActionFormProps> = ({
         <button
           type="submit"
           disabled={isSubmitting || !actor.trim() || !comment.trim()}
-          className="w-full h-9 rounded bg-paper-1 hover:bg-paper-0 active:bg-paper-1 text-ink-900 text-xs font-semibold tracking-wide transition disabled:opacity-40 disabled:pointer-events-none flex items-center justify-center gap-1.5 shadow-sm active:scale-[0.98]"
+          className="w-full h-9 rounded bg-paper-1 hover:bg-paper-0 active:bg-paper-1 text-ink-900 text-xs font-semibold tracking-wide transition disabled:opacity-40 disabled:pointer-events-none flex items-center justify-center gap-1.5 shadow-none active:scale-[0.98]"
         >
           {isSubmitting ? (
             <>

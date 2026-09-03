@@ -4,7 +4,7 @@ import { AuditEventItem } from '../types/api';
 
 export const AuditTimeline: React.FC<{ events: AuditEventItem[] }> = ({ events }) => {
   return (
-    <div className="bg-paper-1 border border-rule-300 rounded-md p-3.5 space-y-3 shadow-sm">
+    <div className="bg-paper-1 border border-rule-300 rounded-md p-3.5 space-y-3 shadow-none">
       <div className="flex items-center justify-between border-b border-rule-300 pb-2">
         <div className="flex items-center gap-1.5">
           <History className="w-3.5 h-3.5 text-source-blue" aria-hidden="true" />

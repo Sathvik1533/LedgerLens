@@ -236,7 +236,7 @@ export const ReviewQueuePage: React.FC<{ onSelectCase?: (caseId: string) => void
                 onClick={() => setSelectedSeverity(sev)}
                 className={`px-3 py-1 rounded-md text-xs font-sans capitalize transition ${
                   selectedSeverity === sev
-                    ? 'bg-blue-900/60 text-ink-900 font-semibold shadow-sm border border-source-blue'
+                    ? 'bg-blue-900/60 text-ink-900 font-semibold shadow-none border border-source-blue'
                     : 'text-ink-700 hover:text-ink-900'
                 }`}
               >
@@ -329,7 +329,7 @@ export const ReviewQueuePage: React.FC<{ onSelectCase?: (caseId: string) => void
                             isCrit ? 'text-ledger-vermilion' : 'text-advisory-amber'
                           }`}
                         >
-                          <span className={`w-2 h-2 rounded-full shrink-0 ${isCrit ? 'bg-ledger-vermilion shadow-sm' : 'bg-advisory-amber shadow-sm'}`} />
+                          <span className={`w-2 h-2 rounded-full shrink-0 ${isCrit ? 'bg-ledger-vermilion shadow-none' : 'bg-advisory-amber shadow-none'}`} />
                           <span>{isCrit ? 'Critical' : 'High'}</span>
                         </span>
                       </td>
@@ -366,7 +366,7 @@ export const ReviewQueuePage: React.FC<{ onSelectCase?: (caseId: string) => void
 
                       {/* 4. Action (Single Affordance) */}
                       <td className="py-4 px-5 align-top text-right">
-                        <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-source-blue group-hover:text-blue-300 group-hover:translate-x-0.5 transition-all font-sans bg-source-blue/10 border border-source-blue px-2.5 py-1 rounded-full shadow-sm">
+                        <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-source-blue group-hover:text-blue-300 group-hover:translate-x-0.5 transition-all font-sans bg-source-blue/10 border border-source-blue px-2.5 py-1 rounded-full shadow-none">
                           <span>Inspect</span>
                           <ArrowRight className="w-3 h-3" aria-hidden="true" />
                         </span>

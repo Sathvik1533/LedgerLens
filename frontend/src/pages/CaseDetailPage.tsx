@@ -83,7 +83,7 @@ export const CaseDetailPage: React.FC<CaseDetailPageProps> = ({ caseId: propCase
 
   if (error || !evidence) {
     return (
-      <div className="bg-paper-1 border border-ledger-vermilion rounded-xl p-8 text-center space-y-4 shadow-sm font-sans">
+      <div className="bg-paper-1 border border-ledger-vermilion rounded-xl p-8 text-center space-y-4 shadow-none font-sans">
         <AlertCircle className="w-10 h-10 text-ledger-vermilion mx-auto" aria-hidden="true" />
         <h3 className="text-base font-semibold text-ink-900">Reconciliation Case Unreachable</h3>
         <p className="text-xs text-ink-900 max-w-md mx-auto">{error || 'Case records could not be retrieved from database.'}</p>

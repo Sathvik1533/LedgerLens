@@ -25,7 +25,7 @@ export default function EvidencePage() {
       <div className="max-w-5xl mx-auto relative z-10">
         <motion.div variants={STAGGER} initial="hidden" animate="show" className="mb-20 text-center">
           <motion.div variants={FADE_UP} className="inline-flex items-center gap-2 mb-6">
-             <span className="text-[10px] font-mono tracking-widest text-ink-700 uppercase border border-rule-300 px-3 py-1 rounded-full bg-white shadow-sm">
+             <span className="text-[10px] font-mono tracking-widest text-ink-700 uppercase border border-rule-300 px-3 py-1 rounded-full bg-white shadow-none">
               Data Model
             </span>
           </motion.div>
@@ -39,7 +39,7 @@ export default function EvidencePage() {
 
         <motion.div variants={STAGGER} initial="hidden" whileInView="show" viewport={{ once: true }} className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-16">
           {sources.map((src, i) => (
-            <motion.div key={i} variants={FADE_UP} className="bg-white border border-rule-300 rounded-2xl p-8 shadow-sm hover:shadow-card hover:border-source-blue/30 transition-all group">
+            <motion.div key={i} variants={FADE_UP} className="bg-white border border-rule-300 rounded-2xl p-8 shadow-none hover:shadow-none hover:border-source-blue/30 transition-all group">
               <div className="w-12 h-12 bg-paper-1 rounded-full flex items-center justify-center mb-6 group-hover:bg-source-blue/10 transition-colors">
                 <src.icon className="w-5 h-5 text-ink-900 group-hover:text-source-blue" />
               </div>
@@ -49,7 +49,7 @@ export default function EvidencePage() {
           ))}
         </motion.div>
 
-        <motion.div variants={FADE_UP} initial="hidden" whileInView="show" viewport={{ once: true }} className="bg-ink-900 text-paper-0 border border-ink-700 rounded-2xl p-8 shadow-card overflow-hidden">
+        <motion.div variants={FADE_UP} initial="hidden" whileInView="show" viewport={{ once: true }} className="bg-ink-900 text-paper-0 border border-ink-700 rounded-2xl p-8 shadow-none overflow-hidden">
           <div className="flex flex-col md:flex-row gap-8 items-center justify-between">
             <div className="max-w-lg">
               <div className="flex items-center gap-2 mb-4">

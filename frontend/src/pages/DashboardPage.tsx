@@ -291,7 +291,7 @@ export const DashboardPage: React.FC = () => {
               </p>
               <div className="text-[10px] font-mono text-matched-green flex items-center gap-1 pt-1">
                 <span className="w-1.5 h-1.5 rounded-full bg-matched-green inline-block" />
-                <span>Ingested &amp; Normalized</span>
+                <Tooltip content="Deterministic 3-Way Parity"><span className="border-b border-dashed border-rule-300 cursor-help">Ingested &amp; Normalized</span></Tooltip>
               </div>
             </div>
 
@@ -331,7 +331,7 @@ export const DashboardPage: React.FC = () => {
               </p>
               <div className="text-[10px] font-mono text-matched-green flex items-center gap-1 pt-1">
                 <span className="w-1.5 h-1.5 rounded-full bg-matched-green inline-block" />
-                <span>Double-Credit Guarded</span>
+                <Tooltip content="Idempotent Credit Pipeline"><span className="border-b border-dashed border-rule-300 cursor-help">Double-Credit Guarded</span></Tooltip>
               </div>
             </div>
           </div>
@@ -364,7 +364,7 @@ export const DashboardPage: React.FC = () => {
                 <div
                   key={typeKey}
                   onClick={() => navigate(`/app/queue?type=${typeKey}`)}
-                  className="bg-paper-1 hover:bg-paper-1 border border-rule-300 hover:border-source-blue rounded-lg p-4 space-y-2 cursor-pointer transition shadow-sm group"
+                  className="bg-paper-1 hover:bg-paper-1 border border-rule-300 hover:border-source-blue rounded-lg p-4 space-y-2 cursor-pointer transition shadow-none group"
                 >
                   <div className="flex items-center justify-between">
                     <span className="text-xs font-semibold text-ink-900 group-hover:text-source-blue/80 transition">

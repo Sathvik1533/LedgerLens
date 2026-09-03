@@ -84,7 +84,7 @@ export const CaseDetailPage: React.FC<CaseDetailPageProps> = ({ caseId: propCase
 
   if (error || !evidence) {
     return (
-      <div className="bg-paper-1 border border-ledger-vermilion rounded-xl p-8 text-center space-y-4 shadow-sm font-sans">
+      <div className="bg-paper-1 border border-ledger-vermilion rounded-xl p-8 text-center space-y-4 shadow-none font-sans">
         <AlertCircle className="w-10 h-10 text-ledger-vermilion mx-auto" aria-hidden="true" />
         <h3 className="text-base font-semibold text-ink-900">Reconciliation Case Unreachable</h3>
         <p className="text-xs text-ink-900 max-w-md mx-auto">{error || 'Case records could not be retrieved from database.'}</p>
@@ -179,66 +179,24 @@ export const CaseDetailPage: React.FC<CaseDetailPageProps> = ({ caseId: propCase
         </div>
       )}
 
-      {/* 3-Column Persistent Desktop Workspace */}
-      <div className="flex flex-col lg:flex-row gap-5 items-start">
-        {/* COLUMN 1: Case Context & Audit Timeline (w-full lg:w-[22%]) */}
-        <div className="w-full lg:w-[22%] space-y-4 shrink-0">
-          <div className="control-panel rounded-xl p-4 space-y-3 shadow-none">
-            <h3 className="text-xs font-bold text-ink-900 uppercase tracking-wider font-sans border-b border-rule-300 pb-2">
-              Case Metadata
-            </h3>
-
-            <div className="space-y-3 text-xs font-sans">
-              <div>
-                <span className="text-ink-700 block text-[11px] font-sans">Amount at Risk</span>
-                <AmountDisplay
-                  amount={evidence.payment?.amount || evidence.expected_net_settlement}
-                  className="text-lg font-bold text-ink-900 font-mono"
-                />
-              </div>
-
-              <div>
-                <span className="text-ink-700 block text-[11px] font-sans">Calculated Discrepancy</span>
-                <AmountDisplay
-                  amount={evidence.settlement_discrepancy}
-                  isDiscrepancy={true}
-                  className="text-base font-bold font-mono text-ledger-vermilion"
-                />
-              </div>
-
-              <div className="pt-2 border-t border-rule-300 space-y-2 text-xs">
-                <div className="flex justify-between items-center text-ink-700">
-                  <span>Exception Code</span>
-                  <span className="text-ink-900 font-mono text-xs font-medium">{evidence.exception_type}</span>
-                </div>
-                <div className="flex justify-between items-center text-ink-700">
-                  <span>Decision State</span>
-                  <span className="text-ink-900 font-mono text-xs font-medium">{evidence.decision_status}</span>
-                </div>
-                <div className="flex justify-between items-center text-ink-700">
-                  <span>Lock Version</span>
-                  <span className="text-ink-900 font-mono text-xs font-medium">v{evidence.version}</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <AuditTimeline events={auditEvents} />
-        </div>
-
-        {/* COLUMN 2: Evidence Comparison Grid & Policy AI Drawer (w-full lg:w-[48%]) */}
-        <div className="w-full lg:w-[48%] space-y-4 flex-1">
+      {/* 2-Column Desktop Workspace (Direction A) */}
+      <div className="grid grid-cols-1 lg:grid-cols-[1fr_400px] gap-6 items-start">
+        {/* Left Column: Evidence Comparison Grid (Direction A) */}
+        <div className="space-y-6">
           <MultiSourceCard evidence={evidence} />
-          <RagCopilotPanel caseId={evidence.case_id} autoRun={true} />
         </div>
 
-        {/* COLUMN 3: Sticky Human Decision Panel (w-full lg:w-[30%]) */}
-        <div className="w-full lg:w-[30%] lg:sticky lg:top-14 space-y-4 shrink-0">
+        {/* Right Column: AI Advisory & Human Decision Log (Direction A) */}
+        <div className="space-y-6 lg:sticky lg:top-6">
+          <RagCopilotPanel caseId={evidence.case_id} autoRun={true} />
+          
           <ReviewActionForm
             evidence={evidence}
             onSuccess={handleReviewSuccess}
             onRefreshCase={loadCaseData}
           />
+          
+          <AuditTimeline events={auditEvents} />
         </div>
       </div>
     </motion.div>

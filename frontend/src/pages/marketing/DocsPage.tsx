@@ -16,7 +16,7 @@ export default function DocsPage() {
       <div className="max-w-5xl mx-auto relative z-10">
         <motion.div initial="hidden" animate="show" variants={{ show: { transition: { staggerChildren: 0.1 } } }} className="mb-16 text-center">
           <motion.div variants={FADE_UP} className="inline-flex items-center gap-2 mb-6">
-             <span className="text-[10px] font-mono tracking-widest text-ink-700 uppercase border border-rule-300 px-3 py-1 rounded-full bg-white shadow-sm">Technical Reference</span>
+             <span className="text-[10px] font-mono tracking-widest text-ink-700 uppercase border border-rule-300 px-3 py-1 rounded-full bg-white shadow-none">Technical Reference</span>
           </motion.div>
           <motion.h1 variants={FADE_UP} className="text-5xl md:text-6xl text-ink-900 font-display font-medium tracking-tight mb-6">Documentation</motion.h1>
           <motion.p variants={FADE_UP} className="text-xl text-ink-700 max-w-2xl mx-auto">Open-source architectural guides for implementing LedgerLens.</motion.p>
@@ -24,7 +24,7 @@ export default function DocsPage() {
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {categories.map((c, i) => (
-             <motion.div key={i} initial="hidden" animate="show" variants={FADE_UP} className="bg-white border border-rule-300 rounded-2xl p-8 shadow-sm hover:shadow-card hover:border-source-blue/30 transition-all cursor-pointer group">
+             <motion.div key={i} initial="hidden" animate="show" variants={FADE_UP} className="bg-white border border-rule-300 rounded-2xl p-8 shadow-none hover:shadow-none hover:border-source-blue/30 transition-all cursor-pointer group">
                <c.icon className="w-6 h-6 mb-4 text-ink-700 group-hover:text-source-blue" />
                <h3 className="text-xl text-ink-900 font-display font-medium mb-2">{c.title}</h3>
                <p className="text-ink-700 text-sm leading-relaxed">{c.desc}</p>
@@ -32,7 +32,7 @@ export default function DocsPage() {
           ))}
         </div>
       
-        <motion.div variants={FADE_UP} className="mt-16 bg-white border border-rule-300 rounded-2xl p-8 shadow-sm">
+        <motion.div variants={FADE_UP} className="mt-16 bg-white border border-rule-300 rounded-2xl p-8 shadow-none">
           <h3 className="text-xl text-ink-900 font-display font-bold mb-6">Design System: Direction A (The Clear Ledger)</h3>
           
           <div className="space-y-8">

@@ -13,49 +13,50 @@ export default {
       },
       colors: {
         paper: {
-          0: '#FBFAF6',
-          1: '#F1EDE4',
+          0: '#F9F9FB', // Institutional Light Canvas
+          1: '#FFFFFF', // Clean White Surfaces
         },
         ink: {
-          900: '#102B42',
-          700: '#334754',
+          900: '#111827', // Crisp Near-Black
+          700: '#4B5563', // Secondary Text
         },
         rule: {
-          300: '#C9C5BC',
+          300: '#E5E7EB', // 1px borders
         },
         source: {
-          blue: '#356A88',
+          blue: '#2563EB',
         },
         matched: {
-          green: '#3E725E',
+          green: '#059669',
         },
         ledger: {
-          vermilion: '#C6533C',
+          vermilion: '#DC2626', // Critical
         },
         advisory: {
-          amber: '#B47A43',
+          amber: '#D97706', // High / Review
         },
         locked: {
-          slate: '#65747A',
+          slate: '#64748B',
         },
         audit: {
-          violet: '#6E627D',
+          violet: '#7C3AED',
         },
       },
       borderRadius: {
         'xs': '2px',
         'sm': '4px',
-        'md': '8px',
+        'md': '8px', // Restrained craft radius
+        'lg': '12px',
       },
       boxShadow: {
-        'subtle': '0 1px 2px rgba(0, 0, 0, 0.3)',
-        'card': '0 4px 12px rgba(0, 0, 0, 0.4)',
+        'subtle': '0 1px 2px 0 rgba(0, 0, 0, 0.05)', // Extremely flat, modern shadow
+        'card': '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
       },
       transitionDuration: {
-        DEFAULT: '180ms',
+        DEFAULT: '150ms',
       },
       transitionTimingFunction: {
-        DEFAULT: 'ease-out',
+        DEFAULT: 'ease-in-out',
       },
     },
   },

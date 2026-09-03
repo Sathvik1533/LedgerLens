@@ -46,7 +46,7 @@ export default function HowItWorksPage() {
       <div className="max-w-4xl mx-auto relative z-10">
         <motion.div variants={STAGGER} initial="hidden" animate="show" className="mb-20 text-center">
           <motion.div variants={FADE_UP} className="inline-flex items-center gap-2 mb-6">
-             <span className="text-[10px] font-mono tracking-widest text-ink-700 uppercase border border-rule-300 px-3 py-1 rounded-full bg-white shadow-sm">
+             <span className="text-[10px] font-mono tracking-widest text-ink-700 uppercase border border-rule-300 px-3 py-1 rounded-full bg-white shadow-none">
               Architecture
             </span>
           </motion.div>
@@ -67,10 +67,10 @@ export default function HowItWorksPage() {
         >
           {steps.map((step, i) => (
             <motion.div key={i} variants={FADE_UP} className="relative flex items-start gap-6 md:gap-8 group">
-              <div className="flex-shrink-0 w-14 h-14 md:w-16 md:h-16 rounded-full bg-paper-1 border-2 border-rule-300 flex items-center justify-center z-10 group-hover:border-source-blue group-hover:bg-source-blue/10 transition-colors shadow-sm">
+              <div className="flex-shrink-0 w-14 h-14 md:w-16 md:h-16 rounded-full bg-paper-1 border-2 border-rule-300 flex items-center justify-center z-10 group-hover:border-source-blue group-hover:bg-source-blue/10 transition-colors shadow-none">
                 <step.icon className="w-6 h-6 text-ink-700 group-hover:text-source-blue transition-colors" />
               </div>
-              <div className="flex-1 bg-white border border-rule-300 rounded-2xl p-6 md:p-8 shadow-sm group-hover:shadow-card group-hover:border-source-blue/30 transition-all">
+              <div className="flex-1 bg-white border border-rule-300 rounded-2xl p-6 md:p-8 shadow-none group-hover:shadow-none group-hover:border-source-blue/30 transition-all">
                 <div className="text-[10px] font-mono text-source-blue mb-2 tracking-widest uppercase">Phase 0{i + 1}</div>
                 <h3 className="text-2xl text-ink-900 font-display font-medium mb-3">{step.title}</h3>
                 <p className="text-ink-700 font-sans leading-relaxed text-sm md:text-base">{step.desc}</p>
