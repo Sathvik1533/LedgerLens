@@ -68,27 +68,27 @@ export default function DocsPage() {
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <div className="space-y-2">
                   <div className="h-12 w-full rounded border border-border bg-canvas"></div>
-                  <div className="text-xs"><span className="font-semibold text-text-primary block">Canvas</span><span className="text-text-secondary font-mono text-[10px]">#181C25 (canvas)</span></div>
+                  <div className="text-xs"><span className="font-semibold text-text-primary block">Canvas</span><span className="text-text-secondary font-mono text-[10px]">#111111 (canvas)</span></div>
                 </div>
                 <div className="space-y-2">
                   <div className="h-12 w-full rounded border border-border bg-surface"></div>
-                  <div className="text-xs"><span className="font-semibold text-text-primary block">Surface</span><span className="text-text-secondary font-mono text-[10px]">#222733 (surface)</span></div>
+                  <div className="text-xs"><span className="font-semibold text-text-primary block">Surface</span><span className="text-text-secondary font-mono text-[10px]">#1E1E1E (surface)</span></div>
                 </div>
                 <div className="space-y-2">
                   <div className="h-12 w-full rounded bg-surface-raised"></div>
-                  <div className="text-xs"><span className="font-semibold text-text-primary block">Primary Text</span><span className="text-text-secondary font-mono text-[10px]">#F8FAFC (text-primary)</span></div>
+                  <div className="text-xs"><span className="font-semibold text-text-primary block">Primary Text</span><span className="text-text-secondary font-mono text-[10px]">#F3F4F6 (text-primary)</span></div>
                 </div>
                 <div className="space-y-2">
                   <div className="h-12 w-full rounded bg-ink-700"></div>
-                  <div className="text-xs"><span className="font-semibold text-text-primary block">Secondary Text</span><span className="text-text-secondary font-mono text-[10px]">#94A3B8 (text-secondary)</span></div>
+                  <div className="text-xs"><span className="font-semibold text-text-primary block">Secondary Text</span><span className="text-text-secondary font-mono text-[10px]">#9CA3AF (text-secondary)</span></div>
                 </div>
                 <div className="space-y-2">
                   <div className="h-12 w-full rounded bg-rule-300"></div>
-                  <div className="text-xs"><span className="font-semibold text-text-primary block">Borders</span><span className="text-text-secondary font-mono text-[10px]">#3A4150 (border)</span></div>
+                  <div className="text-xs"><span className="font-semibold text-text-primary block">Borders</span><span className="text-text-secondary font-mono text-[10px]">#333333 (border)</span></div>
                 </div>
                 <div className="space-y-2">
                   <div className="h-12 w-full rounded bg-critical"></div>
-                  <div className="text-xs"><span className="font-semibold text-text-primary block">Critical</span><span className="text-text-secondary font-mono text-[10px]">#F43F5E (critical)</span></div>
+                  <div className="text-xs"><span className="font-semibold text-text-primary block">Critical</span><span className="text-text-secondary font-mono text-[10px]">#EF4444 (critical)</span></div>
                 </div>
                 <div className="space-y-2">
                   <div className="h-12 w-full rounded bg-high"></div>

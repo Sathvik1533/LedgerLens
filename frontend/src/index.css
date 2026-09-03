@@ -4,27 +4,27 @@
 
 @layer base {
   :root {
-    --color-canvas: #181C25;
-    --color-surface: #222733;
-    --color-surface-raised: #2D3342;
-    --color-surface-evidence: #14171F;
-    --color-border: #3A4150;
-    --color-border-strong: #4F586B;
-    --color-text-primary: #F8FAFC;
-    --color-text-secondary: #94A3B8;
-    --color-text-muted: #64748B;
-    --color-accent: #14B8A6;
-    --color-accent-hover: #0D9488;
+    --color-canvas: #111111;
+    --color-surface: #1E1E1E;
+    --color-surface-raised: #2A2A2A;
+    --color-surface-evidence: #161616;
+    --color-border: #333333;
+    --color-border-strong: #444444;
+    --color-text-primary: #F3F4F6;
+    --color-text-secondary: #9CA3AF;
+    --color-text-muted: #6B7280;
+    --color-accent: #3B82F6;
+    --color-accent-hover: #2563EB;
     --color-accent-foreground: #FFFFFF;
-    --color-critical: #F43F5E;
-    --color-critical-surface: rgba(244, 63, 94, 0.1);
+    --color-critical: #EF4444;
+    --color-critical-surface: rgba(239, 68, 68, 0.1);
     --color-high: #F59E0B;
     --color-high-surface: rgba(245, 158, 11, 0.1);
     --color-resolved: #10B981;
     --color-resolved-surface: rgba(16, 185, 129, 0.1);
     --color-advisory: #8B5CF6;
     --color-advisory-surface: rgba(139, 92, 246, 0.1);
-    --color-focus: rgba(20, 184, 166, 0.5);
+    --color-focus: rgba(59, 130, 246, 0.5);
   }
   
   body {
