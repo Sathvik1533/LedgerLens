@@ -121,7 +121,7 @@ export const DashboardPage: React.FC = () => {
             01 &mdash; CONTINUOUS RECONCILIATION ENGINE
           </span>
           <span className="text-ink-700">&bull;</span>
-          <span className="text-xs text-ink-700 font-mono">DETERMINISTIC 3-WAY PARITY</span>
+          <span className="text-xs text-ink-700 font-mono">AUTOMATED MATCHING</span>
         </div>
 
         <div className="flex flex-wrap items-end justify-between gap-4 pt-1">

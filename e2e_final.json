@@ -67,20 +67,20 @@
     }
   ],
   "computed_fonts": {
-    "heading": "Inter, sans-serif",
+    "heading": "\"Plus Jakarta Sans\", sans-serif",
     "body": "Inter, sans-serif",
-    "money": "\"JetBrains Mono\", monospace"
+    "money": "Inter, sans-serif"
   },
   "queue_interactions": {
     "critical_rows_sample": [
-      "Critical\n\t\n\nSettlement received but expected bank credit is missing.\n\npay_001050\n\u2022\nMissing Bank Credit\n\t\u20b96,496.50\t",
-      "Critical\n\t\n\nSettlement received but expected bank credit is missing.\n\npay_001050\n\u2022\nMissing Bank Credit\n\t\u20b96,496.50\t",
-      "Critical\n\t\n\nSettlement received but expected bank credit is missing.\n\npay_001050\n\u2022\nMissing Bank Credit\n\t\u20b96,496.50\t"
+      "Critical\n\t\n\nA settlement exists, but no matching bank credit was found.\n\npay_001050\n\u2022\nBank credit is missing\n\t\u20b96,496.50\t",
+      "Critical\n\t\n\nA settlement exists, but no matching bank credit was found.\n\npay_001050\n\u2022\nBank credit is missing\n\t\u20b96,496.50\t",
+      "Critical\n\t\n\nA settlement exists, but no matching bank credit was found.\n\npay_001050\n\u2022\nBank credit is missing\n\t\u20b96,496.50\t"
     ],
     "high_rows_sample": [
-      "High\n\t\n\nMultiple bank statement credits reference the same batch ID.\n\npay_001057\n\u2022\nDuplicate Bank Credit\n\t\u20b99,849.00\t",
-      "High\n\t\n\nMultiple bank statement credits reference the same batch ID.\n\npay_001057\n\u2022\nDuplicate Bank Credit\n\t\u20b99,849.00\t",
-      "High\n\t\n\nMultiple bank statement credits reference the same batch ID.\n\npay_001057\n\u2022\nDuplicate Bank Credit\n\t\u20b99,849.00\t"
+      "High\n\t\n\nMore than one bank credit appears to match this settlement.\n\npay_001057\n\u2022\nDuplicate Bank Credit\n\t\u20b99,849.00\t",
+      "High\n\t\n\nMore than one bank credit appears to match this settlement.\n\npay_001057\n\u2022\nDuplicate Bank Credit\n\t\u20b99,849.00\t",
+      "High\n\t\n\nMore than one bank credit appears to match this settlement.\n\npay_001057\n\u2022\nDuplicate Bank Credit\n\t\u20b99,849.00\t"
     ],
     "real_scroll_test": {
       "before": {
@@ -89,8 +89,9 @@
       },
       "after": {
         "sidebar": 0,
-        "window": 500
-      }
+        "window": 0
+      },
+      "nav_position": "static"
     }
   },
   "case_workflow": {
@@ -116,8 +117,8 @@
     },
     "Desktop: /app/queue": {
       "violations": 2,
-      "passes": 29,
-      "incomplete": 1,
+      "passes": 35,
+      "incomplete": 2,
       "details": [
         {
           "id": "color-contrast",
@@ -147,7 +148,7 @@
     "Desktop: /app/settings": {
       "violations": 4,
       "passes": 22,
-      "incomplete": 1,
+      "incomplete": 0,
       "details": [
         {
           "id": "color-contrast",
@@ -180,8 +181,8 @@
     },
     "Mobile: /app/queue": {
       "violations": 2,
-      "passes": 29,
-      "incomplete": 1,
+      "passes": 35,
+      "incomplete": 2,
       "details": [
         {
           "id": "color-contrast",
@@ -211,7 +212,7 @@
     "Mobile: /app/settings": {
       "violations": 4,
       "passes": 23,
-      "incomplete": 1,
+      "incomplete": 0,
       "details": [
         {
           "id": "color-contrast",
@@ -252,6 +253,6 @@
     }
   },
   "errors": [
-    "Traceback (most recent call last):\n  File \"/Users/k.sathvik/razorpay-ai-finance-controller/e2e_comprehensive.py\", line 160, in run\n    await page_b.fill('input[placeholder*=\"e.g. j.doe\"]', \"parallel_user\")\n  File \"/Users/k.sathvik/.pyenv/versions/3.11.15/lib/python3.11/site-packages/playwright/async_api/_generated.py\", line 11250, in fill\n    await self._impl_obj.fill(\n  File \"/Users/k.sathvik/.pyenv/versions/3.11.15/lib/python3.11/site-packages/playwright/_impl/_page.py\", line 928, in fill\n    return await self._main_frame.fill(**locals_to_params(locals()))\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/Users/k.sathvik/.pyenv/versions/3.11.15/lib/python3.11/site-packages/playwright/_impl/_frame.py\", line 636, in fill\n    await self._fill(**locals_to_params(locals()))\n  File \"/Users/k.sathvik/.pyenv/versions/3.11.15/lib/python3.11/site-packages/playwright/_impl/_frame.py\", line 648, in _fill\n    await self._channel.send(\"fill\", self._timeout, locals_to_params(locals()))\n  File \"/Users/k.sathvik/.pyenv/versions/3.11.15/lib/python3.11/site-packages/playwright/_impl/_connection.py\", line 76, in send\n    return await self._connection.wrap_api_call(\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/Users/k.sathvik/.pyenv/versions/3.11.15/lib/python3.11/site-packages/playwright/_impl/_connection.py\", line 632, in wrap_api_call\n    raise rewrite_error(error, f\"{parsed_st['apiName']}: {error}\") from None\nplaywright._impl._errors.TimeoutError: Page.fill: Timeout 30000ms exceeded.\nCall log:\n  - waiting for locator(\"input[placeholder*=\\\"e.g. j.doe\\\"]\")\n\n"
+    "Traceback (most recent call last):\n  File \"/Users/k.sathvik/razorpay-ai-finance-controller/e2e_comprehensive.py\", line 166, in run\n    await page_b.fill('input[placeholder*=\"e.g. j.doe\"]', \"parallel_user\")\n  File \"/Users/k.sathvik/.pyenv/versions/3.11.15/lib/python3.11/site-packages/playwright/async_api/_generated.py\", line 11250, in fill\n    await self._impl_obj.fill(\n  File \"/Users/k.sathvik/.pyenv/versions/3.11.15/lib/python3.11/site-packages/playwright/_impl/_page.py\", line 928, in fill\n    return await self._main_frame.fill(**locals_to_params(locals()))\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/Users/k.sathvik/.pyenv/versions/3.11.15/lib/python3.11/site-packages/playwright/_impl/_frame.py\", line 636, in fill\n    await self._fill(**locals_to_params(locals()))\n  File \"/Users/k.sathvik/.pyenv/versions/3.11.15/lib/python3.11/site-packages/playwright/_impl/_frame.py\", line 648, in _fill\n    await self._channel.send(\"fill\", self._timeout, locals_to_params(locals()))\n  File \"/Users/k.sathvik/.pyenv/versions/3.11.15/lib/python3.11/site-packages/playwright/_impl/_connection.py\", line 76, in send\n    return await self._connection.wrap_api_call(\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/Users/k.sathvik/.pyenv/versions/3.11.15/lib/python3.11/site-packages/playwright/_impl/_connection.py\", line 632, in wrap_api_call\n    raise rewrite_error(error, f\"{parsed_st['apiName']}: {error}\") from None\nplaywright._impl._errors.TimeoutError: Page.fill: Timeout 30000ms exceeded.\nCall log:\n  - waiting for locator(\"input[placeholder*=\\\"e.g. j.doe\\\"]\")\n\n"
   ]
 }

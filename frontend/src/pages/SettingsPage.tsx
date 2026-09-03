@@ -102,7 +102,7 @@ export const SettingsPage: React.FC = () => {
               </div>
               <button
                 type="submit"
-                className="px-4 py-2 bg-ink-900 hover:bg-ink-700 text-ink-900 font-semibold text-xs rounded transition shadow-sm"
+                className="px-4 py-2 bg-ink-900 hover:bg-ink-700 text-white font-semibold focus-ring text-xs rounded transition shadow-sm"
               >
                 Update Contract Rates
               </button>
@@ -115,17 +115,17 @@ export const SettingsPage: React.FC = () => {
               <div className="flex items-center gap-2">
                 <Cpu className="w-4 h-4 text-cyan-400" />
                 <h3 className="text-sm font-semibold text-ink-900 uppercase tracking-wider">
-                  Grounded AI Safety Guardrails
+                  Evidence Confidence Settings
                 </h3>
               </div>
-              <span className="text-xs font-mono text-cyan-400">pgvector cosine</span>
+              
             </div>
 
             <div className="space-y-3 text-xs">
               <div className="flex justify-between items-center">
-                <label className="text-ink-900 font-medium">Policy Grounding Confidence Floor</label>
+                <label className="text-ink-900 font-medium">Minimum Policy Confidence</label>
                 <span className="font-mono text-ink-900 bg-paper-0 px-2 py-0.5 rounded border border-rule-300">
-                  Cosine &ge; {cosineFloor}
+                  Score &ge; {cosineFloor}
                 </span>
               </div>
               <input
@@ -138,7 +138,7 @@ export const SettingsPage: React.FC = () => {
                 className="w-full accent-blue-500 cursor-pointer"
               />
               <p className="text-[11px] text-ink-700">
-                Retrieval vectors below this threshold trigger an automatic fallback to manual policy inspection to prevent hallucinated advice.
+                Policy matches below this confidence level trigger a fallback to manual inspection.
               </p>
             </div>
           </div>
@@ -150,29 +150,29 @@ export const SettingsPage: React.FC = () => {
             <div className="flex items-center gap-2 border-b border-rule-300 pb-3">
               <Lock className="w-4 h-4 text-matched-green" />
               <h3 className="text-sm font-semibold text-ink-900 uppercase tracking-wider">
-                Concurrency Controls
+                System Protections
               </h3>
             </div>
 
             <div className="space-y-3 text-xs">
               <div className="p-3 bg-paper-0 border border-rule-300 rounded">
-                <div className="font-semibold text-ink-900">Optimistic CAS Versioning</div>
+                <div className="font-semibold text-ink-900">Review Overwrite Protection</div>
                 <div className="text-ink-700 text-[11px] mt-0.5">
-                  Enforces strict lock versions (`lock_version=vN`). Concurrent modifications reject stale reviews with HTTP 409.
+                  Prevents one reviewer from overwriting a newer decision if they both open the case at the same time.
                 </div>
               </div>
 
               <div className="p-3 bg-paper-0 border border-rule-300 rounded">
-                <div className="font-semibold text-ink-900">Batch Idempotency Keying</div>
+                <div className="font-semibold text-ink-900">Duplicate File Prevention</div>
                 <div className="text-ink-700 text-[11px] mt-0.5">
-                  `X-Idempotency-Key` prevents duplicate ingestion runs across payments and gateway settlement feeds.
+                  Ensures that uploading the same file twice does not create duplicate financial records.
                 </div>
               </div>
 
               <div className="p-3 bg-paper-0 border border-rule-300 rounded">
-                <div className="font-semibold text-ink-900">Monetary Scale Precision</div>
+                <div className="font-semibold text-ink-900">Mathematical Accuracy</div>
                 <div className="text-ink-700 text-[11px] mt-0.5">
-                  PostgreSQL `NUMERIC(15,2)` and Python `Decimal` penny-exact math. Zero IEEE-754 floating-point drift.
+                  The system uses exact penny-level math for all calculations instead of approximations, preventing invisible rounding errors.
                 </div>
               </div>
             </div>
@@ -182,7 +182,7 @@ export const SettingsPage: React.FC = () => {
             <div className="flex items-center gap-2 border-b border-rule-300 pb-3">
               <Server className="w-4 h-4 text-source-blue" />
               <h3 className="text-sm font-semibold text-ink-900 uppercase tracking-wider">
-                System Architecture & Capabilities (Static Info)
+                Technical Details
               </h3>
             </div>
 

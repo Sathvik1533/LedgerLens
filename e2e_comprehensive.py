@@ -99,8 +99,12 @@ async def run():
             await page.locator("text=Any Severity").first.click(timeout=3000)
             await page.wait_for_timeout(1000)
             
+            
             # Real scrolling Test
             await page.evaluate("window.scrollTo(0,0)")
+            
+            nav_pos = await page.evaluate("window.getComputedStyle(document.querySelector('nav') || document.querySelector('.w-full.border-b')).position")
+            
             sidebar = page.locator('.overflow-y-auto').first
             
             scroll_before = await page.evaluate('''() => {
@@ -127,8 +131,10 @@ async def run():
             }''')
             report["queue_interactions"]["real_scroll_test"] = {
                 "before": scroll_before,
-                "after": scroll_after
+                "after": scroll_after,
+                "nav_position": nav_pos
             }
+
 
             # --- 4. Workflow ---
             # Click the first row

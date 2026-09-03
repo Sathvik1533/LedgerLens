@@ -48,12 +48,12 @@ export default function AppLayout() {
     <div className="min-h-screen bg-paper-0 flex flex-col font-sans text-ink-900 selection:bg-source-blue/20 relative">
       
       {/* Apptains-style Floating Glass Navigation Dock */}
-      <div className="fixed top-4 md:top-6 left-0 right-0 w-full z-50 flex justify-center pointer-events-none px-4">
+      <div className="w-full border-b border-rule-300 bg-paper-0 flex justify-center px-4 py-3">
         <motion.nav 
         initial={{ y: -50, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ type: "spring", stiffness: 300, damping: 25 }}
-        className="flex items-center p-1.5 bg-paper-0/80 backdrop-blur-xl border border-rule-300 rounded-full shadow-card max-w-full overflow-x-auto no-scrollbar pointer-events-auto"
+        className="flex items-center p-1.5 max-w-full overflow-x-auto no-scrollbar"
       >
         <Link to="/" className="flex items-center justify-center w-10 h-10 rounded-full hover:bg-paper-1 transition mr-2 shrink-0 group">
           <Logo className="w-6 h-6 group-hover:scale-105 transition-transform" />
@@ -108,7 +108,7 @@ export default function AppLayout() {
       </div>
 
       {/* Main Workspace */}
-      <main className="flex-1 min-h-screen pt-32 pb-12 relative flex flex-col bg-paper-0">
+      <main className="flex-1 pb-12 relative flex flex-col bg-paper-0">
         <Outlet />
       </main>
     </div>

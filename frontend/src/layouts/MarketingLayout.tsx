@@ -7,7 +7,7 @@ export default function MarketingLayout() {
 
   return (
     <div className="min-h-screen bg-paper-0 flex flex-col font-sans">
-      <nav className="fixed top-0 w-full z-50 bg-paper-0/80 backdrop-blur-xl border-b border-rule-300">
+      <nav className="w-full bg-paper-0 border-b border-rule-300">
         <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
           <Link to="/" className="flex items-center space-x-3">
             <Logo className="w-8 h-8" />
@@ -27,7 +27,7 @@ export default function MarketingLayout() {
           </div>
         </div>
       </nav>
-      <main className="flex-1 mt-16">
+      <main className="flex-1">
         <Outlet />
       </main>
       <footer className="border-t border-rule-300 py-12 bg-paper-1">

@@ -98,7 +98,7 @@ export const IngestionFeedsPage: React.FC = () => {
               Data Feeds &amp; Ingestion Hub
             </h1>
             <p className="text-sm text-ink-700 mt-2 font-sans max-w-xl leading-relaxed">
-              Manage multi-source feeds, upload synthetic batch records, and verify ACID duplicate-batch idempotency safely without corrupting the production ledger.
+              Manage multi-source feeds, upload synthetic batch records, and verify uploading behavior safely without corrupting the active ledger.
             </p>
           </div>
           <div>
@@ -162,9 +162,9 @@ export const IngestionFeedsPage: React.FC = () => {
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
                   <label htmlFor="idempotency" className="block text-xs font-semibold text-ink-900">
-                    Custom Idempotency Key (Optional)
+                    Duplicate Prevention Key (Optional)
                   </label>
-                  <span className="text-[10px] font-mono text-ink-700">X-Idempotency-Key</span>
+                  <span className="text-[10px] font-mono text-ink-700">(Batch ID)</span>
                 </div>
                 <input
                   id="idempotency"
@@ -253,7 +253,7 @@ export const IngestionFeedsPage: React.FC = () => {
             <div className="flex items-center gap-2 border-b border-rule-300 pb-4">
               <Shield className="w-4 h-4 text-ink-900" />
               <h2 className="text-xs font-bold text-ink-900 uppercase tracking-widest font-mono">
-                Idempotency Invariants
+                Data Protections
               </h2>
             </div>
 
@@ -273,9 +273,9 @@ export const IngestionFeedsPage: React.FC = () => {
               </div>
 
               <div className="p-4 rounded-lg bg-paper-0 border border-rule-300">
-                <h3 className="font-semibold text-ink-900 text-xs mb-1">Attributed Traceability</h3>
+                <h3 className="font-semibold text-ink-900 text-xs mb-1">Permanent Audit Trail</h3>
                 <p className="text-xs text-ink-700 leading-relaxed">
-                  Every ingestion lifecycle emits an immutable append-only audit event, cryptographically tying the raw CSV row to its normalized, internal database ID.
+                  Every uploaded row is permanently recorded with a timestamp, ensuring clear visibility into who uploaded what data and when.
                 </p>
               </div>
             </div>
@@ -301,7 +301,7 @@ export const IngestionFeedsPage: React.FC = () => {
               <table className="w-full text-left text-sm border-collapse">
                 <thead>
                   <tr className="bg-paper-0 border-b border-rule-300">
-                    <th className="py-3 px-6 text-[10px] font-mono text-ink-700 uppercase tracking-widest">Idempotency Key</th>
+                    <th className="py-3 px-6 text-[10px] font-mono text-ink-700 uppercase tracking-widest">Batch Key</th>
                     <th className="py-3 px-6 text-[10px] font-mono text-ink-700 uppercase tracking-widest">Source Table</th>
                     <th className="py-3 px-6 text-[10px] font-mono text-ink-700 uppercase tracking-widest text-right">Submitted</th>
                     <th className="py-3 px-6 text-[10px] font-mono text-ink-700 uppercase tracking-widest text-right">Accepted</th>
