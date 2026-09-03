@@ -46,32 +46,32 @@ export const Navbar: React.FC<{ onRefresh?: () => void; isRefreshing?: boolean }
 
   return (
     <>
-      <header className="sticky top-0 z-40 w-full h-14 bg-[#000000]/85 backdrop-blur-xl border-b border-rule-300 px-4 sm:px-8 flex items-center justify-between">
+      <header className="sticky top-0 z-40 w-full h-14 bg-[#000000]/85 backdrop-blur-xl border-b border-border px-4 sm:px-8 flex items-center justify-between">
         {/* Brand & Mark */}
         <div className="flex items-center gap-8">
           <NavLink
             to="/dashboard"
-            className="flex items-center gap-3 text-ink-900 font-semibold tracking-tight hover:opacity-95 transition group"
+            className="flex items-center gap-3 text-text-primary font-semibold tracking-tight hover:opacity-95 transition group"
           >
-            <div className="w-8 h-8 rounded-full bg-paper-1 text-ink-900 p-0.5 shadow-none flex items-center justify-center">
-              <div className="w-full h-full rounded-full bg-paper-1 flex items-center justify-center">
-                <svg viewBox="0 0 24 24" className="w-4 h-4 text-source-blue" fill="none" stroke="currentColor" strokeWidth="2.5">
+            <div className="w-8 h-8 rounded-full bg-surface text-text-primary p-0.5 shadow-none flex items-center justify-center">
+              <div className="w-full h-full rounded-full bg-surface flex items-center justify-center">
+                <svg viewBox="0 0 24 24" className="w-4 h-4 text-accent" fill="none" stroke="currentColor" strokeWidth="2.5">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
                 </svg>
               </div>
             </div>
             <div className="flex flex-col">
-              <span className="text-sm font-bold tracking-tight text-ink-900 font-sans">
+              <span className="text-sm font-bold tracking-tight text-text-primary font-sans">
                 LedgerLens
               </span>
-              <span className="text-[10px] font-mono text-ink-700 tracking-wider uppercase -mt-0.5">
+              <span className="text-[10px] font-mono text-text-secondary tracking-wider uppercase -mt-0.5">
                 AI Finance Controller
               </span>
             </div>
           </NavLink>
 
           {/* Navigation Links with Framer Motion active pill indicator */}
-          <nav className="hidden md:flex items-center gap-1 bg-paper-1 border border-rule-300 rounded-full p-1 shadow-none">
+          <nav className="hidden md:flex items-center gap-1 bg-surface border border-border rounded-full p-1 shadow-none">
             {NAV_ITEMS.map((item) => {
               const Icon = item.icon;
               const isActive =
@@ -83,15 +83,15 @@ export const Navbar: React.FC<{ onRefresh?: () => void; isRefreshing?: boolean }
                   key={item.path}
                   to={item.path}
                   className={`relative px-3.5 py-1.5 rounded-full text-xs font-medium transition flex items-center gap-1.5 ${
-                    isActive ? 'text-ink-900 font-semibold' : 'text-ink-700 hover:text-ink-900 hover:bg-paper-0/[0.04]'
+                    isActive ? 'text-text-primary font-semibold' : 'text-text-secondary hover:text-text-primary hover:bg-canvas/[0.04]'
                   }`}
                 >
-                  <Icon className={`w-3.5 h-3.5 ${isActive ? 'text-source-blue' : 'text-ink-700'}`} />
+                  <Icon className={`w-3.5 h-3.5 ${isActive ? 'text-accent' : 'text-text-secondary'}`} />
                   <span className="font-sans">{item.label}</span>
                   {isActive && (
                     <motion.div
                       layoutId="navbar-indicator"
-                      className="absolute inset-0 rounded-full bg-paper-1 border border-source-blue -z-10 shadow-none"
+                      className="absolute inset-0 rounded-full bg-surface border border-accent -z-10 shadow-none"
                       transition={{ type: 'spring', stiffness: 380, damping: 30 }}
                     />
                   )}
@@ -104,9 +104,9 @@ export const Navbar: React.FC<{ onRefresh?: () => void; isRefreshing?: boolean }
         {/* Global Controls & Status */}
         <div className="flex items-center gap-3">
           {/* Feed Sync Indicator */}
-          <div className="hidden sm:flex items-center gap-2 px-3 py-1 rounded-full bg-paper-1 border border-rule-300 text-xs text-ink-700 font-sans">
+          <div className="hidden sm:flex items-center gap-2 px-3 py-1 rounded-full bg-surface border border-border text-xs text-text-secondary font-sans">
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse shadow-none" />
-            <span className="text-ink-900 font-medium">4 Feeds Live</span>
+            <span className="text-text-primary font-medium">4 Feeds Live</span>
           </div>
 
           {/* Trigger Reconciliation Loop Button */}
@@ -115,19 +115,19 @@ export const Navbar: React.FC<{ onRefresh?: () => void; isRefreshing?: boolean }
             whileTap={{ scale: 0.97 }}
             onClick={handleRunRecon}
             disabled={isRunningRecon}
-            className="h-8 px-4 rounded-full bg-paper-1 text-ink-900 hover:from-blue-500 hover:to-indigo-500 text-ink-900 text-xs font-semibold flex items-center gap-1.5 shadow-none transition disabled:opacity-50"
+            className="h-8 px-4 rounded-full bg-surface text-text-primary hover:from-blue-500 hover:to-indigo-500 text-text-primary text-xs font-semibold flex items-center gap-1.5 shadow-none transition disabled:opacity-50"
             title="Execute 3-way deterministic reconciliation loop"
           >
             {isRunningRecon ? (
               <>
-                <RefreshCw className="w-3.5 h-3.5 animate-spin text-ink-900" />
+                <RefreshCw className="w-3.5 h-3.5 animate-spin text-text-primary" />
                 <span>Reconciling...</span>
               </>
             ) : (
               <>
-                <Play className="w-3 h-3 fill-white text-ink-900" />
+                <Play className="w-3 h-3 fill-white text-text-primary" />
                 <span>Run Recon</span>
-                <span className="text-ink-900/60 ml-0.5">&rarr;</span>
+                <span className="text-text-primary/60 ml-0.5">&rarr;</span>
               </>
             )}
           </motion.button>
@@ -139,10 +139,10 @@ export const Navbar: React.FC<{ onRefresh?: () => void; isRefreshing?: boolean }
               whileTap={{ scale: 0.95 }}
               onClick={onRefresh}
               disabled={isRefreshing}
-              className="h-8 w-8 rounded-full bg-paper-1 hover:bg-paper-1 border border-rule-300 text-ink-700 hover:text-ink-900 flex items-center justify-center transition"
+              className="h-8 w-8 rounded-full bg-surface hover:bg-surface border border-border text-text-secondary hover:text-text-primary flex items-center justify-center transition"
               title="Refresh all data"
             >
-              <RefreshCw className={`w-3.5 h-3.5 ${isRefreshing ? 'animate-spin text-source-blue' : ''}`} />
+              <RefreshCw className={`w-3.5 h-3.5 ${isRefreshing ? 'animate-spin text-accent' : ''}`} />
             </motion.button>
           )}
         </div>
@@ -155,60 +155,60 @@ export const Navbar: React.FC<{ onRefresh?: () => void; isRefreshing?: boolean }
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.95 }}
-            className="w-full max-w-lg bg-paper-1 border border-white/[0.1] rounded-lg shadow-none p-5 space-y-4 font-sans"
+            className="w-full max-w-lg bg-surface border border-white/[0.1] rounded-lg shadow-none p-5 space-y-4 font-sans"
           >
-            <div className="flex items-center justify-between border-b border-rule-300 pb-3">
+            <div className="flex items-center justify-between border-b border-border pb-3">
               <div className="flex items-center gap-2">
-                <CheckCircle2 className="w-5 h-5 text-matched-green" />
-                <h3 className="text-sm font-semibold text-ink-700">
+                <CheckCircle2 className="w-5 h-5 text-resolved" />
+                <h3 className="text-sm font-semibold text-text-secondary">
                   Reconciliation Loop Executed
                 </h3>
               </div>
               <button
                 onClick={() => setReconModalData(null)}
-                className="text-ink-700 hover:text-ink-700 transition p-1"
+                className="text-text-secondary hover:text-text-secondary transition p-1"
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
 
             <div className="grid grid-cols-3 gap-3">
-              <div className="bg-paper-0/80 border border-rule-300 rounded p-3 text-center">
-                <span className="text-[10px] text-ink-700 uppercase">Payments</span>
-                <div className="text-base font-semibold font-mono text-ink-700">
+              <div className="bg-canvas/80 border border-border rounded p-3 text-center">
+                <span className="text-[10px] text-text-secondary uppercase">Payments</span>
+                <div className="text-base font-semibold font-mono text-text-secondary">
                   {reconModalData.total_payments_processed}
                 </div>
               </div>
-              <div className="bg-paper-0/80 border border-rule-300 rounded p-3 text-center">
-                <span className="text-[10px] text-ink-700 uppercase">Auto-Reconciled</span>
-                <div className="text-base font-semibold font-mono text-matched-green">
+              <div className="bg-canvas/80 border border-border rounded p-3 text-center">
+                <span className="text-[10px] text-text-secondary uppercase">Auto-Reconciled</span>
+                <div className="text-base font-semibold font-mono text-resolved">
                   {reconModalData.auto_reconciled_count}
                 </div>
               </div>
-              <div className="bg-paper-0/80 border border-rule-300 rounded p-3 text-center">
-                <span className="text-[10px] text-ink-700 uppercase">Flagged Exceptions</span>
-                <div className="text-base font-semibold font-mono text-advisory-amber">
+              <div className="bg-canvas/80 border border-border rounded p-3 text-center">
+                <span className="text-[10px] text-text-secondary uppercase">Flagged Exceptions</span>
+                <div className="text-base font-semibold font-mono text-high">
                   {reconModalData.needs_review_count + (reconModalData.unresolved_count || 0)}
                 </div>
               </div>
             </div>
 
-            <div className="bg-paper-0/60 border border-rule-300 rounded p-3 space-y-1.5 text-xs">
-              <div className="flex justify-between text-ink-700">
-                <span className="text-ink-700">Match Rate:</span>
-                <span className="font-mono font-medium text-matched-green">
+            <div className="bg-canvas/60 border border-border rounded p-3 space-y-1.5 text-xs">
+              <div className="flex justify-between text-text-secondary">
+                <span className="text-text-secondary">Match Rate:</span>
+                <span className="font-mono font-medium text-resolved">
                   {reconModalData.match_rate_percentage}%
                 </span>
               </div>
-              <div className="flex justify-between text-ink-700">
-                <span className="text-ink-700">Amount Reconciled:</span>
-                <span className="font-mono font-medium text-ink-700">
+              <div className="flex justify-between text-text-secondary">
+                <span className="text-text-secondary">Amount Reconciled:</span>
+                <span className="font-mono font-medium text-text-secondary">
                   ₹{Number(reconModalData.total_amount_reconciled || 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}
                 </span>
               </div>
-              <div className="flex justify-between text-ink-700">
-                <span className="text-ink-700">Amount at Risk:</span>
-                <span className="font-mono font-medium text-ledger-vermilion">
+              <div className="flex justify-between text-text-secondary">
+                <span className="text-text-secondary">Amount at Risk:</span>
+                <span className="font-mono font-medium text-critical">
                   ₹{Number(reconModalData.total_amount_at_risk || 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}
                 </span>
               </div>
@@ -220,7 +220,7 @@ export const Navbar: React.FC<{ onRefresh?: () => void; isRefreshing?: boolean }
                   setReconModalData(null);
                   navigate('/exceptions');
                 }}
-                className="px-4 py-2 rounded bg-paper-1 hover:bg-paper-0 text-ink-900 text-xs font-semibold transition"
+                className="px-4 py-2 rounded bg-surface hover:bg-canvas text-text-primary text-xs font-semibold transition"
               >
                 Inspect Exceptions Queue →
               </button>

@@ -39,21 +39,21 @@ export default function HowItWorksPage() {
   ];
 
   return (
-    <div className="bg-paper-0 min-h-screen pt-32 pb-24 px-6 overflow-hidden relative">
+    <div className="bg-canvas min-h-screen pt-32 pb-24 px-6 overflow-hidden relative">
       {/* Background Architectural Grid */}
       <div className="absolute inset-0 bg-[linear-gradient(to_right,#C9C5BC20_1px,transparent_1px),linear-gradient(to_bottom,#C9C5BC20_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_60%_at_50%_0%,#000_70%,transparent_100%)] pointer-events-none" />
 
       <div className="max-w-4xl mx-auto relative z-10">
         <motion.div variants={STAGGER} initial="hidden" animate="show" className="mb-20 text-center">
           <motion.div variants={FADE_UP} className="inline-flex items-center gap-2 mb-6">
-             <span className="text-[10px] font-mono tracking-widest text-ink-700 uppercase border border-rule-300 px-3 py-1 rounded-full bg-white shadow-none">
+             <span className="text-[10px] font-mono tracking-widest text-text-secondary uppercase border border-border px-3 py-1 rounded-full bg-surface shadow-none">
               Architecture
             </span>
           </motion.div>
-          <motion.h1 variants={FADE_UP} className="text-5xl md:text-6xl text-ink-900 font-display font-medium tracking-tight mb-6">
+          <motion.h1 variants={FADE_UP} className="text-5xl md:text-6xl text-text-primary font-display font-medium tracking-tight mb-6">
             The Operator Journey
           </motion.h1>
-          <motion.p variants={FADE_UP} className="text-xl text-ink-700 font-sans max-w-2xl mx-auto leading-relaxed">
+          <motion.p variants={FADE_UP} className="text-xl text-text-secondary font-sans max-w-2xl mx-auto leading-relaxed">
             From ingestion to resolution, LedgerLens enforces a strict, transparent, human-in-the-loop pipeline.
           </motion.p>
         </motion.div>
@@ -67,13 +67,13 @@ export default function HowItWorksPage() {
         >
           {steps.map((step, i) => (
             <motion.div key={i} variants={FADE_UP} className="relative flex items-start gap-6 md:gap-8 group">
-              <div className="flex-shrink-0 w-14 h-14 md:w-16 md:h-16 rounded-full bg-paper-1 border-2 border-rule-300 flex items-center justify-center z-10 group-hover:border-source-blue group-hover:bg-source-blue/10 transition-colors shadow-none">
-                <step.icon className="w-6 h-6 text-ink-700 group-hover:text-source-blue transition-colors" />
+              <div className="flex-shrink-0 w-14 h-14 md:w-16 md:h-16 rounded-full bg-surface border-2 border-border flex items-center justify-center z-10 group-hover:border-accent group-hover:bg-accent/10 transition-colors shadow-none">
+                <step.icon className="w-6 h-6 text-text-secondary group-hover:text-accent transition-colors" />
               </div>
-              <div className="flex-1 bg-white border border-rule-300 rounded-2xl p-6 md:p-8 shadow-none group-hover:shadow-none group-hover:border-source-blue/30 transition-all">
-                <div className="text-[10px] font-mono text-source-blue mb-2 tracking-widest uppercase">Phase 0{i + 1}</div>
-                <h3 className="text-2xl text-ink-900 font-display font-medium mb-3">{step.title}</h3>
-                <p className="text-ink-700 font-sans leading-relaxed text-sm md:text-base">{step.desc}</p>
+              <div className="flex-1 bg-surface border border-border rounded-2xl p-6 md:p-8 shadow-none group-hover:shadow-none group-hover:border-accent/30 transition-all">
+                <div className="text-[10px] font-mono text-accent mb-2 tracking-widest uppercase">Phase 0{i + 1}</div>
+                <h3 className="text-2xl text-text-primary font-display font-medium mb-3">{step.title}</h3>
+                <p className="text-text-secondary font-sans leading-relaxed text-sm md:text-base">{step.desc}</p>
               </div>
             </motion.div>
           ))}

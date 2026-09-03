@@ -34,10 +34,10 @@ export const CustomSelect: React.FC<CustomSelectProps> = ({ value, onChange, opt
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full flex items-center justify-between bg-paper-0 border border-rule-300 rounded-md px-3 py-2 text-sm text-ink-900 focus:outline-none focus:border-ink-900 focus-visible:ring-2 focus-visible:ring-ink-900/20 focus-visible:border-ink-900 transition-all transition-colors shadow-none"
+        className="w-full flex items-center justify-between bg-canvas border border-border rounded-md px-3 py-2 text-sm text-text-primary focus:outline-none focus:border-ink-900 focus-visible:ring-2 focus-visible:ring-ink-900/20 focus-visible:border-ink-900 transition-all transition-colors shadow-none"
       >
         <span>{selectedOption.label}</span>
-        <ChevronDown className={`w-4 h-4 text-ink-700 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+        <ChevronDown className={`w-4 h-4 text-text-secondary transition-transform ${isOpen ? 'rotate-180' : ''}`} />
       </button>
 
       <AnimatePresence>
@@ -47,7 +47,7 @@ export const CustomSelect: React.FC<CustomSelectProps> = ({ value, onChange, opt
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
             transition={{ duration: 0.15 }}
-            className="absolute z-50 w-full mt-1 bg-white border border-rule-300 rounded-md shadow-none overflow-hidden"
+            className="absolute z-50 w-full mt-1 bg-surface border border-border rounded-md shadow-none overflow-hidden"
           >
             <div className="max-h-60 overflow-y-auto py-1 custom-scrollbar" data-lenis-prevent="true">
               {options.map((option) => (
@@ -58,12 +58,12 @@ export const CustomSelect: React.FC<CustomSelectProps> = ({ value, onChange, opt
                     onChange(option.value);
                     setIsOpen(false);
                   }}
-                  className={`w-full text-left px-3 py-2 text-sm flex items-center justify-between hover:bg-paper-0 transition-colors ${
-                    value === option.value ? 'bg-paper-1 font-medium text-ink-900' : 'text-ink-700'
+                  className={`w-full text-left px-3 py-2 text-sm flex items-center justify-between hover:bg-canvas transition-colors ${
+                    value === option.value ? 'bg-surface font-medium text-text-primary' : 'text-text-secondary'
                   }`}
                 >
                   <span>{option.label}</span>
-                  {value === option.value && <Check className="w-3.5 h-3.5 text-ink-900" />}
+                  {value === option.value && <Check className="w-3.5 h-3.5 text-text-primary" />}
                 </button>
               ))}
             </div>

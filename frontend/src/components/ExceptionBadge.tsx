@@ -16,19 +16,19 @@ export const EXCEPTION_CONFIG: Record<string, { label: string; explanation: stri
   missing_settlement: {
     label: 'Settlement record is missing',
     explanation: 'A payment exists, but no corresponding settlement record was received.',
-    iconColor: 'text-advisory-amber',
+    iconColor: 'text-high',
     icon: Landmark,
   },
   missing_bank_credit: {
     label: 'Bank credit is missing',
     explanation: 'A settlement exists, but no matching bank credit was found.',
-    iconColor: 'text-advisory-amber',
+    iconColor: 'text-high',
     icon: Building2,
   },
   amount_mismatch: {
     label: 'Amount does not match',
     explanation: 'The amount recorded by one source differs from the expected amount.',
-    iconColor: 'text-ledger-vermilion',
+    iconColor: 'text-critical',
     icon: Scale,
   },
   fee_mismatch: {
@@ -40,7 +40,7 @@ export const EXCEPTION_CONFIG: Record<string, { label: string; explanation: stri
   duplicate_payment: {
     label: 'Possible duplicate payment',
     explanation: 'More than one payment record appears to reference the same order.',
-    iconColor: 'text-ledger-vermilion',
+    iconColor: 'text-critical',
     icon: ReceiptText,
   },
   duplicate_bank_credit: {
@@ -81,8 +81,8 @@ export const ExceptionBadge: React.FC<{ type: ExceptionType | string | null; siz
 }) => {
   if (!type || type === 'clean') {
     return (
-      <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-sans font-medium bg-paper-1 text-matched-green border border-matched-green">
-        <CheckCircle2 className="w-2.5 h-2.5 text-matched-green" aria-hidden="true" />
+      <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-sans font-medium bg-surface text-resolved border border-resolved">
+        <CheckCircle2 className="w-2.5 h-2.5 text-resolved" aria-hidden="true" />
         <span>Clean Match</span>
       </span>
     );
@@ -91,7 +91,7 @@ export const ExceptionBadge: React.FC<{ type: ExceptionType | string | null; siz
   const config = EXCEPTION_CONFIG[type] || {
     label: type.replace(/_/g, ' '),
     explanation: 'An unrecognized exception occurred.',
-    iconColor: 'text-ink-700',
+    iconColor: 'text-text-secondary',
     icon: AlertTriangle,
   };
 
@@ -107,7 +107,7 @@ export const ExceptionBadge: React.FC<{ type: ExceptionType | string | null; siz
     }>
       <span
         tabIndex={0}
-        className={`inline-flex items-center font-sans font-medium rounded border border-rule-300 bg-paper-1 text-ink-700 hover:border-ink-700 focus-ring ${sizeClasses}`}
+        className={`inline-flex items-center font-sans font-medium rounded border border-border bg-surface text-text-secondary hover:border-ink-700 focus-ring ${sizeClasses}`}
         aria-label={`Exception type: ${config.label}`}
       >
         <Icon className={`${size === 'md' ? 'w-3 h-3' : 'w-2.5 h-2.5'} shrink-0 ${config.iconColor}`} aria-hidden="true" />

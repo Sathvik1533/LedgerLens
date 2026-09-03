@@ -12,51 +12,52 @@ export default {
         display: ['Manrope', 'sans-serif'],
       },
       colors: {
-        paper: {
-          0: '#F9F9FB', // Institutional Light Canvas
-          1: '#FFFFFF', // Clean White Surfaces
+        canvas: 'var(--color-canvas)',
+        surface: {
+          DEFAULT: 'var(--color-surface)',
+          raised: 'var(--color-surface-raised)',
+          evidence: 'var(--color-surface-evidence)',
         },
-        ink: {
-          900: '#111827', // Crisp Near-Black
-          700: '#4B5563', // Secondary Text
+        border: {
+          DEFAULT: 'var(--color-border)',
+          strong: 'var(--color-border-strong)',
         },
-        rule: {
-          300: '#E5E7EB', // 1px borders
+        text: {
+          primary: 'var(--color-text-primary)',
+          secondary: 'var(--color-text-secondary)',
+          muted: 'var(--color-text-muted)',
         },
-        source: {
-          blue: '#2563EB',
+        accent: {
+          DEFAULT: 'var(--color-accent)',
+          hover: 'var(--color-accent-hover)',
+          foreground: 'var(--color-accent-foreground)',
         },
-        matched: {
-          green: '#059669',
+        critical: {
+          DEFAULT: 'var(--color-critical)',
+          surface: 'var(--color-critical-surface)',
         },
-        ledger: {
-          vermilion: '#DC2626', // Critical
+        high: {
+          DEFAULT: 'var(--color-high)',
+          surface: 'var(--color-high-surface)',
+        },
+        resolved: {
+          DEFAULT: 'var(--color-resolved)',
+          surface: 'var(--color-resolved-surface)',
         },
         advisory: {
-          amber: '#D97706', // High / Review
-        },
-        locked: {
-          slate: '#64748B',
-        },
-        audit: {
-          violet: '#7C3AED',
+          DEFAULT: 'var(--color-advisory)',
+          surface: 'var(--color-advisory-surface)',
         },
       },
       borderRadius: {
         'xs': '2px',
         'sm': '4px',
-        'md': '8px', // Restrained craft radius
+        'md': '8px',
         'lg': '12px',
       },
       boxShadow: {
-        'subtle': '0 1px 2px 0 rgba(0, 0, 0, 0.05)', // Extremely flat, modern shadow
-        'card': '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
-      },
-      transitionDuration: {
-        DEFAULT: '150ms',
-      },
-      transitionTimingFunction: {
-        DEFAULT: 'ease-in-out',
+        'none': '0 0 #0000',
+        'focus': '0 0 0 2px var(--color-canvas), 0 0 0 4px var(--color-focus)',
       },
     },
   },

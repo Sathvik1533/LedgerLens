@@ -83,13 +83,13 @@ export const CaseDetailPage: React.FC<CaseDetailPageProps> = ({ caseId: propCase
 
   if (error || !evidence) {
     return (
-      <div className="bg-paper-1 border border-ledger-vermilion rounded-xl p-8 text-center space-y-4 shadow-none font-sans">
-        <AlertCircle className="w-10 h-10 text-ledger-vermilion mx-auto" aria-hidden="true" />
-        <h3 className="text-base font-semibold text-ink-900">Reconciliation Case Unreachable</h3>
-        <p className="text-xs text-ink-900 max-w-md mx-auto">{error || 'Case records could not be retrieved from database.'}</p>
+      <div className="bg-surface border border-critical rounded-xl p-8 text-center space-y-4 shadow-none font-sans">
+        <AlertCircle className="w-10 h-10 text-critical mx-auto" aria-hidden="true" />
+        <h3 className="text-base font-semibold text-text-primary">Reconciliation Case Unreachable</h3>
+        <p className="text-xs text-text-primary max-w-md mx-auto">{error || 'Case records could not be retrieved from database.'}</p>
         <button
           onClick={handleBack}
-          className="inline-flex items-center gap-2 px-4 py-2 bg-paper-1 hover:bg-paper-0 text-ink-900 text-xs font-semibold rounded shadow transition"
+          className="inline-flex items-center gap-2 px-4 py-2 bg-surface hover:bg-canvas text-text-primary text-xs font-semibold rounded shadow transition"
         >
           <ArrowLeft className="w-4 h-4" aria-hidden="true" />
           <span>Return to Queue</span>
@@ -101,20 +101,20 @@ export const CaseDetailPage: React.FC<CaseDetailPageProps> = ({ caseId: propCase
   return (
     <div className="space-y-6 max-w-7xl mx-auto font-sans">
       {/* 1. Context & Section Header Strip */}
-      <div className="space-y-2 border-b border-rule-300 pb-4">
+      <div className="space-y-2 border-b border-border pb-4">
         <div className="flex items-center gap-2">
-          <span className="text-[11px] font-mono font-bold uppercase tracking-widest text-source-blue bg-source-blue/10 border border-source-blue px-2.5 py-0.5 rounded-full">
+          <span className="text-[11px] font-mono font-bold uppercase tracking-widest text-accent bg-accent/10 border border-accent px-2.5 py-0.5 rounded-full">
             03 &mdash; CASE INVESTIGATION WORKSPACE
           </span>
-          <span className="text-ink-700">&bull;</span>
-          <span className="text-xs text-ink-700 font-mono">3-COLUMN RECONCILIATION TERMINAL</span>
+          <span className="text-text-secondary">&bull;</span>
+          <span className="text-xs text-text-secondary font-mono">3-COLUMN RECONCILIATION TERMINAL</span>
         </div>
 
         <div className="flex flex-wrap items-center justify-between gap-3 pt-1">
           <div className="flex items-center gap-4">
             <button
               onClick={handleBack}
-              className="flex items-center gap-1.5 text-xs font-semibold text-ink-700 hover:text-ink-900 transition py-1.5 px-3 rounded-full bg-paper-1 hover:bg-paper-1 border border-rule-300"
+              className="flex items-center gap-1.5 text-xs font-semibold text-text-secondary hover:text-text-primary transition py-1.5 px-3 rounded-full bg-surface hover:bg-surface border border-border"
               title="Return to review queue"
             >
               <ArrowLeft className="w-3.5 h-3.5" aria-hidden="true" />
@@ -123,18 +123,18 @@ export const CaseDetailPage: React.FC<CaseDetailPageProps> = ({ caseId: propCase
 
             <div>
               <div className="flex flex-wrap items-center gap-2">
-                <span className="text-[11px] font-semibold text-ink-700 font-mono">CASE:</span>
+                <span className="text-[11px] font-semibold text-text-secondary font-mono">CASE:</span>
                 <button
                   onClick={copyCaseId}
-                  className="text-xs font-semibold text-ink-900 hover:text-ink-900 flex items-center gap-1 rounded font-mono bg-paper-1 px-2 py-0.5 border border-rule-300"
+                  className="text-xs font-semibold text-text-primary hover:text-text-primary flex items-center gap-1 rounded font-mono bg-surface px-2 py-0.5 border border-border"
                   title="Click to copy case ID"
                 >
                   <span>{evidence.case_id}</span>
-                  {copied ? <Check className="w-3 h-3 text-matched-green" /> : <Copy className="w-3 h-3 text-ink-700" />}
+                  {copied ? <Check className="w-3 h-3 text-resolved" /> : <Copy className="w-3 h-3 text-text-secondary" />}
                 </button>
                 <ExceptionBadge type={evidence.exception_type} size="sm" />
               </div>
-              <p className="text-xs text-ink-700 mt-0.5 font-mono">
+              <p className="text-xs text-text-secondary mt-0.5 font-mono">
                 Payment ID: {evidence.payment_id} &bull; Currency: {evidence.currency}
               </p>
             </div>
@@ -142,14 +142,14 @@ export const CaseDetailPage: React.FC<CaseDetailPageProps> = ({ caseId: propCase
 
           {/* Right Header Badges */}
           <div className="flex items-center gap-3">
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs bg-paper-1 border border-rule-300 text-ink-700 font-mono">
-              <Lock className="w-3 h-3 text-source-blue" aria-hidden="true" />
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs bg-surface border border-border text-text-secondary font-mono">
+              <Lock className="w-3 h-3 text-accent" aria-hidden="true" />
               <span>Version: v{evidence.version}</span>
             </span>
 
             <button
               onClick={loadCaseData}
-              className="p-2 rounded-full bg-paper-1 hover:bg-paper-1 border border-rule-300 text-ink-700 hover:text-ink-900 transition"
+              className="p-2 rounded-full bg-surface hover:bg-surface border border-border text-text-secondary hover:text-text-primary transition"
               aria-label="Refresh case data"
               title="Refresh case data"
             >
@@ -163,15 +163,15 @@ export const CaseDetailPage: React.FC<CaseDetailPageProps> = ({ caseId: propCase
       {successBanner && (
         <div
           role="status"
-          className="rounded-xl bg-matched-green/10 border border-matched-green p-4 flex items-center justify-between gap-3 text-matched-green text-xs shadow-none"
+          className="rounded-xl bg-resolved-surface border border-resolved p-4 flex items-center justify-between gap-3 text-resolved text-xs shadow-none"
         >
           <div className="flex items-center gap-2.5">
-            <CheckCircle2 className="w-4 h-4 text-matched-green shrink-0" aria-hidden="true" />
+            <CheckCircle2 className="w-4 h-4 text-resolved shrink-0" aria-hidden="true" />
             <span>{successBanner}</span>
           </div>
           <button
             onClick={() => setSuccessBanner(null)}
-            className="text-xs font-semibold text-matched-green hover:text-matched-green underline"
+            className="text-xs font-semibold text-resolved hover:text-resolved underline"
           >
             Dismiss
           </button>
@@ -183,40 +183,40 @@ export const CaseDetailPage: React.FC<CaseDetailPageProps> = ({ caseId: propCase
         {/* COLUMN 1: Case Context & Audit Timeline (w-full lg:w-[22%]) */}
         <div className="w-full lg:w-[22%] space-y-4 shrink-0">
           <div className="control-panel rounded-xl p-4 space-y-3 shadow-none">
-            <h3 className="text-xs font-bold text-ink-900 uppercase tracking-wider font-sans border-b border-rule-300 pb-2">
+            <h3 className="text-xs font-bold text-text-primary uppercase tracking-wider font-sans border-b border-border pb-2">
               Case Metadata
             </h3>
 
             <div className="space-y-3 text-xs font-sans">
               <div>
-                <span className="text-ink-700 block text-[11px] font-sans">Amount at Risk</span>
+                <span className="text-text-secondary block text-[11px] font-sans">Amount at Risk</span>
                 <AmountDisplay
                   amount={evidence.payment?.amount || evidence.expected_net_settlement}
-                  className="text-lg font-bold text-ink-900 font-mono"
+                  className="text-lg font-bold text-text-primary font-mono"
                 />
               </div>
 
               <div>
-                <span className="text-ink-700 block text-[11px] font-sans">Calculated Discrepancy</span>
+                <span className="text-text-secondary block text-[11px] font-sans">Calculated Discrepancy</span>
                 <AmountDisplay
                   amount={evidence.settlement_discrepancy}
                   isDiscrepancy={true}
-                  className="text-base font-bold font-mono text-ledger-vermilion"
+                  className="text-base font-bold font-mono text-critical"
                 />
               </div>
 
-              <div className="pt-2 border-t border-rule-300 space-y-2 text-xs">
-                <div className="flex justify-between items-center text-ink-700">
+              <div className="pt-2 border-t border-border space-y-2 text-xs">
+                <div className="flex justify-between items-center text-text-secondary">
                   <span>Exception Code</span>
-                  <span className="text-ink-900 font-mono text-xs font-medium">{evidence.exception_type}</span>
+                  <span className="text-text-primary font-mono text-xs font-medium">{evidence.exception_type}</span>
                 </div>
-                <div className="flex justify-between items-center text-ink-700">
+                <div className="flex justify-between items-center text-text-secondary">
                   <span>Decision State</span>
-                  <span className="text-ink-900 font-mono text-xs font-medium">{evidence.decision_status}</span>
+                  <span className="text-text-primary font-mono text-xs font-medium">{evidence.decision_status}</span>
                 </div>
-                <div className="flex justify-between items-center text-ink-700">
+                <div className="flex justify-between items-center text-text-secondary">
                   <span>Lock Version</span>
-                  <span className="text-ink-900 font-mono text-xs font-medium">v{evidence.version}</span>
+                  <span className="text-text-primary font-mono text-xs font-medium">v{evidence.version}</span>
                 </div>
               </div>
             </div>

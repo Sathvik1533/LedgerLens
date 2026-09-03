@@ -46,16 +46,16 @@ export default function AppLayout() {
   ];
 
   return (
-    <div className="h-screen bg-paper-0 flex font-sans text-ink-900 selection:bg-source-blue/20 overflow-hidden">
+    <div className="h-screen bg-canvas flex font-sans text-text-primary selection:bg-accent/20 overflow-hidden">
       
       {/* Direction A: Slim Fixed Sidebar */}
-      <nav className="w-16 md:w-56 shrink-0 border-r border-rule-300 bg-paper-1 flex flex-col justify-between h-full overflow-y-auto overscroll-contain">
+      <nav className="w-16 md:w-56 shrink-0 border-r border-border bg-surface flex flex-col justify-between h-full overflow-y-auto overscroll-contain">
         
         <div>
-          <div className="h-16 flex items-center justify-center md:justify-start md:px-6 border-b border-rule-300">
+          <div className="h-16 flex items-center justify-center md:justify-start md:px-6 border-b border-border">
             <Link to="/" className="flex items-center gap-3 group">
               <Logo className="w-6 h-6 group-hover:scale-105 transition-transform" />
-              <span className="font-display font-bold text-ink-900 hidden md:block tracking-tight">LedgerLens</span>
+              <span className="font-display font-bold text-text-primary hidden md:block tracking-tight">LedgerLens</span>
             </Link>
           </div>
 
@@ -67,7 +67,7 @@ export default function AppLayout() {
                 <Link
                   key={item.path}
                   to={item.path}
-                  className={`flex items-center justify-center md:justify-start gap-3 px-2 md:px-3 py-2.5 rounded-md transition-colors relative group ${isActive ? 'bg-rule-300 text-ink-900' : 'text-ink-700 hover:bg-paper-0 hover:text-ink-900'}`}
+                  className={`flex items-center justify-center md:justify-start gap-3 px-2 md:px-3 py-2.5 rounded-md transition-colors relative group ${isActive ? 'bg-rule-300 text-text-primary' : 'text-text-secondary hover:bg-canvas hover:text-text-primary'}`}
                 >
                   <Icon className="w-5 h-5 shrink-0" />
                   <span className="text-sm font-medium hidden md:block">
@@ -75,7 +75,7 @@ export default function AppLayout() {
                   </span>
                   {item.badge !== undefined && item.badge > 0 && (
                     <span className={`hidden md:flex absolute right-2 text-[10px] font-mono px-1.5 py-0.5 rounded-full ${
-                      isActive ? 'bg-white text-ink-900 shadow-none border border-rule-300' : 'bg-ledger-vermilion/10 text-ledger-vermilion border border-ledger-vermilion/20'
+                      isActive ? 'bg-surface text-text-primary shadow-none border border-border' : 'bg-critical-surface text-critical border border-critical/20'
                     }`}>
                       {item.badge}
                     </span>
@@ -86,21 +86,21 @@ export default function AppLayout() {
           </div>
         </div>
 
-        <div className="p-4 border-t border-rule-300 flex justify-center md:justify-start">
+        <div className="p-4 border-t border-border flex justify-center md:justify-start">
            <button
             onClick={handleTriggerRecon}
             disabled={isRunningRecon}
-            className="flex items-center justify-center md:justify-start gap-2 w-full px-2 md:px-3 py-2 rounded-md bg-paper-0 border border-rule-300 hover:border-source-blue transition-all disabled:opacity-50"
+            className="flex items-center justify-center md:justify-start gap-2 w-full px-2 md:px-3 py-2 rounded-md bg-canvas border border-border hover:border-accent transition-all disabled:opacity-50"
             title="Run Recon Engine (Cmd+E)"
           >
-            <Play className={`w-4 h-4 fill-ink-900 text-ink-900 shrink-0 ${isRunningRecon ? 'animate-pulse' : ''}`} />
+            <Play className={`w-4 h-4 fill-text-primary text-text-primary shrink-0 ${isRunningRecon ? 'animate-pulse' : ''}`} />
             <span className="text-xs font-semibold hidden md:block">Run Recon</span>
           </button>
         </div>
       </nav>
 
       {/* Main Workspace */}
-      <main className="flex-1 h-full relative flex flex-col bg-paper-0 overflow-y-auto no-scrollbar">
+      <main className="flex-1 h-full relative flex flex-col bg-canvas overflow-y-auto no-scrollbar">
         <Outlet />
       </main>
     </div>

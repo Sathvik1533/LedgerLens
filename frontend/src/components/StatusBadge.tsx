@@ -11,27 +11,27 @@ const STATUS_CONFIG: Record<string, StatusMeta> = {
   needs_review: {
     label: 'Needs Review',
     dotColor: 'bg-amber-400',
-    textColor: 'text-advisory-amber',
+    textColor: 'text-high',
   },
   auto_reconciled: {
     label: 'Auto Reconciled',
     dotColor: 'bg-emerald-400',
-    textColor: 'text-matched-green',
+    textColor: 'text-resolved',
   },
   approved: {
     label: 'Approved',
     dotColor: 'bg-emerald-400',
-    textColor: 'text-matched-green',
+    textColor: 'text-resolved',
   },
   rejected: {
     label: 'Rejected',
     dotColor: 'bg-rose-400',
-    textColor: 'text-ink-900',
+    textColor: 'text-text-primary',
   },
   unresolved: {
     label: 'Unresolved',
     dotColor: 'bg-slate-400',
-    textColor: 'text-ink-700',
+    textColor: 'text-text-secondary',
   },
 };
 
@@ -39,7 +39,7 @@ export const StatusBadge: React.FC<{ status: DecisionStatus | string }> = ({ sta
   const config = STATUS_CONFIG[status] || {
     label: status.replace(/_/g, ' '),
     dotColor: 'bg-slate-400',
-    textColor: 'text-ink-900',
+    textColor: 'text-text-primary',
   };
 
   return (

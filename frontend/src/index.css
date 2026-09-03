@@ -3,91 +3,32 @@
 @tailwind utilities;
 
 @layer base {
+  :root {
+    --color-canvas: #181C25;
+    --color-surface: #222733;
+    --color-surface-raised: #2D3342;
+    --color-surface-evidence: #14171F;
+    --color-border: #3A4150;
+    --color-border-strong: #4F586B;
+    --color-text-primary: #F8FAFC;
+    --color-text-secondary: #94A3B8;
+    --color-text-muted: #64748B;
+    --color-accent: #14B8A6;
+    --color-accent-hover: #0D9488;
+    --color-accent-foreground: #FFFFFF;
+    --color-critical: #F43F5E;
+    --color-critical-surface: rgba(244, 63, 94, 0.1);
+    --color-high: #F59E0B;
+    --color-high-surface: rgba(245, 158, 11, 0.1);
+    --color-resolved: #10B981;
+    --color-resolved-surface: rgba(16, 185, 129, 0.1);
+    --color-advisory: #8B5CF6;
+    --color-advisory-surface: rgba(139, 92, 246, 0.1);
+    --color-focus: rgba(20, 184, 166, 0.5);
+  }
+  
   body {
-    @apply bg-paper-0 text-ink-900 antialiased font-sans;
-  }
-}
-
-@layer utilities {
-  .shadow-subtle {
-    box-shadow: 0 1px 2px rgba(16, 43, 66, 0.05);
-  }
-  
-  .shadow-card {
-    box-shadow: 0 4px 12px rgba(16, 43, 66, 0.08), 0 1px 2px rgba(16, 43, 66, 0.04);
-  }
-
-  /* Shimmer Button Pattern (INTERACTION-PATTERNS.md 4.2: CSS @keyframes) */
-  .animate-shimmer {
-    background: linear-gradient(
-      120deg,
-      transparent 20%,
-      rgba(255, 255, 255, 0.2) 50%,
-      transparent 80%
-    );
-    background-size: 200% auto;
-    animation: shimmer 2.5s linear infinite;
-  }
-  
-  @keyframes shimmer {
-    to {
-      background-position: 200% center;
-    }
-  }
-
-  /* Border Beam Pattern (INTERACTION-PATTERNS.md 4.2: CSS @keyframes) */
-  .border-beam {
-    position: relative;
-  }
-  .border-beam::before {
-    content: '';
-    position: absolute;
-    inset: -1px;
-    border-radius: inherit;
-    padding: 1px;
-    background: conic-gradient(
-      from var(--border-angle),
-      transparent 70%,
-      #356A88 100%
-    );
-    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-    -webkit-mask-composite: xor;
-    mask-composite: exclude;
-    pointer-events: none;
-    animation: border-beam-spin 4s linear infinite;
-  }
-  
-  @property --border-angle {
-    syntax: "<angle>";
-    inherits: true;
-    initial-value: 0turn;
-  }
-  
-  @keyframes border-beam-spin {
-    to {
-      --border-angle: 1turn;
-    }
-  }
-}
-
-@layer utilities {
-  .focus-ring {
-    @apply focus:outline-none focus-visible:ring-2 focus-visible:ring-source-blue/50 focus-visible:ring-offset-2 focus-visible:ring-offset-paper-0 transition-shadow;
-  }
-}
-
-@layer utilities {
-  .custom-scrollbar::-webkit-scrollbar {
-    width: 4px;
-  }
-  .custom-scrollbar::-webkit-scrollbar-track {
-    background: transparent;
-  }
-  .custom-scrollbar::-webkit-scrollbar-thumb {
-    background: #C9C5BC;
-    border-radius: 4px;
-  }
-  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-    background: #829BB8;
+    background-color: var(--color-canvas);
+    color: var(--color-text-primary);
   }
 }
