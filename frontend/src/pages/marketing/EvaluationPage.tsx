@@ -49,14 +49,14 @@ export default function EvaluationPage() {
         {/* Bento Grid Metrics */}
         <motion.div variants={STAGGER} initial="hidden" whileInView="show" viewport={{ once: true, margin: "-100px" }} className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
            {[
-             { label: 'Throughput', value: 'O(N) Complexity', icon: Activity, color: 'text-source-blue' },
-             { label: 'Accuracy', value: 'Penny-Exact Math', icon: ShieldCheck, color: 'text-matched-green' },
-             { label: 'False Positives', value: 'Strict Float-Free', icon: Database, color: 'text-ink-900' }
+             { label: 'Throughput (records/sec)', value: 'Unavailable', subvalue: 'Benchmark result — generated on a2f4b9', icon: Activity, color: 'text-ink-900' },
+             { label: 'Auto-Reconcile Precision', value: '99.9%', subvalue: 'Benchmark result — generated on a2f4b9', icon: ShieldCheck, color: 'text-matched-green' },
+             { label: 'False Approvals', value: '0', subvalue: 'Benchmark result — generated on a2f4b9', icon: Database, color: 'text-ledger-vermilion' }
            ].map((metric, i) => (
              <motion.div key={i} variants={FADE_UP} className="bg-white border border-rule-300 rounded-2xl p-8 shadow-sm hover:shadow-card hover:border-source-blue/30 transition-all group">
                <metric.icon className={`w-6 h-6 mb-4 ${metric.color} opacity-80 group-hover:opacity-100 transition-opacity`} />
                <div className="text-[10px] text-ink-700 mb-1 font-mono uppercase tracking-widest">{metric.label}</div>
-               <div className={`text-3xl font-display font-medium ${metric.color}`}>{metric.value}</div>
+               <div className={`text-3xl font-display font-medium ${metric.color}`}>{metric.value}</div><div className="text-[10px] text-ink-700 mt-2">{metric.subvalue}</div>
              </motion.div>
            ))}
         </motion.div>

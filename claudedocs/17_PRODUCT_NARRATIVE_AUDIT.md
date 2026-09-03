@@ -1,49 +1,52 @@
 # Product Narrative Audit
 
-## Plain-Language Narrative Review
+This document traces the public story flow for LedgerLens, ensuring it communicates value to a Finance Operations Manager in plain language, stripped of backend implementation jargon.
 
-This evaluation simulates a non-technical Finance Operations Manager traversing the public routes.
+## The Required 7-Step Narration
+1. **The Problem:** Finance teams lose money when records do not agree.
+2. **The Aggregation:** LedgerLens brings payment, settlement, refund, and bank records together.
+3. **The Discrepancy:** It shows exactly what does not match.
+4. **The Evidence:** The operator inspects the supporting evidence side-by-side.
+5. **The Advisory:** Policy guidance is available to explain context, but it cannot make the decision.
+6. **The Decision:** A human records the final decision.
+7. **The Audit:** The audit trail preserves the outcome immutably for future review.
 
-### `/` (Landing Page)
-- **Exact Headline:** Stop losing money to invisible reconciliation errors.
-- **Exact Subheading:** A financial control room that automatically reconciles payments, gateway settlements, refunds, and bank credits—surfacing exceptions directly to your human operators with full audit visibility.
-- **Section Order:** Hero -> "Engineering over Aesthetics" (Value Props)
-- **Exact CTA Text:** Open Control Room, See How It Works, Launch Control Room
-- **Intended Visitor:** Finance Ops / Risk Manager.
-- **Visitor Takeaway:** The system finds exactly where financial records mismatch so I don't lose money.
-- **Technical terms rewritten:** "Deterministic 3-Way Parity" -> "Automated Financial Matching"; "ACID Audit Logs" -> "Permanent Audit Logs"; "cryptographic receipts" -> "permanent, time-stamped records". (Rewrites applied & verified).
+## Page-by-Page Narrative Verification
 
-### `/how-it-works` (Mechanism)
-- **Exact Headline:** The Operator Journey
-- **Exact Subheading:** How LedgerLens processes millions of events to give your team exactly what they need.
-- **Section Order:** Data -> Rules Engine -> AI RAG -> Audit
-- **Exact CTA Text:** Enter the Control Room
-- **Intended Visitor:** Process Auditor / Operations Lead.
-- **Visitor Takeaway:** The system trusts database rules first; AI is only used to suggest policy actions, not to perform math.
+### 1. Landing Page (`/`)
+- **Primary Message:** Stop losing money to invisible reconciliation errors.
+- **Story Step:** 1 & 2 (Problem & Aggregation).
+- **Audit Result:** Removed "ACID Audit Logs" and "Deterministic 3-Way Parity". Replaced with "Automated Financial Matching" and "Permanent Audit Logs". The hero clearly states the problem.
 
-### `/evidence` (Proof)
-- **Exact Headline:** Multi-Source Evidence
-- **Exact Subheading:** 4-way parity without the hallucination risk.
-- **Section Order:** Explanation -> Screenshots / Diagrams
-- **Exact CTA Text:** View Evaluation
-- **Intended Visitor:** Technical Assessor.
-- **Visitor Takeaway:** Gateway, Settlement, and Bank records are all verified simultaneously.
+### 2. How it Works (`/how-it-works`)
+- **Primary Message:** The Operator Journey from exception to resolution.
+- **Story Step:** 3 & 4 (Discrepancy & Evidence).
+- **Audit Result:** Plain language explains the workflow. No mention of "Pydantic" or "FastAPI".
 
-### `/evaluation` (Metrics)
-- **Exact Headline:** Evaluation Metrics
-- **Exact Subheading:** System guarantees and mathematical boundaries.
-- **Section Order:** Speed/Throughput -> Accuracy Guarantees
-- **Exact CTA Text:** Read Documentation
-- **Intended Visitor:** System Architect / Security Reviewer.
-- **Visitor Takeaway:** The application guarantees penny-exact math using Decimal processing.
+### 3. Evidence (`/evidence`)
+- **Primary Message:** Side-by-side comparison of 4 data sources.
+- **Story Step:** 4 (Evidence).
+- **Audit Result:** Emphasizes that operators see the raw data, not a black box AI output. 
 
-### Product-Story Test Answers
-1. **What problem LedgerLens solves:** Missing money from unmatched financial events.
-2. **What money or risk can be missed:** Missing bank credits, duplicate refunds, MDR fee mismatches.
-3. **Which records LedgerLens compares:** Gateway Capture, Gateway Settlement, Customer Refunds, Bank Statements.
-4. **Why the result is trustworthy:** Exact float-free math; AI never touches the final calculated amount.
-5. **What the human operator does:** Reviews explicit mismatches, consults RAG-policy drawer, and clicks Approve/Reject with a mandated rationale.
-6. **What remains in the audit trail:** The user ID, the exact decision, the rationale, and the lock version.
-7. **Where to inspect the product:** `/app` (Control Room dashboard) and `/app/queue`.
+### 4. Evaluation (`/evaluation`)
+- **Primary Message:** LedgerLens is tested against rigorous, measured benchmarks.
+- **Story Step:** Trust building.
+- **Audit Result:** Scheduled for rewrite (per `24_EVALUATION_METRIC_PROVENANCE.md`) to remove slogans ("O(N) Complexity") and replace them with actual data throughput and accuracy metrics.
 
-**Verdict:** PASS. Jargon actively stripped. Flow logically progresses from Risk (Landing) -> Mechanism -> Evidence -> Action (Queue).
+### 5. Exception Control Room (`/app/queue`)
+- **Primary Message:** A prioritized list of financial discrepancies requiring your attention.
+- **Story Step:** 3 (Discrepancy).
+- **Audit Result:** Clean severity labels ("Critical", "High") with plain-language tooltips explaining the financial risk thresholds. 
+
+### 6. Case Workspace (`/app/case/:id`)
+- **Primary Message:** Review evidence, consult policy, make a final decision.
+- **Story Step:** 4, 5 & 6 (Evidence, Advisory, Decision).
+- **Audit Result:** Jargon purged ("RAG" -> "Policy-based explanation", "CAS" -> "Safe update protection"). The interface explicitly states: "You remain in control."
+
+### 7. Ledger Audit (`/app/audit`)
+- **Primary Message:** A permanent history of every action taken.
+- **Story Step:** 7 (Audit).
+- **Audit Result:** Uses chronological, timestamped storytelling rather than "cryptographic event stream" terminology.
+
+## Conclusion
+The public site now correctly leads a non-engineer through the operational value of the product, while technical documentation handles backend architectural capabilities.

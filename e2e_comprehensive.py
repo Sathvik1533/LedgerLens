@@ -38,7 +38,7 @@ async def run():
                       "/app/audit", "/app/policies", "/app/settings"]
             
             for route in routes:
-                url = f"http://localhost:5173{route}"
+                url = f"http://127.0.0.1:5173{route}"
                 await page.goto(url)
                 await page.wait_for_load_state("networkidle")
                 
@@ -58,14 +58,14 @@ async def run():
             mobile_context = await browser.new_context(viewport={'width': 375, 'height': 812})
             mpage = await mobile_context.new_page()
             for route in ["/", "/app/queue", "/app/audit", "/app/settings"]:
-                url = f"http://localhost:5173{route}"
+                url = f"http://127.0.0.1:5173{route}"
                 await mpage.goto(url)
                 await mpage.wait_for_load_state("networkidle")
                 await run_axe(mpage, f"Mobile: {route}")
             await mobile_context.close()
                 
             # --- 2. Compute Fonts Check (on Queue page) ---
-            await page.goto("http://localhost:5173/app/queue")
+            await page.goto("http://127.0.0.1:5173/app/queue")
             await page.wait_for_load_state("networkidle")
             
             font_eval = await page.evaluate('''() => {
