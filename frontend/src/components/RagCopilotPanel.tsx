@@ -1,39 +1,25 @@
-import { motion, AnimatePresence } from 'framer-motion';
 import React, { useState, useEffect } from 'react';
-import {
-  BookOpen,
-  ChevronDown,
-  ChevronUp,
-  RefreshCw,
-  AlertCircle,
-  FileText,
-  ShieldCheck,
-  
-} from 'lucide-react';
 import { InvestigationResult } from '../types/api';
 import { investigateCase } from '../api/client';
-import { Tooltip } from './Tooltip';
-import { CitationCard } from './CitationCard';
 
-interface RagCopilotPanelProps {
+interface PolicyNoteProps {
   caseId: string;
   autoRun?: boolean;
 }
 
-export const RagCopilotPanel: React.FC<RagCopilotPanelProps> = ({ caseId, autoRun = true }) => {
+export const RagCopilotPanel: React.FC<PolicyNoteProps> = ({ caseId, autoRun = true }) => {
   const [result, setResult] = useState<InvestigationResult | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
-  const [isExpanded, setIsExpanded] = useState<boolean>(true);
 
-  const runInvestigation = async () => {
+  const loadPolicyGuidance = async () => {
     setIsLoading(true);
     setError(null);
     try {
       const data = await investigateCase(caseId);
       setResult(data);
     } catch (err: any) {
-      setError(err.message || 'Policy assistant failed to load guidance.');
+      setError(err.message || 'Approved policy guidance currently unavailable.');
     } finally {
       setIsLoading(false);
     }
@@ -41,156 +27,106 @@ export const RagCopilotPanel: React.FC<RagCopilotPanelProps> = ({ caseId, autoRu
 
   useEffect(() => {
     if (autoRun && caseId) {
-      runInvestigation();
+      loadPolicyGuidance();
     }
   }, [caseId, autoRun]);
 
   return (
-    <div className="rounded-xl bg-surface border border-advisory-border overflow-hidden shadow-panel">
-      {/* Accordion Trigger Header */}
-      <button
-        onClick={() => setIsExpanded(!isExpanded)}
-        className="w-full px-5 py-3.5 bg-surface-alt hover:bg-surface-hover flex items-center justify-between gap-3 text-left transition focus-ring"
-        aria-expanded={isExpanded}
-        aria-label="Toggle policy explanation drawer"
-      >
-        <div className="flex items-center gap-2.5">
-          <div className="w-7 h-7 rounded-lg bg-advisory-subtle border border-advisory-border flex items-center justify-center text-advisory-light">
-            <BookOpen className="w-4 h-4" aria-hidden="true" />
-          </div>
-          <div>
-            <div className="flex items-center gap-2">
-              <span className="text-xs font-bold text-text-primary tracking-wide uppercase">
-                Policy-based explanation
-              </span>
-              <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-surface border border-border-strong text-text-secondary">
-                Read-Only
-              </span>
-            </div>
-            <p className="text-[11px] text-text-secondary">
-              Grounded AI guidance retrieved from local financial reconciliation operating policies
-            </p>
-          </div>
-        </div>
-
-        <div className="flex items-center gap-2">
-          {result && (
-            <Tooltip content="Whether the advisory explanation is sufficiently supported by retrieved policy evidence.">
-            <span
-              tabIndex={0}
-              className={`focus-ring hidden sm:inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold border ${
-                result.is_confident
-                  ? 'bg-resolved-subtle text-resolved border-resolved-border'
-                  : 'bg-warning-subtle text-high border-warning-border'
-              }`}
-            >
-              {result.is_confident ? (
-                <>
-                  <ShieldCheck className="w-3 h-3 text-resolved" aria-hidden="true" />
-                  <span>Evidence grounding</span>
-                </>
-              ) : (
-                <>
-                  <AlertCircle className="w-3 h-3 text-high" aria-hidden="true" />
-                  <span>Evidence grounding (Low)</span>
-                </>
-              )}
+    <div className="border border-rule bg-surface p-5 rounded-xs space-y-4 font-sans margin-note">
+      {/* Header */}
+      <div className="flex items-start justify-between border-b border-rule/70 pb-3">
+        <div className="space-y-0.5">
+          <div className="flex items-center gap-2">
+            <span className="w-1.5 h-1.5 rounded-full bg-brass" />
+            <span className="text-[11px] font-mono uppercase tracking-wider text-brass font-semibold">
+              Policy Note
             </span>
-            </Tooltip>
-          )}
-          {isExpanded ? (
-            <ChevronUp className="w-4 h-4 text-text-secondary" aria-hidden="true" />
-          ) : (
-            <ChevronDown className="w-4 h-4 text-text-secondary" aria-hidden="true" />
-          )}
+            <span className="text-[10px] font-mono px-1.5 py-0.2 bg-canvas border border-rule text-ink-secondary rounded-xs">
+              Read-Only Guidance
+            </span>
+          </div>
+          <span className="font-editorial text-lg font-medium text-ink block">
+            Approved operating rule & precedent
+          </span>
         </div>
-      </button>
 
-      {/* Accordion Body */}
-      <AnimatePresence initial={false}>
-      {isExpanded && (
-        <motion.div
-          initial={{ height: 0, opacity: 0 }}
-          animate={{ height: "auto", opacity: 1 }}
-          exit={{ height: 0, opacity: 0 }}
-          transition={{ duration: 0.2, ease: "easeOut" }}
-          className="overflow-hidden"
+        <button
+          onClick={loadPolicyGuidance}
+          disabled={isLoading}
+          className="text-[11px] font-mono text-ink-secondary hover:text-ink underline disabled:opacity-50"
         >
-        <div className="p-5 space-y-4 text-xs border-t border-border-subtle bg-surface">
-          {isLoading ? (
-            <div className="py-6 flex flex-col items-center justify-center space-y-2 text-text-secondary">
-              <RefreshCw className="w-5 h-5 text-blue-400 animate-spin" aria-hidden="true" />
-              <span>Retrieving policy guidance and inspecting vector store...</span>
-            </div>
-          ) : error ? (
-            <div className="p-3.5 rounded-lg bg-critical-subtle border border-critical-border text-critical flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <AlertCircle className="w-4 h-4 shrink-0" aria-hidden="true" />
-                <span>{error}</span>
-              </div>
-              <button
-                onClick={runInvestigation}
-                className="px-2.5 py-1 rounded bg-rose-900 text-text-primary font-semibold hover:bg-rose-800"
-              >
-                Retry
-              </button>
-            </div>
-          ) : result ? (
-            <div className="space-y-4">
-              {/* Summary & Root Cause */}
-              <div className="space-y-2">
-                <h4 className="text-[11px] font-mono font-bold uppercase tracking-wider text-blue-400">
-                  Root Cause Analysis
-                </h4>
-                <p className="text-text-primary leading-relaxed bg-surface-alt border border-border-subtle rounded-lg p-3">
-                  {result.root_cause_analysis || result.summary}
-                </p>
-              </div>
+          {isLoading ? 'Checking...' : 'Re-verify'}
+        </button>
+      </div>
 
-              {/* Recommended Action */}
-              <div className="space-y-2">
-                <h4 className="text-[11px] font-mono font-bold uppercase tracking-wider text-resolved">
-                  Recommended Next Action
-                </h4>
-                <p className="text-text-primary leading-relaxed bg-surface-alt border border-border-subtle rounded-lg p-3">
-                  {result.recommended_action}
-                </p>
-              </div>
+      {/* Loading state */}
+      {isLoading && (
+        <div className="py-4 text-xs font-mono text-ink-secondary flex items-center gap-2">
+          <span className="w-2 h-2 rounded-full bg-brass animate-ping" />
+          <span>Consulting approved policy library...</span>
+        </div>
+      )}
 
-              {/* Policy Citations */}
-              {result.citations && result.citations.length > 0 && (
-                <div className="space-y-2">
-                  <h4 className="text-[11px] font-mono font-bold uppercase tracking-wider text-text-secondary flex items-center gap-1.5">
-                    <FileText className="w-3.5 h-3.5 text-text-secondary" aria-hidden="true" />
-                    <span>Policy Citations ({result.citations.length})</span>
-                  </h4>
-                  <div className="space-y-2">
-                    {result.citations.map((c, i) => (
-                      <CitationCard key={i} citation={c} />
-                    ))}
-                  </div>
-                </div>
-              )}
+      {/* Error state */}
+      {error && !isLoading && (
+        <div className="text-xs text-critical font-mono py-2">
+          {error}
+        </div>
+      )}
 
-              {/* Read-Only Disclaimer */}
-              <div className="pt-2 border-t border-border-subtle text-[11px] text-text-secondary italic">
-                Policy guidance is read-only. You remain in control.
-              </div>
-            </div>
-          ) : (
-            <div className="py-4 text-center text-text-secondary">
-              <button
-                onClick={runInvestigation}
-                className="px-3.5 py-1.5 rounded-lg bg-surface-raised hover:bg-ink-700 text-text-primary font-semibold focus-ring"
-              >
-                Inspect Policy Guidance
-              </button>
+      {/* Result body */}
+      {result && !isLoading && (
+        <div className="space-y-3.5 text-xs text-ink leading-relaxed">
+          {/* Summary / Root Cause */}
+          <div className="space-y-1">
+            <span className="text-[11px] font-mono uppercase text-ink-secondary block">
+              Rule Interpretation
+            </span>
+            <p className="text-ink font-normal">{result.summary}</p>
+          </div>
+
+          {result.recommended_action && (
+            <div className="space-y-1 pt-2 border-t border-rule/50">
+              <span className="text-[11px] font-mono uppercase text-ink-secondary block">
+                Standard Recommended Action
+              </span>
+              <p className="text-ink font-medium">{result.recommended_action}</p>
             </div>
           )}
+
+          {/* Citations from Policy Library */}
+          {result.citations && result.citations.length > 0 && (
+            <div className="space-y-2 pt-2 border-t border-rule/50">
+              <span className="text-[11px] font-mono uppercase text-ink-secondary block">
+                Policy Grounding Citations ({result.citations.length})
+              </span>
+              <div className="space-y-2">
+                {result.citations.map((cite, idx) => (
+                  <div key={idx} className="p-2.5 bg-canvas/60 border border-rule rounded-xs space-y-1 text-[11px]">
+                    <div className="flex justify-between font-mono text-ink-secondary">
+                      <span className="font-semibold text-ink">{cite.source_file}</span>
+                      <span>Verified Document</span>
+                    </div>
+                    <p className="italic text-ink-secondary font-serif leading-normal">&ldquo;{cite.quote}&rdquo;</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Secondary Disclosure for Technical Retrieval Metadata */}
+          <details className="pt-2 text-[11px] font-mono text-ink-muted border-t border-rule/40">
+            <summary className="cursor-pointer hover:text-ink">
+              Technical retrieval metadata
+            </summary>
+            <div className="mt-2 p-2 bg-canvas/40 border border-rule/60 rounded-xs space-y-1">
+              <div>Grounding confidence: {result.is_confident ? 'Pass (>= 0.35 cosine floor)' : 'Sub-threshold review required'}</div>
+              <div>Retrieval boundary: Local immutable markdown corpus only</div>
+              <div>Decision model: Pure advisory; cannot approve or mutate financial records</div>
+            </div>
+          </details>
         </div>
-        </motion.div>
       )}
-      </AnimatePresence>
     </div>
   );
 };

@@ -96,13 +96,19 @@ async def ingest_bank_credits_csv(
     except ValueError as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
 
+from backend.app.api.deps import get_current_reviewer
+from backend.app.models.user import UserModel
+
 @router.get(
     "/status",
     response_model=dict,
     status_code=status.HTTP_200_OK,
     summary="Get status of ingestion feeds and recent batches",
 )
-def get_ingestion_status(db: Session = Depends(get_db)):
+def get_ingestion_status(
+    db: Session = Depends(get_db),
+    current_user: UserModel = Depends(get_current_reviewer),
+):
     from sqlalchemy import select, func
     from backend.app.models.payment import PaymentModel
     from backend.app.models.settlement import SettlementModel

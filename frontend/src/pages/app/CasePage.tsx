@@ -1,24 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import {
-  ArrowLeft,
-  RefreshCw,
-  AlertCircle,
-  Copy,
-  Check,
-  Lock,
-  CheckCircle2,
-} from 'lucide-react';
-import { CaseEvidenceResponse, AuditEventItem } from '../../types/api';
+import { CaseEvidenceResponse, AuditEventItem, HumanReviewResponse } from '../../types/api';
 import { fetchCaseDetail, fetchCaseAuditTrail } from '../../api/client';
 import { MultiSourceCard } from '../../components/MultiSourceCard';
 import { ReviewActionForm } from '../../components/ReviewActionForm';
 import { AuditTimeline } from '../../components/AuditTimeline';
 import { RagCopilotPanel } from '../../components/RagCopilotPanel';
-import { ExceptionBadge } from '../../components/ExceptionBadge';
-import { AmountDisplay } from '../../components/AmountDisplay';
 import { CaseWorkspaceSkeleton } from '../../components/SkeletonLoaders';
+import { LedgerTraceA } from '../../components/concepts/LedgerTraceA';
 
 interface CaseDetailPageProps {
   caseId?: string;
@@ -37,12 +26,13 @@ export const CaseDetailPage: React.FC<CaseDetailPageProps> = ({ caseId: propCase
       navigate('/app/queue');
     }
   };
+
   const [evidence, setEvidence] = useState<CaseEvidenceResponse | null>(null);
   const [auditEvents, setAuditEvents] = useState<AuditEventItem[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
-  const [successBanner, setSuccessBanner] = useState<string | null>(null);
+  const [receiptBanner, setReceiptBanner] = useState<HumanReviewResponse | null>(null);
 
   const loadCaseData = async () => {
     setIsLoading(true);
@@ -55,7 +45,15 @@ export const CaseDetailPage: React.FC<CaseDetailPageProps> = ({ caseId: propCase
       setEvidence(evData);
       setAuditEvents(auditData || []);
     } catch (err: any) {
-      setError(err.message || 'Failed to load case details.');
+      let msg = 'The requested case could not be retrieved from the ledger.';
+      if (err?.message && typeof err.message === 'string' && err.message !== '[object Object]') {
+        msg = err.message;
+      } else if (typeof err?.detail === 'string') {
+        msg = err.detail;
+      } else if (Array.isArray(err?.detail)) {
+        msg = err.detail.map((d: any) => d.msg || String(d)).join('; ');
+      }
+      setError(msg);
     } finally {
       setIsLoading(false);
     }
@@ -73,133 +71,150 @@ export const CaseDetailPage: React.FC<CaseDetailPageProps> = ({ caseId: propCase
     setTimeout(() => setCopied(false), 1500);
   };
 
-  const handleReviewSuccess = async () => {
-    setSuccessBanner('Human decision submitted successfully. The review action and rationale are permanently recorded in the audit trail.');
+  const handleReviewSuccess = async (receipt?: HumanReviewResponse) => {
+    if (receipt) {
+      setReceiptBanner(receipt);
+    }
     await loadCaseData();
   };
 
   if (isLoading) {
-    return <CaseWorkspaceSkeleton />;
+    return (
+      <div className="w-full max-w-6xl mx-auto p-6 md:p-10">
+        <CaseWorkspaceSkeleton />
+      </div>
+    );
   }
 
   if (error || !evidence) {
     return (
-      <div className="bg-surface border border-critical rounded-xl p-8 text-center space-y-4 shadow-none font-sans">
-        <AlertCircle className="w-10 h-10 text-critical mx-auto" aria-hidden="true" />
-        <h3 className="text-base font-semibold text-text-primary">Reconciliation Case Unreachable</h3>
-        <p className="text-xs text-text-primary max-w-md mx-auto">{error || 'Case records could not be retrieved from database.'}</p>
+      <div className="w-full max-w-2xl mx-auto my-16 p-8 border border-critical/40 bg-surface rounded-xs text-center space-y-4 font-sans">
+        <div className="w-2 h-2 rounded-full bg-critical mx-auto" />
+        <h3 className="font-editorial text-2xl font-medium text-ink">
+          Reconciliation record unreachable
+        </h3>
+        <p className="text-xs font-mono text-ink-secondary max-w-md mx-auto">
+          {error || 'The case identifier does not correspond to an active ledger record.'}
+        </p>
         <button
           onClick={handleBack}
-          className="inline-flex items-center gap-2 px-4 py-2 bg-surface hover:bg-canvas text-text-primary text-xs font-semibold rounded shadow transition"
+          className="px-4 py-2 bg-ink text-canvas text-xs font-medium rounded-xs hover:bg-ink/90 transition-colors"
         >
-          <ArrowLeft className="w-4 h-4" aria-hidden="true" />
-          <span>Return to Queue</span>
+          Return to review queue
         </button>
       </div>
     );
   }
 
   return (
-    <motion.div initial={{opacity:0, y:10}} animate={{opacity:1, y:0}} className="w-full max-w-6xl mx-auto p-6 lg:p-10 space-y-8 font-sans">
-      {/* 1. Context & Section Header Strip */}
-      <div className="space-y-2 border-b border-border pb-4">
-        <div className="flex items-center gap-2">
-          <span className="text-[11px] font-mono font-bold uppercase tracking-widest text-accent bg-accent/10 border border-accent px-2.5 py-0.5 rounded-full">
-            03 &mdash; CASE INVESTIGATION WORKSPACE
-          </span>
-          <span className="text-text-secondary">&bull;</span>
-          <span className="text-xs text-text-secondary font-mono">3-COLUMN RECONCILIATION TERMINAL</span>
+    <div className="w-full max-w-6xl mx-auto p-6 md:p-10 space-y-8 font-sans">
+      {/* 1. Case Dossier Masthead */}
+      <div className="space-y-3 border-b border-rule pb-5">
+        <div className="flex items-center gap-2 text-xs font-mono text-ink-secondary">
+          <button
+            onClick={handleBack}
+            className="hover:text-ink transition-colors flex items-center gap-1"
+          >
+            <span>&larr; Review queue</span>
+          </button>
+          <span>/</span>
+          <span>Dossier</span>
+          <span>/</span>
+          <span className="text-ink font-semibold">{evidence.case_id}</span>
         </div>
 
-        <div className="flex flex-wrap items-center justify-between gap-3 pt-1">
-          <div className="flex items-center gap-4">
-            <button
-              onClick={handleBack}
-              className="flex items-center gap-1.5 text-xs font-semibold text-text-secondary hover:text-text-primary transition py-1.5 px-3 rounded-full bg-surface hover:bg-surface border border-border"
-              title="Return to review queue"
-            >
-              <ArrowLeft className="w-3.5 h-3.5" aria-hidden="true" />
-              <span>Queue</span>
-            </button>
-
-            <div>
-              <div className="flex flex-wrap items-center gap-2">
-                <span className="text-[11px] font-semibold text-text-secondary font-mono">CASE:</span>
-                <button
-                  onClick={copyCaseId}
-                  className="text-xs font-semibold text-text-primary hover:text-text-primary flex items-center gap-1 rounded font-mono bg-surface px-2 py-0.5 border border-border"
-                  title="Click to copy case ID"
-                >
-                  <span>{evidence.case_id}</span>
-                  {copied ? <Check className="w-3 h-3 text-resolved" /> : <Copy className="w-3 h-3 text-text-secondary" />}
-                </button>
-                <ExceptionBadge type={evidence.exception_type} size="sm" />
-              </div>
-              <p className="text-xs text-text-secondary mt-0.5 font-mono">
-                Payment ID: {evidence.payment_id} &bull; Currency: {evidence.currency}
-              </p>
+        <div className="flex flex-wrap items-end justify-between gap-4">
+          <div>
+            <span className="text-xs font-mono uppercase tracking-wider text-ink-secondary block">
+              Case Investigation Dossier
+            </span>
+            <h1 className="font-editorial text-3xl font-medium text-ink mt-0.5">
+              Payment {evidence.payment_id}
+            </h1>
+            <div className="flex items-center gap-3 mt-1 text-xs font-mono text-ink-secondary">
+              <button
+                onClick={copyCaseId}
+                className="hover:text-ink flex items-center gap-1 underline decoration-dotted"
+                title="Click to copy case ID"
+              >
+                <span>UUID: {evidence.case_id}</span>
+                {copied && <span className="text-ledger-green">✓ copied</span>}
+              </button>
+              <span>&bull;</span>
+              <span>Ledger Version: v{evidence.version}</span>
+              {evidence.case_opened_at && (
+                <>
+                  <span>&bull;</span>
+                  <span>Opened: {new Date(evidence.case_opened_at).toLocaleDateString('en-IN')}</span>
+                </>
+              )}
             </div>
           </div>
 
-          {/* Right Header Badges */}
-          <div className="flex items-center gap-3">
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs bg-surface border border-border text-text-secondary font-mono">
-              <Lock className="w-3 h-3 text-accent" aria-hidden="true" />
-              <span>Version: v{evidence.version}</span>
-            </span>
-
+          <div className="flex items-center gap-2">
             <button
               onClick={loadCaseData}
-              className="p-2 rounded-full bg-surface hover:bg-surface border border-border text-text-secondary hover:text-text-primary transition"
-              aria-label="Refresh case data"
-              title="Refresh case data"
+              className="px-3 py-1.5 border border-rule bg-surface hover:bg-canvas text-xs font-mono text-ink rounded-xs transition-colors"
             >
-              <RefreshCw className="w-3.5 h-3.5" aria-hidden="true" />
+              Refresh case records
             </button>
           </div>
         </div>
       </div>
 
-      {/* Success Notification Banner */}
-      {successBanner && (
-        <div
-          role="status"
-          className="rounded-xl bg-resolved-surface border border-resolved p-4 flex items-center justify-between gap-3 text-resolved text-xs shadow-none"
-        >
-          <div className="flex items-center gap-2.5">
-            <CheckCircle2 className="w-4 h-4 text-resolved shrink-0" aria-hidden="true" />
-            <span>{successBanner}</span>
+      {/* Dated Ledger Receipt Notification */}
+      {receiptBanner && (
+        <div className="p-4 bg-ledger-green/10 border border-ledger-green/30 rounded-xs flex items-center justify-between gap-4 text-xs font-mono text-ink">
+          <div>
+            <strong className="text-ledger-green block">
+              ✓ Decision permanently recorded to ledger
+            </strong>
+            <span className="text-ink-secondary text-[11px]">
+              Receipt {receiptBanner.review_action_id} &bull; Signer: {receiptBanner.actor} &bull; Result: {receiptBanner.new_decision_status}
+            </span>
           </div>
           <button
-            onClick={() => setSuccessBanner(null)}
-            className="text-xs font-semibold text-resolved hover:text-resolved underline"
+            onClick={() => setReceiptBanner(null)}
+            className="text-ink-secondary hover:text-ink text-[11px] underline"
           >
-            Dismiss
+            Dismiss receipt
           </button>
         </div>
       )}
 
-      {/* 2-Column Desktop Workspace (Direction A) */}
-      <div className="grid grid-cols-1 lg:grid-cols-[1fr_400px] gap-6 items-start">
-        {/* Left Column: Evidence Comparison Grid (Direction A) */}
+      {/* 2. Asymmetric Workspace Layout: Wide Reading Column (60%) + Margin Column (40%) */}
+      <div className="grid grid-cols-1 lg:grid-cols-[1.5fr_1fr] gap-8 items-start">
+        {/* Left Column: What happened & Which records prove it (4-source evidence) */}
         <div className="space-y-6">
+          <div className="space-y-2">
+            <span className="text-[11px] font-mono text-ink-secondary uppercase tracking-wider block">
+              Continuous Trace Alignment
+            </span>
+            <LedgerTraceA 
+              evidence={evidence}
+              compact={true} 
+            />
+          </div>
           <MultiSourceCard evidence={evidence} />
         </div>
 
-        {/* Right Column: AI Advisory & Human Decision Log (Direction A) */}
-        <div className="space-y-6 lg:sticky lg:top-6">
+        {/* Right Margin Column: What rule fired, Operator decision, Audit receipt */}
+        <div className="space-y-6 lg:sticky lg:top-20">
+          {/* Rule Fired: Policy Margin Note */}
           <RagCopilotPanel caseId={evidence.case_id} autoRun={true} />
-          
+
+          {/* Operator Decision: Sign-off Note */}
           <ReviewActionForm
             evidence={evidence}
             onSuccess={handleReviewSuccess}
             onRefreshCase={loadCaseData}
           />
-          
+
+          {/* Recorded History: Audit Ledger */}
           <AuditTimeline events={auditEvents} />
         </div>
       </div>
-    </motion.div>
+    </div>
   );
 };
 

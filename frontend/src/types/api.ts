@@ -62,6 +62,15 @@ export interface BankCreditFacts {
   narration: string | null;
 }
 
+export interface RefundFacts {
+  refund_id: string;
+  refund_amount: string;
+  currency: string;
+  refund_status: string;
+  refund_type: string;
+  refund_timestamp: string | null;
+}
+
 export interface CaseEvidenceResponse {
   case_id: string;
   payment_id: string;
@@ -76,6 +85,7 @@ export interface CaseEvidenceResponse {
   payment: PaymentFacts | null;
   settlement: SettlementFacts | null;
   bank_credits: BankCreditFacts[];
+  refunds?: RefundFacts[];
 }
 
 export interface HumanReviewRequest {
@@ -187,5 +197,58 @@ export interface PolicySearchResult {
     similarity_score: number;
     is_grounded: boolean;
   }>;
+}
+
+export interface BenchmarkExceptionCategory {
+  category: string;
+  label: string;
+  count: number;
+  exposure_inr: string;
+  representative_case_id: string | null;
+  representative_payment_id: string | null;
+  policy_sop: string;
+  resolution_path: string;
+  present_in_batch?: boolean;
+}
+
+export interface ReconciliationBenchmarkResponse {
+  benchmark_name?: string;
+  has_run: boolean;
+  status?: string;
+  message?: string;
+  run_id?: string | null;
+  timestamp_utc: string | null;
+  dataset_size: number;
+  seed?: number;
+  elapsed_seconds?: number | null;
+  throughput_records_per_sec?: number | null;
+  throughput_unit?: string;
+  match_rate_percentage?: number | null;
+  precision_auto_reconcile?: number | null;
+  recall_auto_reconcile?: number | null;
+  false_approvals?: number;
+  zero_false_approval_invariant?: string;
+  summary: {
+    total_records: number;
+    auto_reconciled_count: number;
+    needs_review_count: number;
+    unresolved_count: number;
+    total_amount_reconciled_inr: string;
+    total_amount_at_risk_inr: string;
+  };
+  denominator_definition?: string | null;
+  match_rate_formula?: string | null;
+  throughput_command?: string;
+  throughput_environment?: string;
+  data_scope?: string | null;
+  deterministic_vs_ai?: string | null;
+  exception_categories: BenchmarkExceptionCategory[];
+}
+
+export interface AuthUser {
+  id: string;
+  email: string;
+  full_name: string;
+  role: 'reviewer' | 'admin';
 }
 

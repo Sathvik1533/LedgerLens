@@ -1,22 +1,11 @@
-import { motion, AnimatePresence } from 'framer-motion';
 import React, { useState } from 'react';
-import {
-  CheckCircle2,
-  XCircle,
-  HelpCircle,
-  AlertTriangle,
-  RefreshCw,
-  Send,
-  Lock,
-  User,
-} from 'lucide-react';
-import { CaseEvidenceResponse, HumanReviewRequest } from '../types/api';
+import { CaseEvidenceResponse, HumanReviewRequest, HumanReviewResponse } from '../types/api';
 import { submitCaseReview, ApiError } from '../api/client';
-import { Tooltip } from './Tooltip';
+import { useAuth } from '../context/AuthContext';
 
 interface ReviewActionFormProps {
   evidence: CaseEvidenceResponse;
-  onSuccess: () => void;
+  onSuccess: (receipt?: HumanReviewResponse) => void;
   onRefreshCase: () => void;
 }
 
@@ -25,37 +14,50 @@ export const ReviewActionForm: React.FC<ReviewActionFormProps> = ({
   onSuccess,
   onRefreshCase,
 }) => {
-  const [actor, setActor] = useState('finance_ops_reviewer');
+  const { user } = useAuth();
   const [action, setAction] = useState<'approve' | 'reject' | 'mark_unresolved'>('approve');
   const [comment, setComment] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [conflictError, setConflictError] = useState(false);
+  const [lastReceipt, setLastReceipt] = useState<HumanReviewResponse | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsSubmitting(true);
     setErrorMsg(null);
     setConflictError(false);
 
+    const cleanComment = comment.trim();
+    if (cleanComment.length < 10) {
+      setErrorMsg('Please provide a clear review reason of at least 10 characters explaining your decision.');
+      return;
+    }
+
+    setIsSubmitting(true);
     try {
       const payload: HumanReviewRequest = {
-        actor,
+        actor: user?.email || 'reviewer@ledgerlens.internal',
         action,
         expected_version: evidence.version,
-        human_comment: comment.trim() || undefined,
+        human_comment: cleanComment,
       };
 
-      await submitCaseReview(evidence.case_id, payload);
-      onSuccess();
+      const response = await submitCaseReview(evidence.case_id, payload);
+      setLastReceipt(response);
+      onSuccess(response);
     } catch (err: any) {
       if (err instanceof ApiError && err.status === 409) {
         setConflictError(true);
         setErrorMsg(
-          'Another reviewer updated this case first. Your action was not saved to prevent overwriting. Please refresh to inspect the latest version.'
+          'Another operator updated this case first. To prevent overwriting, your decision was not recorded. Refresh the case to inspect the latest state.'
         );
       } else {
-        setErrorMsg(err.message || 'Failed to record decision.');
+        const readableError = typeof err?.message === 'string' 
+          ? err.message 
+          : typeof err?.detail === 'string'
+          ? err.detail
+          : 'Unable to record decision to ledger. Check network connectivity.';
+        setErrorMsg(readableError);
       }
     } finally {
       setIsSubmitting(false);
@@ -63,223 +65,149 @@ export const ReviewActionForm: React.FC<ReviewActionFormProps> = ({
   };
 
   return (
-    <div className="bg-surface border border-border rounded-md p-4 space-y-4 shadow-none">
-      {/* Header */}
-      <div className="border-b border-border pb-3 space-y-0.5">
-        <div className="flex items-center justify-between gap-2">
-          <h3 className="text-xs font-semibold text-text-secondary uppercase tracking-wider font-sans">
-            Human Decision Panel
-          </h3>
-          <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-surface border border-border text-text-secondary">
-            v{evidence.version}
+    <div className="border border-rule bg-surface p-5 rounded-xs space-y-4 font-sans shadow-subtle">
+      {/* Header Styled as Institutional Sign-off */}
+      <div className="border-b border-rule pb-3 space-y-1">
+        <div className="flex items-center justify-between">
+          <span className="font-editorial text-lg font-medium text-ink">
+            Record a review decision
+          </span>
+          <span className="text-[11px] font-mono px-1.5 py-0.5 border border-rule text-ink-secondary bg-canvas rounded-xs">
+            Ledger v{evidence.version}
           </span>
         </div>
-        <p className="text-[11px] text-text-secondary font-sans">
-          Permanent financial review state transition with audit trail logging
+        <p className="text-xs text-ink-secondary leading-relaxed">
+          Sign this financial review note. Your decision, rationale, and timestamp will be permanently appended to the immutable audit ledger.
         </p>
       </div>
 
-      {/* HTTP 409 Collision Alert */}
-      <AnimatePresence>
+      {/* Conflict collision notification */}
       {conflictError && (
-        <motion.div
-          initial={{ opacity: 0, y: -10, height: 0 }}
-          animate={{ opacity: 1, y: 0, height: "auto" }}
-          exit={{ opacity: 0, height: 0 }}
-          transition={{ duration: 0.2 }}
-
-          role="alert"
-          aria-live="assertive"
-          className="rounded-md bg-critical-surface border border-critical p-3 space-y-2 text-xs text-text-primary shadow-none font-sans"
-        >
-          <div className="flex items-start gap-2">
-            <AlertTriangle className="w-4 h-4 text-critical shrink-0 mt-0.5" aria-hidden="true" />
-            <div className="space-y-1 flex-1">
-              <Tooltip content="Your action was not saved because someone updated this case first.">
-                <span tabIndex={0} className="font-semibold text-text-secondary focus-ring">Case changed by another reviewer</span>
-              </Tooltip>
-              <p className="text-text-secondary leading-snug">{errorMsg}</p>
-            </div>
-          </div>
+        <div className="p-3 bg-critical/10 border border-critical/30 rounded-xs space-y-2 text-xs text-critical font-sans">
+          <div className="font-semibold">Case updated by another reviewer</div>
+          <p className="text-[11px] leading-normal">{errorMsg}</p>
           <button
-            type="button"
             onClick={onRefreshCase}
-            className="w-full mt-1.5 py-1.5 px-3 rounded bg-critical hover:bg-critical text-text-primary font-semibold flex items-center justify-center gap-1.5 border border-critical transition active:scale-[0.98] text-xs shadow-none"
+            className="px-2.5 py-1 bg-critical text-canvas text-[11px] font-medium rounded-xs hover:bg-critical/90 transition-colors"
           >
-            <RefreshCw className="w-3 h-3" aria-hidden="true" />
-            <span>Refresh Case Data</span>
+            Refresh latest case data
           </button>
-        </motion.div>
+        </div>
       )}
-      </AnimatePresence>
 
-      {/* Standard Error Message */}
-      <AnimatePresence>
+      {/* General Error banner */}
       {errorMsg && !conflictError && (
-        <motion.div
-          initial={{ opacity: 0, height: 0 }}
-          animate={{ opacity: 1, height: "auto" }}
-          exit={{ opacity: 0, height: 0 }}
-          transition={{ duration: 0.2 }}
-
-          role="alert"
-          className="rounded-md bg-critical-surface border border-critical p-2.5 text-xs text-text-primary flex items-start gap-2 font-sans"
-        >
-          <AlertTriangle className="w-3.5 h-3.5 text-critical shrink-0 mt-0.5" aria-hidden="true" />
-          <span>{errorMsg}</span>
-        </motion.div>
+        <div className="p-2.5 bg-critical/10 border border-critical/30 rounded-xs text-xs text-critical font-mono">
+          {errorMsg}
+        </div>
       )}
-      </AnimatePresence>
 
-      {/* Review Form */}
-      <form onSubmit={handleSubmit} className="space-y-3.5">
-        {/* Reviewer Identifier */}
-        <div className="space-y-1">
-          <label htmlFor="reviewer-actor" className="block text-xs font-semibold text-text-secondary font-sans">
-            Reviewer Identity <span className="text-critical">*</span>
-          </label>
-          <div className="relative">
-            <User className="w-3.5 h-3.5 text-text-secondary absolute left-2.5 top-1/2 -translate-y-1/2" aria-hidden="true" />
-            <input
-              id="reviewer-actor"
-              type="text"
-              required
-              value={actor}
-              onChange={(e) => setActor(e.target.value)}
-              className="w-full bg-canvas border border-border rounded pl-8 pr-3 py-1.5 text-xs text-text-secondary placeholder-ink-700/50 focus:outline-none focus:border-zinc-500 focus:ring-1 focus:ring-zinc-500/20 font-mono transition"
-              placeholder="e.g. ops_analyst_01"
-            />
+      {/* Post-submission Dated Ledger Receipt */}
+      {lastReceipt && (
+        <div className="p-4 bg-ledger-green/10 border border-ledger-green/30 rounded-xs space-y-2 font-mono text-xs text-ink">
+          <div className="flex items-center justify-between text-ledger-green font-semibold">
+            <span>✓ Decision recorded to ledger</span>
+            <span>v{lastReceipt.current_version}</span>
+          </div>
+          <div className="text-[11px] text-ink-secondary space-y-1 pt-1 border-t border-ledger-green/20">
+            <div>Receipt ID: {lastReceipt.review_action_id}</div>
+            <div>Signer: {lastReceipt.actor} ({lastReceipt.action})</div>
+            <div>Recorded: {new Date(lastReceipt.actioned_at).toLocaleString('en-IN')}</div>
+            <div>Audit Event: {lastReceipt.audit_event_id}</div>
+          </div>
+        </div>
+      )}
+
+      {/* Decision Form */}
+      <form onSubmit={handleSubmit} className="space-y-4 text-xs">
+        {/* Verified Reviewer Identity */}
+        <div className="p-2.5 bg-canvas border border-rule rounded-xs space-y-1">
+          <div className="text-[11px] font-mono uppercase text-ink-secondary tracking-wider">
+            Verified Reviewer Identity
+          </div>
+          <div className="flex items-center justify-between font-mono text-xs">
+            <span className="text-ink font-medium">
+              {user?.full_name || 'Demo Reviewer'}
+            </span>
+            <span className="text-ink-secondary text-[11px]">
+              {user?.role === 'admin' ? 'Administrator' : 'Reviewer'} ({user?.email || 'reviewer@ledgerlens.internal'})
+            </span>
           </div>
         </div>
 
-        {/* Action Radio Selector */}
-        <fieldset className="space-y-1.5">
-          <legend className="text-xs font-semibold text-text-secondary mb-1 font-sans">
-            Review Action <span className="text-critical">*</span>
-          </legend>
-          <div className="space-y-1.5 font-sans">
-            {/* Option 1: Approve */}
-            <label
-              className={`flex items-start gap-2.5 p-2.5 rounded border cursor-pointer transition ${
-                action === 'approve'
-                  ? 'bg-resolved-surface border-resolved text-text-secondary'
-                  : 'bg-canvas border-border text-text-secondary hover:bg-surface'
-              }`}
-            >
-              <input
-                type="radio"
-                name="decision-action"
-                value="approve"
-                checked={action === 'approve'}
-                onChange={() => setAction('approve')}
-                className="w-3.5 h-3.5 text-resolved focus-ring mt-0.5"
-              />
-              <div className="flex items-start gap-2 flex-1">
-                <CheckCircle2 className="w-3.5 h-3.5 text-resolved shrink-0 mt-0.5" aria-hidden="true" />
-                <div>
-                  <div className="text-xs font-semibold">Approve (Resolve Anomaly)</div>
-                  <div className="text-[10px] text-text-secondary">Accepts transaction variance and marks ledger entry resolved</div>
-                </div>
-              </div>
-            </label>
-
-            {/* Option 2: Reject */}
-            <label
-              className={`flex items-start gap-2.5 p-2.5 rounded border cursor-pointer transition ${
-                action === 'reject'
-                  ? 'bg-critical-surface border-critical text-text-secondary'
-                  : 'bg-canvas border-border text-text-secondary hover:bg-surface'
-              }`}
-            >
-              <input
-                type="radio"
-                name="decision-action"
-                value="reject"
-                checked={action === 'reject'}
-                onChange={() => setAction('reject')}
-                className="w-3.5 h-3.5 text-critical focus-ring mt-0.5"
-              />
-              <div className="flex items-start gap-2 flex-1">
-                <XCircle className="w-3.5 h-3.5 text-critical shrink-0 mt-0.5" aria-hidden="true" />
-                <div>
-                  <div className="text-xs font-semibold">Reject (Flag Financial Error)</div>
-                  <div className="text-[10px] text-text-secondary">Rejects settlement discrepancy and requests merchant debit</div>
-                </div>
-              </div>
-            </label>
-
-            {/* Option 3: Mark Unresolved */}
-            <label
-              className={`flex items-start gap-2.5 p-2.5 rounded border cursor-pointer transition ${
-                action === 'mark_unresolved'
-                  ? 'bg-high-surface border-high text-text-secondary'
-                  : 'bg-canvas border-border text-text-secondary hover:bg-surface'
-              }`}
-            >
-              <input
-                type="radio"
-                name="decision-action"
-                value="mark_unresolved"
-                checked={action === 'mark_unresolved'}
-                onChange={() => setAction('mark_unresolved')}
-                className="w-3.5 h-3.5 text-high focus-ring mt-0.5"
-              />
-              <div className="flex items-start gap-2 flex-1">
-                <HelpCircle className="w-3.5 h-3.5 text-high shrink-0 mt-0.5" aria-hidden="true" />
-                <div>
-                  <div className="text-xs font-semibold">Mark Unresolved (Escalate)</div>
-                  <div className="text-[10px] text-text-secondary">Escalate to banking operations desk for external trace</div>
-                </div>
-              </div>
-            </label>
-          </div>
-        </fieldset>
-
-        {/* Reason / Rationale Textarea */}
-        <div className="space-y-1">
-          <label htmlFor="review-comment" className="block text-xs font-semibold text-text-secondary font-sans">
-            Resolution Rationale / Note <span className="text-critical">*</span>
+        {/* Action Choice */}
+        <div className="space-y-1.5">
+          <label className="text-[11px] font-mono uppercase text-ink-secondary block">
+            Review Determination
           </label>
+          <div className="grid grid-cols-3 gap-2">
+            <button
+              type="button"
+              onClick={() => setAction('approve')}
+              className={`py-2 px-2 border text-center font-medium rounded-xs transition-colors ${
+                action === 'approve'
+                  ? 'border-ledger-green bg-ledger-green/10 text-ledger-green font-semibold'
+                  : 'border-rule bg-canvas text-ink-secondary hover:border-ink hover:text-ink'
+              }`}
+            >
+              Approve match
+            </button>
+            <button
+              type="button"
+              onClick={() => setAction('reject')}
+              className={`py-2 px-2 border text-center font-medium rounded-xs transition-colors ${
+                action === 'reject'
+                  ? 'border-critical bg-critical/10 text-critical font-semibold'
+                  : 'border-rule bg-canvas text-ink-secondary hover:border-ink hover:text-ink'
+              }`}
+            >
+              Reject record
+            </button>
+            <button
+              type="button"
+              onClick={() => setAction('mark_unresolved')}
+              className={`py-2 px-2 border text-center font-medium rounded-xs transition-colors ${
+                action === 'mark_unresolved'
+                  ? 'border-brass bg-brass/10 text-brass font-semibold'
+                  : 'border-rule bg-canvas text-ink-secondary hover:border-ink hover:text-ink'
+              }`}
+            >
+              Escalate
+            </button>
+          </div>
+        </div>
+
+        {/* Operating Rationale */}
+        <div className="space-y-1">
+          <div className="flex items-center justify-between">
+            <label className="text-[11px] font-mono uppercase text-ink-secondary block">
+              Audit Rationale & Reference Notes
+            </label>
+            <span className={`text-[10px] font-mono ${comment.trim().length >= 10 ? 'text-ledger-green' : 'text-ink-secondary'}`}>
+              {comment.trim().length}/10 min chars
+            </span>
+          </div>
           <textarea
-            id="review-comment"
-            rows={3}
-            required
             value={comment}
             onChange={(e) => setComment(e.target.value)}
-            placeholder="Explain why this decision is justified (recorded in audit history)..."
-            className="w-full bg-canvas border border-border rounded p-2.5 text-xs text-text-secondary placeholder-ink-700/50 focus:outline-none focus:border-zinc-500 focus:ring-1 focus:ring-zinc-500/20 font-sans transition"
+            rows={3}
+            required
+            minLength={10}
+            className="w-full px-3 py-2 border border-rule bg-canvas text-ink font-sans text-xs rounded-xs focus:outline-none focus:border-ink"
+            placeholder="Explain the commercial or operational justification for this decision (minimum 10 characters)..."
           />
         </div>
 
-        {/* Optimistic Locking Notice */}
-        <div className="flex items-center justify-between text-[10px] text-text-secondary font-mono">
-          <Tooltip content="The version used to prevent overwriting another reviewer's update.">
-          <span tabIndex={0} className="flex items-center gap-1 focus-ring">
-            <Lock className="w-3 h-3 text-accent" aria-hidden="true" />
-            Case version: {evidence.version}
-          </span>
-          </Tooltip>
-          <Tooltip content="Prevents one reviewer from overwriting a newer decision.">
-          <span tabIndex={0} className="text-text-secondary focus-ring">Safe update protection</span>
-          </Tooltip>
-        </div>
-
-        {/* Submit Button */}
+        {/* Submit button */}
         <button
           type="submit"
-          disabled={isSubmitting || !actor.trim() || !comment.trim()}
-          className="w-full h-9 rounded bg-surface hover:bg-canvas active:bg-surface text-text-primary text-xs font-semibold tracking-wide transition disabled:opacity-40 disabled:pointer-events-none flex items-center justify-center gap-1.5 shadow-none active:scale-[0.98]"
+          disabled={isSubmitting}
+          className="w-full py-2.5 bg-ink hover:bg-ink/90 text-canvas font-medium text-xs rounded-xs transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
         >
           {isSubmitting ? (
-            <>
-              <RefreshCw className="w-3 h-3 animate-spin text-text-secondary" aria-hidden="true" />
-              <span>Persisting Decision...</span>
-            </>
+            <span>Recording to ledger...</span>
           ) : (
-            <>
-              <Send className="w-3 h-3 text-text-secondary" aria-hidden="true" />
-              <span>Submit Human Decision</span>
-            </>
+            <span>Record review decision</span>
           )}
         </button>
       </form>

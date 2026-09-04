@@ -1,6 +1,6 @@
 from typing import Optional
 from uuid import UUID
-from fastapi import APIRouter, Depends, HTTPException, Path, Query, status
+from fastapi import APIRouter, Depends, HTTPException, Path, Query, Request, status
 from sqlalchemy.orm import Session
 from decimal import Decimal
 
@@ -15,6 +15,8 @@ from backend.app.schemas.review import (
 from backend.app.domain.exceptions import ConcurrentUpdateError
 from backend.app.repositories.review_repo import ReviewRepository
 from backend.app.repositories.reconciliation_repo import ReconciliationRepository
+from backend.app.api.deps import get_current_reviewer, review_rate_limiter
+from backend.app.models.user import UserModel
 
 router = APIRouter()
 
@@ -33,6 +35,7 @@ def get_review_queue(
     limit: int = Query(100, ge=1, le=1000),
     offset: int = Query(0, ge=0),
     db: Session = Depends(get_db),
+    current_user: UserModel = Depends(get_current_reviewer),
 ):
     repo = ReviewRepository(db)
     cases = repo.get_review_queue(limit=limit, offset=offset, exception_type=exception_type)
@@ -85,8 +88,30 @@ def get_review_queue(
 def submit_review_action(
     case_id: UUID = Path(..., description="UUID of the reconciliation case"),
     body: HumanReviewRequest = ...,
+    request: Request = ...,
     db: Session = Depends(get_db),
+    current_user: UserModel = Depends(get_current_reviewer),
 ):
+    review_rate_limiter.check(request, "review decision")
+
+    if body.action not in ["approve", "reject", "mark_unresolved"]:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail="Invalid action. Allowed review actions are 'approve', 'reject', or 'mark_unresolved'.",
+        )
+
+    clean_comment = (body.human_comment or "").strip()
+    if len(clean_comment) < 10:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail="Please provide a clear review reason of at least 10 characters explaining your decision.",
+        )
+    if len(clean_comment) > 1000:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail="Review reason must be 1000 characters or fewer.",
+        )
+
     repo = ReviewRepository(db)
     case = repo.get_case_by_id(case_id)
 
@@ -105,13 +130,16 @@ def submit_review_action(
             ),
         )
 
+    # Invariant: Actor identity is bound to the verified authenticated user session
+    authenticated_actor = current_user.email
+
     try:
         review_action, audit_event = repo.apply_review_action_atomic(
             case=case,
             expected_version=body.expected_version,
-            actor=body.actor,
+            actor=authenticated_actor,
             action=body.action,
-            human_comment=body.human_comment,
+            human_comment=clean_comment,
             selected_candidate_id=body.selected_candidate_id,
         )
     except ValueError as e:
@@ -145,6 +173,7 @@ def submit_review_action(
 def get_case_audit_trail(
     case_id: UUID = Path(..., description="UUID of the reconciliation case"),
     db: Session = Depends(get_db),
+    current_user: UserModel = Depends(get_current_reviewer),
 ):
     repo = ReviewRepository(db)
     case = repo.get_case_by_id(case_id)
@@ -181,6 +210,7 @@ def get_all_audit_trail(
     limit: int = Query(100, ge=1, le=1000),
     offset: int = Query(0, ge=0),
     db: Session = Depends(get_db),
+    current_user: UserModel = Depends(get_current_reviewer),
 ):
     repo = ReviewRepository(db)
     events = repo.get_all_audit_events(limit=limit, offset=offset)
@@ -210,6 +240,7 @@ def get_all_audit_trail(
 def get_case_detail(
     case_id: UUID = Path(..., description="UUID of the reconciliation case"),
     db: Session = Depends(get_db),
+    current_user: UserModel = Depends(get_current_reviewer),
 ):
     from backend.app.rag.tools.sql_tool import SQLEvidenceTool
     repo = ReviewRepository(db)
@@ -225,4 +256,5 @@ def get_case_detail(
     evidence["decision_status"] = case.decision_status
     evidence["case_opened_at"] = case.case_opened_at.isoformat() if case.case_opened_at else None
     return evidence
+
 

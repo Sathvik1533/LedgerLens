@@ -8,6 +8,8 @@ from backend.app.db.session import get_db
 from backend.app.rag.retriever import PolicyRetriever
 from backend.app.rag.tools.sql_tool import SQLEvidenceTool
 from backend.app.rag.assistant import InvestigationAssistant, InvestigationResult
+from backend.app.api.deps import get_current_reviewer
+from backend.app.models.user import UserModel
 
 router = APIRouter()
 
@@ -25,6 +27,7 @@ _retriever.load_corpus()
 def run_investigation(
     case_id: UUID = Path(..., description="UUID of the reconciliation case"),
     db: Session = Depends(get_db),
+    current_user: UserModel = Depends(get_current_reviewer),
 ):
     sql_tool = SQLEvidenceTool(db)
     
@@ -55,7 +58,7 @@ class PolicyQueryRequest(BaseModel):
     status_code=status.HTTP_200_OK,
     summary="Get loaded RAG policy corpus documents",
 )
-def get_policy_corpus():
+def get_policy_corpus(current_user: UserModel = Depends(get_current_reviewer)):
     from backend.app.rag.retriever import CORPUS_DIR, CORPUS_VERSION, GROUNDING_FLOOR
     documents = []
     for md_file in sorted(CORPUS_DIR.glob("*.md")):
@@ -79,7 +82,7 @@ def get_policy_corpus():
     status_code=status.HTTP_200_OK,
     summary="Direct semantic search against policy corpus with grounding floor",
 )
-def query_policies(body: PolicyQueryRequest):
+def query_policies(body: PolicyQueryRequest, current_user: UserModel = Depends(get_current_reviewer)):
     chunks = _retriever.retrieve(query=body.query, top_k=body.top_k)
     return {
         "query": body.query,

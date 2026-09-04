@@ -15,12 +15,34 @@ class Citation(BaseModel):
     quote: str = Field(..., description="The exact quote from the policy")
 
 
+def _sanitize_plain_text(text: str) -> str:
+    """
+    Conservative plain-text sanitizer:
+    Strips markdown hashtag headings, bold/italic markers, and code blocks
+    while strictly preserving currency symbols (₹), punctuation, quotes,
+    numbers, and source references.
+    """
+    if not text:
+        return ""
+    # Safely remove markdown header prefixes (#, ##, ###) at the start of lines
+    clean = re.sub(r'^#{1,6}\s*', '', text, flags=re.MULTILINE)
+    # Remove markdown bold/italic asterisks while preserving the inner text
+    clean = re.sub(r'\*{1,3}([^*]+)\*{1,3}', r'\1', clean)
+    # Remove code fences
+    clean = re.sub(r'```[a-zA-Z]*\n?', '', clean)
+    clean = re.sub(r'```', '', clean)
+    # Normalize excessive blank lines
+    clean = re.sub(r'\n{3,}', '\n\n', clean)
+    return clean.strip()
+
+
 class InvestigationResult(BaseModel):
-    summary: str = Field(..., description="1-2 sentence summary of the issue")
-    root_cause_analysis: str = Field(..., description="Detailed explanation of the discrepancy")
-    recommended_action: str = Field(..., description="Clear next steps for the ops team")
+    summary: str = Field(..., description="1-2 sentence summary of the issue in clean plain text")
+    root_cause_analysis: str = Field(..., description="Detailed explanation in clean plain text")
+    recommended_action: str = Field(..., description="Clear next steps for the ops reviewer in clean plain text")
     citations: List[Citation] = Field(..., description="List of policy citations used in reasoning")
     is_confident: bool = Field(..., description="True if the LLM is highly confident in its assessment")
+
 
 
 class BaseLLMClient:
@@ -154,35 +176,33 @@ class InvestigationAssistant:
             policy_context = "No relevant policy documents found above the grounding floor."
 
         # 3. Construct the prompt
-        system_prompt = """You are an expert AI Finance Controller. 
-Your task is to analyze a reconciliation discrepancy and provide a clear, structured investigation report.
+        system_prompt = """You are an AI Finance Investigation Assistant.
+Your task is to analyze a reconciliation discrepancy and provide clear, plain-language guidance for a finance reviewer.
 
-You will be provided with:
-1. SQL EVIDENCE: The exact financial facts from the database.
-2. RAG POLICY: Relevant excerpts from the company's financial policies.
-
-RULES:
-- You must base your reasoning STRICTLY on the provided SQL Evidence and RAG Policy.
-- NEVER invent or hallucinate financial numbers.
-- If the policy does not explicitly cover the scenario, state that your confidence is low.
-- Provide your output in exact JSON format matching the requested schema.
+CRITICAL PLAIN-TEXT RULE:
+- Return clean plain text. Do NOT use markdown hashtag headings (#, ##, ###), markdown tables, code blocks, or raw JSON formatting inside string values.
+- Write in short, clear sentences. Explain one idea at a time.
+- State: What happened, Why it matters, and What to do next.
+- Retain exact rupee amounts (₹) and percentages without modification.
+- Ground your analysis strictly in the provided SQL Evidence and Policy.
+- Never invent or guess numbers.
 """
 
         user_content = f"""
-### SQL EVIDENCE ###
+SQL EVIDENCE:
 {json.dumps(evidence, indent=2)}
 
-### RAG POLICY ###
+RELEVANT POLICY RULES:
 {policy_context}
 
-Analyze the above data and provide a JSON response with the following keys:
-- "summary": A brief 1-2 sentence summary of what went wrong.
-- "root_cause_analysis": A detailed step-by-step explanation of the numbers and why the exception was raised.
-- "recommended_action": What the human operations team should do to fix it.
-- "citations": A list of objects, each with "source_file" (e.g., fee_policy.md) and "quote" (an exact excerpt from the policy text you relied on).
+Analyze the discrepancy and provide a JSON response with the following keys:
+- "summary": A brief 1-2 sentence plain-language summary of what happened.
+- "root_cause_analysis": A step-by-step plain-language explanation of why the numbers disagree.
+- "recommended_action": A clear next step for the human reviewer to resolve the discrepancy.
+- "citations": A list of objects with "source_file" and "quote" (exact short excerpt from policy).
 - "is_confident": boolean (true/false)
 
-Return ONLY valid JSON. No markdown formatting blocks around it.
+Return ONLY valid JSON.
 """
 
         # 4. Execute LLM call with bounded retry
@@ -202,14 +222,24 @@ Return ONLY valid JSON. No markdown formatting blocks around it.
                     
                 data = json.loads(raw_text.strip())
                 
-                result = InvestigationResult(**data)
+                # Conservative sanitization to guarantee plain text
+                sanitized_summary = _sanitize_plain_text(data.get("summary", ""))
+                sanitized_rc = _sanitize_plain_text(data.get("root_cause_analysis", ""))
+                sanitized_rec = _sanitize_plain_text(data.get("recommended_action", ""))
+
+                result = InvestigationResult(
+                    summary=sanitized_summary,
+                    root_cause_analysis=sanitized_rc,
+                    recommended_action=sanitized_rec,
+                    citations=[Citation(**c) for c in data.get("citations", [])],
+                    is_confident=data.get("is_confident", True)
+                )
                 
                 # Basic guardrail: Verify citations actually exist in the retrieved chunks
                 for citation in result.citations:
                     found = False
                     for chunk in chunks:
                         if citation.source_file in chunk.source_file:
-                            # Normalize whitespace for flexible checking
                             clean_quote = re.sub(r'\s+', ' ', citation.quote.lower())
                             clean_text = re.sub(r'\s+', ' ', chunk.text.lower())
                             if clean_quote in clean_text or clean_text in clean_quote:
@@ -222,7 +252,7 @@ Return ONLY valid JSON. No markdown formatting blocks around it.
                 
             except Exception as e:
                 if attempt == max_retries - 1:
-                    # Grounded Deterministic Fallback using local policy retriever chunks
+                    # Grounded Deterministic Fallback in clear plain language
                     policy_citations = [
                         Citation(
                             source_file=c.source_file,
@@ -231,37 +261,36 @@ Return ONLY valid JSON. No markdown formatting blocks around it.
                         for c in chunks[:2]
                     ]
                     
-                    # Generate deterministic root cause based on exact SQL evidence
                     discrepancy = evidence.get("settlement_discrepancy", "0.00")
                     exp_net = evidence.get("expected_net_settlement", "0.00")
                     rep_net = evidence.get("reported_net_settlement", "0.00")
                     
                     if exception_type == "amount_mismatch":
-                        rc = f"Calculated expected net payout (₹{exp_net}) deviates from gateway reported net (₹{rep_net}) by ₹{abs(float(discrepancy)):.2f}. Contractual 2% MDR + 18% GST formula indicates gateway deduction variance."
-                        rec = "Verify gateway settlement schedule and adjust merchant ledger balance if fee overcharge is confirmed per SOP-402."
+                        rc = f"The payment was captured, but the gateway remitted ₹{rep_net} instead of the expected ₹{exp_net}. The unexplained difference is ₹{abs(float(discrepancy)):.2f}."
+                        rec = "Verify the gateway deduction schedule and demand a credit adjustment or approve an authorized fee waiver."
                     elif exception_type == "missing_settlement":
-                        rc = "Merchant transaction was captured, but corresponding settlement line item was omitted from the daily settlement batch."
-                        rec = "Escalate to payment gateway operations desk for batch re-transmission per SOP-101."
+                        rc = "The payment was successfully captured on the storefront, but the gateway payout batch omitted this transaction."
+                        rec = "Escalate to the payment gateway operations desk for batch re-transmission and settlement."
                     elif exception_type == "missing_bank_credit":
-                        rc = "Gateway reported settlement confirmation, but no matching bank statement credit UTR was posted to the nodal account."
-                        rec = "Initiate bank statement trace with banking operations partner per SOP-203."
+                        rc = "The gateway reported settlement confirmation, but no matching credit UTR was deposited in the bank account."
+                        rec = "Initiate a bank statement trace with banking operations to confirm deposit clearing."
                     elif exception_type == "duplicate_payment":
-                        rc = "Multiple captured payment transaction records share identical order reference identifiers."
-                        rec = "Inspect customer authorization log and initiate automated refund for secondary charge per SOP-305."
+                        rc = "Two separate captured payments share the same customer order identifier."
+                        rec = "Inspect authorization records and initiate a customer reversal refund for the duplicate capture."
                     elif exception_type == "duplicate_bank_credit":
-                        rc = "Multiple bank statement credit lines reference the identical settlement batch reference identifier."
-                        rec = "Audit nodal bank credit journal and verify double-credit entry per SOP-204."
+                        rc = "The bank statement records two credits for the same settlement batch."
+                        rec = "Audit the bank statement journal and verify whether a shadow credit was posted."
                     elif exception_type == "partial_refund_not_reflected":
-                        rc = "Customer partial refund was executed, but settlement net payout calculation was not adjusted."
-                        rec = "Debit merchant settlement balance for unreflected refund portion per SOP-501."
+                        rc = "A customer refund was completed, but the gateway payout calculation did not adjust for the refunded amount."
+                        rec = "Adjust the ledger balance to recover the unadjusted refund in the upcoming settlement cycle."
                     else:
-                        rc = f"Transaction flagged under exception category: {exception_type}. Verification of multi-source journal records required."
-                        rec = "Perform multi-source journal review and apply appropriate adjustment per standard operating procedure."
+                        rc = f"This record requires manual inspection under exception category: {exception_type.replace('_', ' ')}."
+                        rec = "Review the four counterparty records and apply the governing operating procedure."
 
                     return InvestigationResult(
-                        summary=f"Automated SOP Analysis for {exception_type.replace('_', ' ').title()}",
-                        root_cause_analysis=rc,
-                        recommended_action=rec,
+                        summary=f"Operating policy guidance for {exception_type.replace('_', ' ')}",
+                        root_cause_analysis=_sanitize_plain_text(rc),
+                        recommended_action=_sanitize_plain_text(rec),
                         citations=policy_citations,
                         is_confident=len(policy_citations) > 0
                     )

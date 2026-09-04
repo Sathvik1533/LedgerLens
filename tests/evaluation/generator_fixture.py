@@ -33,17 +33,38 @@ def generate_evaluation_dataset(
     """
     random.seed(seed)
     
-    anomaly_plan: List[str] = (
-        ["amount_mismatch"] * 4
-        + ["missing_bank_credit"] * 4
-        + ["partial_refund_not_reflected"] * 3
-        + ["fee_mismatch"] * 3
-        + ["duplicate_payment"] * 2
-        + ["missing_settlement"] * 2
-    )
-    
-    # 42 clean + 18 anomalies = 60 total valid records
-    record_plan: List[str] = ["clean"] * 42 + anomaly_plan
+    if total_records == 60:
+        anomaly_plan: List[str] = (
+            ["amount_mismatch"] * 4
+            + ["missing_bank_credit"] * 4
+            + ["partial_refund_not_reflected"] * 3
+            + ["fee_mismatch"] * 3
+            + ["duplicate_payment"] * 2
+            + ["missing_settlement"] * 2
+        )
+        clean_count = 42
+    else:
+        # Dynamic fixture scaling (e.g. Fixture B with custom size and exception mix)
+        clean_count = int(total_records * 0.65)
+        anomaly_count = total_records - clean_count
+        weights = {
+            "amount_mismatch": 0.22,
+            "missing_bank_credit": 0.22,
+            "partial_refund_not_reflected": 0.18,
+            "fee_mismatch": 0.18,
+            "duplicate_payment": 0.10,
+            "missing_settlement": 0.10,
+        }
+        anomaly_plan: List[str] = []
+        for exc_name, weight in weights.items():
+            count = max(1, int(round(anomaly_count * weight)))
+            anomaly_plan.extend([exc_name] * count)
+        if len(anomaly_plan) > anomaly_count:
+            anomaly_plan = anomaly_plan[:anomaly_count]
+        elif len(anomaly_plan) < anomaly_count:
+            anomaly_plan.extend(["amount_mismatch"] * (anomaly_count - len(anomaly_plan)))
+
+    record_plan: List[str] = ["clean"] * clean_count + anomaly_plan
     
     # Sort or fix order deterministically
     random.shuffle(record_plan)
@@ -290,13 +311,13 @@ def generate_evaluation_dataset(
     }
 
     ground_truth_meta = {
-        "total_submitted": 61,
-        "total_accepted": 60,
+        "total_submitted": total_records + 1,
+        "total_accepted": total_records,
         "total_rejected": 1,
-        "expected_auto_reconciled": 42,
-        "expected_needs_review": 18,
+        "expected_auto_reconciled": clean_count,
+        "expected_needs_review": len(anomaly_plan),
         "expected_unresolved": 0,
-        "expected_match_rate": 70.0,
+        "expected_match_rate": round((clean_count / total_records) * 100, 2),
         "expected_total_amount_reconciled_inr": str(total_reconciled_amount),
         "expected_total_amount_at_risk_inr": str(total_risk_amount),
         "expected_exception_counts": exception_counts,

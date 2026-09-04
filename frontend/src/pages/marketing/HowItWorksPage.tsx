@@ -1,83 +1,112 @@
-import { motion } from 'framer-motion';
-import { Activity, Database, GitCommit, FileText } from 'lucide-react';
-
-const STAGGER = {
-  hidden: { opacity: 0 },
-  show: {
-    opacity: 1,
-    transition: { staggerChildren: 0.15 }
-  }
-};
-
-const FADE_UP = {
-  hidden: { opacity: 0, y: 20 },
-  show: { opacity: 1, y: 0, transition: { type: "spring" as const, stiffness: 300, damping: 24 } }
-};
+import { Link } from 'react-router-dom';
+import { SequentialTraceLine } from '../../components/ui/SequentialTraceLine';
 
 export default function HowItWorksPage() {
   const steps = [
-    { 
-      title: 'Deterministic Matching', 
-      desc: 'The engine ingests 4 data streams: payments, refunds, settlements, and bank credits. It strictly enforces ACID invariants to find exact matches. Ambiguity is never guessed.',
-      icon: Database
+    {
+      step: '01',
+      title: 'Money enters across four counterparty streams',
+      role: 'Four Financial Feeds',
+      desc: 'Every customer transaction creates multiple independent records: the payment captured in the checkout register, the net payout reported by the payment gateway, customer refund adjustments, and the final deposit line on the institutional bank statement.',
+      subtext: 'Four source counterparties: payment_id, settlement_id, refund_id, and bank UTR reference.',
     },
-    { 
-      title: 'Exception Triaging', 
-      desc: 'Only failed matches (discrepancies, missing credits, fee anomalies) are surfaced to the Queue. The noise is eliminated.',
-      icon: Activity
+    {
+      step: '02',
+      title: 'Records are compared against contractual fee rules',
+      role: 'Paisa-Level Verification',
+      desc: 'The reconciliation engine applies exact commercial contract terms down to ₹0.01: Expected Net = Gross captured − [Agreed MDR fee (2%) + Statutory GST (18%)] − Customer refunds. When all four counterparties agree down to the single paisa, the transaction is verified and closed.',
+      subtext: 'Automatic match: zero variance (≤ ₹0.01) and confirmed bank deposit.',
     },
-    { 
-      title: 'Grounded Resolution', 
-      desc: 'When an operator opens a case, an AI copilot grounds its analysis solely on the provided evidence JSON and the approved corporate policy manual.',
-      icon: FileText
+    {
+      step: '03',
+      title: 'A discrepancy is isolated and redlined at the exact source',
+      role: 'Variance Isolation',
+      desc: 'If less money arrives than contracted—or a bank credit never appears, or a gateway deduction deviates from the agreed fee schedule—the broken relationship is redlined immediately. The deficit is isolated into an exception case categorized under one of eight strict financial failure modes.',
+      subtext: 'Surfaced into operational review queue prioritized by monetary exposure.',
     },
-    { 
-      title: 'Immutable Audit Trail', 
-      desc: 'Decisions are committed as append-only cryptographic receipts to the ledger. Accountability is absolute.',
-      icon: GitCommit
-    }
+    {
+      step: '04',
+      title: 'Evidence and governing operating rules are reviewed side by side',
+      role: 'Finance Operator + Policy Notes',
+      desc: 'A finance controller opens the case dossier. The four original counterparty slips are presented as physical audit documents alongside the exact contractual clause from the approved operating manual, clarifying why the variance occurred without guesswork.',
+      subtext: 'Read-only guidance citing exact SOP section and line numbers.',
+    },
+    {
+      step: '05',
+      title: 'A human decision is permanently recorded to the ledger',
+      role: 'Finance Controller Sign-Off',
+      desc: 'The controller determines the commercial resolution: approve with an authorized fee waiver, initiate a clawback dispute with the gateway, or escalate to banking operations. Their identity, rationale, and timestamp are sealed into an immutable, append-only audit ledger.',
+      subtext: 'Permanent audit receipt: dated, cryptographically verifiable, and non-repudiable.',
+    },
   ];
 
   return (
-    <div className="bg-canvas min-h-screen pt-32 pb-24 px-6 overflow-hidden relative">
-      {/* Background Architectural Grid */}
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,#C9C5BC20_1px,transparent_1px),linear-gradient(to_bottom,#C9C5BC20_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_60%_at_50%_0%,#000_70%,transparent_100%)] pointer-events-none" />
+    <div className="w-full max-w-5xl mx-auto px-6 py-12 md:py-20 space-y-16 font-sans">
+      {/* Header */}
+      <div className="space-y-4 max-w-2xl">
+        <span className="text-xs font-mono uppercase tracking-wider text-ink-secondary block">
+          OPERATIONAL METHODOLOGY
+        </span>
+        <h1 className="font-editorial text-4xl sm:text-5xl font-medium text-ink leading-tight">
+          How continuous reconciliation closes the loop
+        </h1>
+        <p className="text-base sm:text-lg text-ink-secondary font-normal leading-relaxed">
+          LedgerLens separates mathematical fact calculation from human policy judgment. Software verifies deterministic parity; human controllers resolve financial ambiguity.
+        </p>
+      </div>
 
-      <div className="max-w-4xl mx-auto relative z-10">
-        <motion.div variants={STAGGER} initial="hidden" animate="show" className="mb-20 text-center">
-          <motion.div variants={FADE_UP} className="inline-flex items-center gap-2 mb-6">
-             <span className="text-[10px] font-mono tracking-widest text-text-secondary uppercase border border-border px-3 py-1 rounded-full bg-surface shadow-none">
-              Architecture
-            </span>
-          </motion.div>
-          <motion.h1 variants={FADE_UP} className="text-5xl md:text-6xl text-text-primary font-display font-medium tracking-tight mb-6">
-            The Operator Journey
-          </motion.h1>
-          <motion.p variants={FADE_UP} className="text-xl text-text-secondary font-sans max-w-2xl mx-auto leading-relaxed">
-            From ingestion to resolution, LedgerLens enforces a strict, transparent, human-in-the-loop pipeline.
-          </motion.p>
-        </motion.div>
+      {/* Sequential Journey */}
+      <div className="space-y-4">
+        {steps.map((s, idx) => (
+          <div key={s.step} className="flex items-stretch">
+            <SequentialTraceLine isLast={idx === steps.length - 1} active={true} />
+            <div className="flex-1 border border-rule bg-surface p-6 sm:p-8 rounded-xs space-y-4 shadow-subtle relative mb-4">
+              <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-2 border-b border-rule/60 pb-3">
+                <div className="flex items-baseline gap-3">
+                  <span className="font-mono text-xs font-semibold text-ink-secondary">
+                    STAGE {s.step}
+                  </span>
+                  <h3 className="font-editorial text-2xl font-medium text-ink">
+                    {s.title}
+                  </h3>
+                </div>
+                <span className={`text-[11px] font-mono px-2 py-0.5 rounded-xs border ${
+                  s.role.includes('Human')
+                    ? 'border-brass text-brass bg-brass/5 font-semibold'
+                    : 'border-rule text-ink-secondary bg-canvas font-medium'
+                }`}>
+                  Actor: {s.role}
+                </span>
+              </div>
 
-        <motion.div 
-          variants={STAGGER}
-          initial="hidden"
-          whileInView="show"
-          viewport={{ once: true, margin: "-100px" }}
-          className="space-y-6 relative before:absolute before:inset-0 before:ml-[27px] md:before:ml-[35px] before:-translate-x-px md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-source-blue/20 before:via-source-blue/20 before:to-transparent"
-        >
-          {steps.map((step, i) => (
-            <motion.div key={i} variants={FADE_UP} className="relative flex items-start gap-6 md:gap-8 group">
-              <div className="flex-shrink-0 w-14 h-14 md:w-16 md:h-16 rounded-full bg-surface border-2 border-border flex items-center justify-center z-10 group-hover:border-accent group-hover:bg-accent/10 transition-colors shadow-none">
-                <step.icon className="w-6 h-6 text-text-secondary group-hover:text-accent transition-colors" />
+              <p className="text-sm text-ink leading-relaxed max-w-3xl">
+                {s.desc}
+              </p>
+
+              <div className="text-xs font-mono text-ink-secondary pt-2 border-t border-rule/40">
+                {s.subtext}
               </div>
-              <div className="flex-1 bg-surface border border-border rounded-2xl p-6 md:p-8 shadow-none group-hover:shadow-none group-hover:border-accent/30 transition-all">
-                <div className="text-[10px] font-mono text-accent mb-2 tracking-widest uppercase">Phase 0{i + 1}</div>
-                <h3 className="text-2xl text-text-primary font-display font-medium mb-3">{step.title}</h3>
-                <p className="text-text-secondary font-sans leading-relaxed text-sm md:text-base">{step.desc}</p>
-              </div>
-            </motion.div>
-          ))}
-        </motion.div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Summary Callout */}
+      <div className="border border-rule bg-surface-evidence p-8 rounded-xs text-center space-y-4">
+        <h3 className="font-editorial text-2xl font-medium text-ink">
+          Inspect the live reconciliation engine
+        </h3>
+        <p className="text-xs sm:text-sm text-ink-secondary max-w-md mx-auto leading-relaxed">
+          See how real synthetic batches are processed and how redlines are reviewed in the operational queue.
+        </p>
+        <div className="pt-2">
+          <Link
+            to="/app/queue"
+            className="px-6 py-2.5 bg-ink text-canvas hover:bg-ink/90 text-sm font-medium rounded-xs transition-colors inline-block"
+          >
+            Open review queue
+          </Link>
+        </div>
       </div>
     </div>
   );

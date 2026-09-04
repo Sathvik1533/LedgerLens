@@ -1,27 +1,152 @@
 {
-  "timestamp": "2026-08-31T17:44:28.122788+00:00",
+  "benchmark_name": "reconciliation_evaluation_benchmark",
+  "has_run": true,
+  "run_id": "eval_run_20260904_130216_s42",
+  "timestamp_utc": "2026-09-04T13:02:16.154401+00:00",
   "dataset_size": 60,
-  "total_submitted": 61,
-  "total_accepted": 60,
-  "total_rejected": 1,
+  "seed": 42,
+  "elapsed_seconds": 0.001293,
+  "throughput_records_per_sec": 46388.75,
+  "throughput_unit": "payment records/sec",
+  "throughput_command": "python evaluation/run_benchmark.py --size 60 --seed 42",
+  "throughput_environment": "Apple Silicon local test harness (PostgreSQL + Python Decimal)",
   "match_rate_percentage": 70.0,
+  "match_rate_formula": "42 auto_reconciled \u00f7 60 records_processed \u00d7 100 = 70.00%",
+  "denominator_definition": "Total valid normalized payment records processed across 4 counterparty streams in the synthetic evaluation batch.",
+  "data_scope": "Synthetic multi-source dataset (60 payments, 54 bank credits, 58 settlements, 3 refunds) with hidden ground truth",
+  "deterministic_vs_ai": "Deterministic rules execute 100% of mathematical matching, parity verification, and exception typing. AI (grounded RAG) acts as an advisory assistant retrieving governing SOP policies without authority to approve or move funds.",
   "precision_auto_reconcile": 100.0,
   "recall_auto_reconcile": 100.0,
   "false_approvals": 0,
   "zero_false_approval_invariant": "PASSED",
   "summary": {
+    "total_records": 60,
     "auto_reconciled_count": 42,
     "needs_review_count": 18,
     "unresolved_count": 0,
     "total_amount_reconciled_inr": "159933.00",
     "total_amount_at_risk_inr": "70907.00"
   },
-  "exception_type_distribution": {
-    "amount_mismatch": 4,
-    "missing_bank_credit": 4,
-    "partial_refund_not_reflected": 3,
-    "fee_mismatch": 3,
-    "duplicate_payment": 2,
-    "missing_settlement": 2
+  "exception_categories": [
+    {
+      "category": "missing_bank_credit",
+      "label": "Missing Bank Credit Verification",
+      "count": 4,
+      "exposure_inr": "16752.00",
+      "policy_sop": "SOP-2026-BNK-03",
+      "resolution_path": "Nodal bank ledger search and UTR clearing claim",
+      "present_in_batch": true,
+      "representative_case_id": "CASE-1016",
+      "representative_payment_id": "pay_eval_1016"
+    },
+    {
+      "category": "amount_mismatch",
+      "label": "Settlement Payout Shortfall",
+      "count": 4,
+      "exposure_inr": "16012.00",
+      "policy_sop": "SOP-2026-FEE-01",
+      "resolution_path": "Gateway fee clawback dispute or approved commercial waiver",
+      "present_in_batch": true,
+      "representative_case_id": "CASE-1014",
+      "representative_payment_id": "pay_eval_1014"
+    },
+    {
+      "category": "partial_refund_not_reflected",
+      "label": "Customer Refund Unadjusted in Payout",
+      "count": 3,
+      "exposure_inr": "12027.50",
+      "policy_sop": "SOP-2026-ESC-02",
+      "resolution_path": "Clawback unadjusted refund in next settlement batch",
+      "present_in_batch": true,
+      "representative_case_id": "CASE-1019",
+      "representative_payment_id": "pay_eval_1019"
+    },
+    {
+      "category": "fee_mismatch",
+      "label": "Commercial Fee Tier Deviation",
+      "count": 3,
+      "exposure_inr": "10251.50",
+      "policy_sop": "SOP-2026-FEE-01",
+      "resolution_path": "Demand fee reconciliation credit note from gateway",
+      "present_in_batch": true,
+      "representative_case_id": "CASE-1003",
+      "representative_payment_id": "pay_eval_1003"
+    },
+    {
+      "category": "duplicate_payment",
+      "label": "Duplicate Customer Charge Detected",
+      "count": 2,
+      "exposure_inr": "9116.00",
+      "policy_sop": "SOP-102",
+      "resolution_path": "Initiate customer reversal refund for duplicate capture",
+      "present_in_batch": true,
+      "representative_case_id": "CASE-1043",
+      "representative_payment_id": "pay_eval_1043"
+    },
+    {
+      "category": "missing_settlement",
+      "label": "Captured Gross Unremitted by Gateway",
+      "count": 2,
+      "exposure_inr": "6748.00",
+      "policy_sop": "SOP-2026-ESC-02",
+      "resolution_path": "Escalate T+2 SLA breach to payment gateway operations",
+      "present_in_batch": true,
+      "representative_case_id": "CASE-1008",
+      "representative_payment_id": "pay_eval_1008"
+    },
+    {
+      "category": "duplicate_bank_credit",
+      "label": "Duplicate Bank Statement Credit",
+      "count": 0,
+      "exposure_inr": "0.00",
+      "policy_sop": "SOP-204",
+      "resolution_path": "Audit nodal bank statement journal and reverse shadow credit",
+      "present_in_batch": false,
+      "representative_case_id": null,
+      "representative_payment_id": null
+    },
+    {
+      "category": "ambiguous_match",
+      "label": "Ambiguous Candidate Settlement Matches",
+      "count": 0,
+      "exposure_inr": "0.00",
+      "policy_sop": "SOP-2026-FEE-01",
+      "resolution_path": "Manual timestamp and acquirer reference link",
+      "present_in_batch": false,
+      "representative_case_id": null,
+      "representative_payment_id": null
+    }
+  ],
+  "recall_per_exception_class": {
+    "clean": 100.0,
+    "fee_mismatch": 100.0,
+    "missing_settlement": 100.0,
+    "amount_mismatch": 100.0,
+    "missing_bank_credit": 100.0,
+    "partial_refund_not_reflected": 100.0,
+    "duplicate_payment": 100.0
+  },
+  "confusion_matrix": {
+    "clean": {
+      "clean": 42
+    },
+    "fee_mismatch": {
+      "fee_mismatch": 3
+    },
+    "missing_settlement": {
+      "missing_settlement": 2
+    },
+    "amount_mismatch": {
+      "amount_mismatch": 4
+    },
+    "missing_bank_credit": {
+      "missing_bank_credit": 4
+    },
+    "partial_refund_not_reflected": {
+      "partial_refund_not_reflected": 3
+    },
+    "duplicate_payment": {
+      "duplicate_payment": 2
+    }
   }
 }

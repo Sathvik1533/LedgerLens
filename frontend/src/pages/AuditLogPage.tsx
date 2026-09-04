@@ -1,28 +1,26 @@
-import { useState, useMemo, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Search, Shield, RefreshCw, GitCommit, User } from 'lucide-react';
-import { Tooltip } from '../components/Tooltip';
-import { CustomSelect } from '../components/CustomSelect';
+import React, { useState, useMemo, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { fetchAllAuditTrail } from '../api/client';
 import { AuditEventItem } from '../types/api';
 
-
-export const AuditLogPage = () => {
+export const AuditLogPage: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedActor, setSelectedActor] = useState('all');
   const [selectedType, setSelectedType] = useState('all');
   const [events, setEvents] = useState<AuditEventItem[]>([]);
-  
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   const loadAudit = async () => {
-    
+    setIsLoading(true);
+    setError(null);
     try {
       const data = await fetchAllAuditTrail(100);
       setEvents(data || []);
-    } catch (err) {
-      console.error(err);
+    } catch (err: any) {
+      setError(err?.message || 'Failed to query immutable audit events.');
     } finally {
-      
+      setIsLoading(false);
     }
   };
 
@@ -30,104 +28,220 @@ export const AuditLogPage = () => {
     loadAudit();
   }, []);
 
+  // Dynamically extract distinct actors and event types
+  const distinctActors = useMemo(() => {
+    const s = new Set<string>();
+    events.forEach((e) => {
+      if (e.actor) s.add(e.actor);
+    });
+    return Array.from(s).sort();
+  }, [events]);
+
+  const distinctTypes = useMemo(() => {
+    const s = new Set<string>();
+    events.forEach((e) => {
+      if (e.event_type) s.add(e.event_type);
+    });
+    return Array.from(s).sort();
+  }, [events]);
+
   const filteredEvents = useMemo(() => {
-    let result = events;
-    if (searchQuery) result = result.filter(e => (e.case_id || "").includes(searchQuery) || (e.batch_id || "").includes(searchQuery));
-    if (selectedActor !== 'all') result = result.filter(e => e.actor === selectedActor);
-    if (selectedType !== 'all') result = result.filter(e => e.event_type === selectedType);
+    let result = [...events];
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase().trim();
+      result = result.filter(
+        (e) =>
+          (e.case_id && e.case_id.toLowerCase().includes(q)) ||
+          (e.batch_id && e.batch_id.toLowerCase().includes(q)) ||
+          (e.actor && e.actor.toLowerCase().includes(q)) ||
+          (e.event_type && e.event_type.toLowerCase().includes(q))
+      );
+    }
+    if (selectedActor !== 'all') {
+      result = result.filter((e) => e.actor === selectedActor);
+    }
+    if (selectedType !== 'all') {
+      result = result.filter((e) => e.event_type === selectedType);
+    }
     return result;
-  }, [searchQuery, selectedActor, selectedType]);
+  }, [events, searchQuery, selectedActor, selectedType]);
 
   return (
-    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="flex-1 p-6 lg:p-10 max-w-5xl mx-auto w-full font-sans">
-      <div className="flex items-center gap-2 mb-3">
-        <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-text-secondary border border-border px-2 py-0.5 rounded shadow-none bg-surface">05 &mdash; IMMUTABLE COMPLIANCE LEDGER</span>
-      </div>
-
-      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6 pb-6 border-b border-border mb-8">
-        <div>
-          <h1 className="text-4xl font-semibold font-display tracking-tight text-text-primary">The Story of the Ledger</h1>
-          <p className="text-sm text-text-secondary mt-2 max-w-2xl leading-relaxed">
-            This is not just a technical dump. This is the cryptographic story of every decision made in LedgerLens. Every human approval and machine resolution is permanently recorded here to ensure strict regulatory compliance.
+    <div className="w-full max-w-7xl mx-auto px-6 py-8 space-y-8 font-sans">
+      {/* 1. Masthead */}
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6 border-b border-rule pb-6">
+        <div className="space-y-1">
+          <div className="flex items-center gap-2 text-xs font-mono text-ink-secondary">
+            <span>IMMUTABLE COMPLIANCE LEDGER</span>
+            <span>&bull;</span>
+            <span className="text-ink font-semibold">Cryptographic Trail</span>
+          </div>
+          <h1 className="font-editorial text-3xl sm:text-4xl font-medium text-ink">
+            The chronological story of the ledger
+          </h1>
+          <p className="text-xs sm:text-sm text-ink-secondary font-sans max-w-2xl leading-relaxed">
+            Every deterministic match, automated exception flag, and human review determination is permanently recorded here. Events are append-only and cryptographically sequenced for audit compliance.
           </p>
         </div>
-        <div className="flex items-center gap-3 shrink-0">
-          <div className="px-3 py-1.5 bg-surface border border-border rounded text-xs font-mono text-text-secondary flex items-center gap-2">
-            <Shield className="w-3.5 h-3.5 text-resolved" /> Permanent Record
-          </div>
-          <button onClick={loadAudit} className="px-3 py-1.5 bg-surface border border-border rounded text-xs font-semibold text-text-primary shadow-none hover:bg-canvas transition-colors flex items-center gap-2">
-            <RefreshCw className="w-3.5 h-3.5" /> Refresh Audit
+
+        <div className="flex items-center gap-3">
+          <button
+            onClick={loadAudit}
+            disabled={isLoading}
+            className="px-3.5 py-2 border border-rule bg-surface hover:bg-canvas text-ink text-xs font-medium rounded-xs transition-colors"
+          >
+            {isLoading ? 'Querying...' : 'Refresh audit records'}
           </button>
         </div>
       </div>
 
-      <div className="flex flex-col md:flex-row gap-4 items-center mb-8 bg-surface p-4 rounded-xl border border-border shadow-subtle">
-        <div className="relative flex-1 w-full">
-          <Search className="w-4 h-4 text-text-secondary absolute left-3 top-1/2 -translate-y-1/2" />
+      {/* 2. Filter Controls */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs font-mono">
+        <div>
+          <label className="text-[10px] uppercase text-ink-secondary block mb-1">Search Audit Record</label>
           <input
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search by Case UUID, Batch ID, or Actor..."
-            className="w-full bg-surface border border-border rounded-md pl-9 pr-3 py-2 text-sm text-text-primary placeholder-ink-700/50 focus:outline-none focus:border-accent focus-visible:ring-2 focus-visible:ring-source-blue/20 focus-visible:border-accent transition-all shadow-none font-mono"
+            placeholder="Case UUID, batch, actor, event..."
+            className="w-full px-3 py-1.5 border border-rule bg-surface text-ink text-xs rounded-xs focus:outline-none focus:border-ink font-mono"
           />
         </div>
-        <div className="w-full md:w-48 shrink-0">
-          <CustomSelect
+
+        <div>
+          <label className="text-[10px] uppercase text-ink-secondary block mb-1">Filter by Actor</label>
+          <select
             value={selectedActor}
-            onChange={setSelectedActor}
-            options={[
-              { value: 'all', label: 'All Actors' },
-              { value: 'concurrent_reviewer_bob', label: 'Reviewer Bob' },
-              { value: 'concurrent_analyst_02', label: 'Analyst 02' }
-            ]}
-          />
+            onChange={(e) => setSelectedActor(e.target.value)}
+            className="w-full px-3 py-1.5 border border-rule bg-surface text-ink text-xs rounded-xs focus:outline-none focus:border-ink font-sans"
+          >
+            <option value="all">All actors ({distinctActors.length})</option>
+            {distinctActors.map((a) => (
+              <option key={a} value={a}>
+                {a}
+              </option>
+            ))}
+          </select>
         </div>
-        <div className="w-full md:w-48 shrink-0">
-          <CustomSelect
+
+        <div>
+          <label className="text-[10px] uppercase text-ink-secondary block mb-1">Filter by Event Type</label>
+          <select
             value={selectedType}
-            onChange={setSelectedType}
-            options={[
-              { value: 'all', label: 'All Event Types' },
-              { value: 'human_rejected', label: 'Human Rejected' },
-              { value: 'system_resolved', label: 'System Resolved' }
-            ]}
-          />
+            onChange={(e) => setSelectedType(e.target.value)}
+            className="w-full px-3 py-1.5 border border-rule bg-surface text-ink text-xs rounded-xs focus:outline-none focus:border-ink font-sans"
+          >
+            <option value="all">All event types ({distinctTypes.length})</option>
+            {distinctTypes.map((t) => (
+              <option key={t} value={t}>
+                {t}
+              </option>
+            ))}
+          </select>
         </div>
       </div>
 
-      <div className="space-y-4 relative before:absolute before:inset-0 before:ml-[19px] before:-translate-x-px before:h-full before:w-0.5 before:bg-gradient-to-b before:from-rule-300 before:via-rule-300 before:to-transparent">
-        <AnimatePresence>
-          {filteredEvents.map((evt) => (
-            <motion.div key={evt.id} initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} className="relative flex items-start gap-6 group">
-              <div className="w-10 h-10 rounded-full bg-surface border-2 border-border flex items-center justify-center z-10 group-hover:border-accent transition-colors shadow-none shrink-0 mt-1">
-                <GitCommit className="w-4 h-4 text-text-secondary group-hover:text-accent" />
-              </div>
-              <div className="flex-1 bg-surface border border-border rounded-xl p-5 shadow-none group-hover:shadow-none transition-shadow">
-                <div className="flex items-center justify-between mb-3">
-                  <div className="flex items-center gap-2">
-                    <Tooltip content="The system event type recorded in the database.">
-                      <span tabIndex={0} className="font-mono text-xs font-semibold text-critical focus-ring">{evt.event_type}</span>
-                    </Tooltip>
-                    <span className="text-rule-300">|</span>
-                    <span className="inline-flex items-center gap-1.5 text-xs text-text-secondary bg-surface px-2 py-0.5 rounded-full border border-border"><User className="w-3 h-3" /> {evt.actor}</span>
-                  </div>
-                  <span className="font-mono text-[10px] text-text-secondary">{new Date(evt.occurred_at).toLocaleString()}</span>
-                </div>
-                <div className="flex items-center gap-2 font-mono text-[11px] text-text-secondary">
-                  {evt.case_id && <span>Case: <span className="text-text-primary">{evt.case_id.substring(0,8)}</span></span>}
-                  {evt.case_id && evt.batch_id && <span className="text-rule-300">&rarr;</span>}
-                  {evt.batch_id && <span>Batch: <span className="text-text-primary">{evt.batch_id.substring(0,8)}</span></span>}
-                  <div className="flex-1" />
-                  {evt.previous_status && <span className="text-high font-semibold">{evt.previous_status}</span>}
-                  {evt.previous_status && evt.new_status && <span className="text-rule-300">&rarr;</span>}
-                  {evt.new_status && <span className="text-critical font-semibold">{evt.new_status}</span>}
-                </div>
-              </div>
-            </motion.div>
-          ))}
-        </AnimatePresence>
-      </div>
-    </motion.div>
+      {/* 3. Chronological Audit Ledger Table */}
+      {isLoading ? (
+        <div className="p-12 text-center border border-rule bg-surface rounded-xs font-mono text-xs text-ink-secondary">
+          Querying immutable audit sequence from database...
+        </div>
+      ) : error ? (
+        <div className="p-8 text-center border border-critical/40 bg-surface rounded-xs space-y-2">
+          <span className="text-xs font-mono text-critical block">{error}</span>
+          <button
+            onClick={loadAudit}
+            className="px-3 py-1 bg-ink text-canvas text-xs font-medium rounded-xs"
+          >
+            Retry
+          </button>
+        </div>
+      ) : filteredEvents.length === 0 ? (
+        <div className="p-12 text-center border border-rule bg-surface rounded-xs space-y-2">
+          <span className="font-editorial text-xl text-ink font-medium block">
+            No audit records match the query
+          </span>
+          <p className="text-xs font-sans text-ink-secondary">
+            Adjust search criteria or refresh to check for recent ledger entries.
+          </p>
+        </div>
+      ) : (
+        <div className="border border-rule bg-surface rounded-xs overflow-hidden shadow-subtle">
+          <div className="p-4 border-b border-rule flex justify-between items-center bg-canvas/60 text-xs font-mono text-ink-secondary">
+            <span>CHRONOLOGICAL EVENT LOG</span>
+            <span>Displaying {filteredEvents.length} recorded events</span>
+          </div>
+
+          <table className="w-full text-left border-collapse text-xs">
+            <thead>
+              <tr className="border-b border-rule bg-canvas/80 text-[11px] font-mono text-ink-secondary">
+                <th className="py-2.5 px-4 font-normal">Event Type</th>
+                <th className="py-2.5 px-4 font-normal">Actor / Signer</th>
+                <th className="py-2.5 px-4 font-normal">Case Dossier Reference</th>
+                <th className="py-2.5 px-4 font-normal">Status Transition</th>
+                <th className="py-2.5 px-4 font-normal text-right">Recorded Timestamp</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-rule/60 font-mono text-[11px]">
+              {filteredEvents.map((evt) => {
+                const isHuman = evt.event_type.startsWith('human_') || evt.actor !== 'system';
+
+                return (
+                  <tr key={evt.id} className="h-[42px] hover:bg-canvas/40 transition-colors">
+                    <td className="py-2.5 px-4 whitespace-nowrap">
+                      <div className="flex items-center gap-2">
+                        <span className={`w-1.5 h-1.5 rounded-full ${isHuman ? 'bg-ink' : 'bg-rule-strong'}`} />
+                        <span className="font-semibold text-ink font-sans">
+                          {evt.event_type.split('_').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}
+                        </span>
+                      </div>
+                    </td>
+
+                    <td className="py-2.5 px-4 whitespace-nowrap text-ink font-sans">
+                      {evt.actor}
+                    </td>
+
+                    <td className="py-2 px-4 whitespace-nowrap">
+                      {evt.case_id ? (
+                        <Link
+                          to={`/app/case/${evt.case_id}`}
+                          className="text-link hover:underline font-mono"
+                          title="Open case dossier"
+                        >
+                          {evt.case_id.slice(0, 10)}...
+                        </Link>
+                      ) : (
+                        <span className="text-ink-muted">System Batch</span>
+                      )}
+                    </td>
+
+                    <td className="py-2 px-4 whitespace-nowrap">
+                      {evt.previous_status && evt.new_status ? (
+                        <span className="flex items-center gap-1.5">
+                          <span className="text-ink-secondary">{evt.previous_status}</span>
+                          <span className="text-ink-muted">&rarr;</span>
+                          <span className="text-ledger-green font-semibold">{evt.new_status}</span>
+                        </span>
+                      ) : (
+                        <span className="text-ink-muted">—</span>
+                      )}
+                    </td>
+
+                    <td className="py-2 px-4 text-right whitespace-nowrap text-ink-secondary">
+                      {new Date(evt.occurred_at).toLocaleString('en-IN', {
+                        dateStyle: 'short',
+                        timeStyle: 'medium',
+                      })}
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </div>
   );
 };
+
+export default AuditLogPage;

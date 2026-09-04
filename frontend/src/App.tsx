@@ -4,6 +4,10 @@ import Lenis from 'lenis';
 import { TooltipProvider } from './components/Tooltip';
 
 
+import { AuthProvider } from './context/AuthContext';
+import { ProtectedRoute } from './components/ProtectedRoute';
+import { LoginPage } from './pages/auth/LoginPage';
+
 // Layouts
 import MarketingLayout from './layouts/MarketingLayout';
 import AppLayout from './layouts/AppLayout';
@@ -24,6 +28,16 @@ import { IngestionFeedsPage } from './pages/IngestionFeedsPage';
 import { AuditLogPage } from './pages/AuditLogPage';
 import { PolicyKnowledgePage } from './pages/PolicyKnowledgePage';
 import SettingsPage from './pages/SettingsPage';
+
+// Visual Concept Review Gate (Document 44)
+import ConceptReviewGatePage from './pages/concepts/ConceptReviewGatePage';
+import ConceptALanding from './pages/concepts/ConceptALanding';
+import ConceptACase from './pages/concepts/ConceptACase';
+import ConceptBLanding from './pages/concepts/ConceptBLanding';
+import ConceptBCase from './pages/concepts/ConceptBCase';
+import ConceptCLanding from './pages/concepts/ConceptCLanding';
+import ConceptCCase from './pages/concepts/ConceptCCase';
+
 
 function App() {
   useEffect(() => {
@@ -49,34 +63,78 @@ function App() {
 
   return (
     <TooltipProvider>
-    <BrowserRouter>
-      <Routes>
-        {/* Marketing Site (Public) */}
-        <Route element={<MarketingLayout />}>
-          <Route path="/" element={<LandingPage />} />
-          <Route path="/how-it-works" element={<HowItWorksPage />} />
-          <Route path="/evidence" element={<EvidencePage />} />
-          <Route path="/evaluation" element={<EvaluationPage />} />
-          <Route path="/docs" element={<DocsPage />} />
-          <Route path="/about" element={<AboutPage />} />
-        </Route>
+      <AuthProvider>
+        <BrowserRouter>
+          <Routes>
+            {/* Public Login */}
+            <Route path="/login" element={<LoginPage />} />
 
-        {/* App Shell (Authenticated Financial Control Room) */}
-        <Route path="/app" element={<AppLayout />}>
-          <Route index element={<Navigate to="/app/queue" replace />} />
-          <Route path="dashboard" element={<DashboardPage />} />
-          <Route path="queue" element={<QueuePage />} />
-          <Route path="case/:caseId" element={<CasePage />} />
-          <Route path="ingestion" element={<IngestionFeedsPage />} />
-          <Route path="audit" element={<AuditLogPage />} />
-          <Route path="policies" element={<PolicyKnowledgePage />} />
-          <Route path="settings" element={<SettingsPage />} />
-        </Route>
+            {/* Marketing Site (Public pages) */}
+            <Route element={<MarketingLayout />}>
+              <Route path="/" element={<LandingPage />} />
+              <Route path="/how-it-works" element={<HowItWorksPage />} />
+              <Route path="/docs" element={<DocsPage />} />
+              <Route path="/about" element={<AboutPage />} />
 
-        {/* Fallback redirect */}
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
-    </BrowserRouter>
+              {/* Protected Evaluation & Evidence */}
+              <Route
+                path="/evidence"
+                element={
+                  <ProtectedRoute>
+                    <EvidencePage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/evaluation"
+                element={
+                  <ProtectedRoute>
+                    <EvaluationPage />
+                  </ProtectedRoute>
+                }
+              />
+            </Route>
+
+            {/* App Shell (Authenticated Financial Control Room) */}
+            <Route
+              path="/app"
+              element={
+                <ProtectedRoute>
+                  <AppLayout />
+                </ProtectedRoute>
+              }
+            >
+              <Route index element={<Navigate to="/app/queue" replace />} />
+              <Route path="dashboard" element={<DashboardPage />} />
+              <Route path="queue" element={<QueuePage />} />
+              <Route path="case/:caseId" element={<CasePage />} />
+              <Route path="ingestion" element={<IngestionFeedsPage />} />
+              <Route path="audit" element={<AuditLogPage />} />
+              <Route path="policies" element={<PolicyKnowledgePage />} />
+              <Route
+                path="settings"
+                element={
+                  <ProtectedRoute requireAdmin>
+                    <SettingsPage />
+                  </ProtectedRoute>
+                }
+              />
+            </Route>
+
+            {/* Concept Review Gate Routes (Document 44 Gate) */}
+            <Route path="/concepts" element={<ConceptReviewGatePage />} />
+            <Route path="/concept/a" element={<ConceptALanding />} />
+            <Route path="/concept/a/case" element={<ConceptACase />} />
+            <Route path="/concept/b" element={<ConceptBLanding />} />
+            <Route path="/concept/b/case" element={<ConceptBCase />} />
+            <Route path="/concept/c" element={<ConceptCLanding />} />
+            <Route path="/concept/c/case" element={<ConceptCCase />} />
+
+            {/* Fallback redirect */}
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+        </BrowserRouter>
+      </AuthProvider>
     </TooltipProvider>
   );
 }

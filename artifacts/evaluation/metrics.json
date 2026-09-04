@@ -1,6 +1,6 @@
 {
   "benchmark_name": "reconciliation_evaluation_benchmark",
-  "timestamp_utc": null,
+  "timestamp_utc": "2026-09-04T13:02:16.154401+00:00",
   "dataset": {
     "total_records": 60,
     "seed": 42,
@@ -12,8 +12,8 @@
     ]
   },
   "performance": {
-    "elapsed_seconds": 0.0,
-    "throughput_records_per_sec": 0.0
+    "elapsed_seconds": 0.001293,
+    "throughput_records_per_sec": 46388.75
   },
   "accuracy": {
     "match_rate_pct": 70.0,
@@ -26,8 +26,38 @@
     "auto_reconciled": 42,
     "needs_review": 18,
     "unresolved": 0,
-    "per_class_recall": {},
-    "confusion_matrix": {}
+    "per_class_recall": {
+      "clean": 100.0,
+      "fee_mismatch": 100.0,
+      "missing_settlement": 100.0,
+      "amount_mismatch": 100.0,
+      "missing_bank_credit": 100.0,
+      "partial_refund_not_reflected": 100.0,
+      "duplicate_payment": 100.0
+    },
+    "confusion_matrix": {
+      "clean": {
+        "clean": 42
+      },
+      "fee_mismatch": {
+        "fee_mismatch": 3
+      },
+      "missing_settlement": {
+        "missing_settlement": 2
+      },
+      "amount_mismatch": {
+        "amount_mismatch": 4
+      },
+      "missing_bank_credit": {
+        "missing_bank_credit": 4
+      },
+      "partial_refund_not_reflected": {
+        "partial_refund_not_reflected": 3
+      },
+      "duplicate_payment": {
+        "duplicate_payment": 2
+      }
+    }
   },
   "financial_summary": {
     "total_amount_reconciled_inr": "159933.00",

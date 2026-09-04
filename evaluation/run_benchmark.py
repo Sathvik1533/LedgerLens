@@ -187,20 +187,65 @@ def run_reconciliation_benchmark(
 
     total_amount_reconciled = sum(r.payment_amount for r in results if _get_val(r.decision_status) == "auto_reconciled")
     total_amount_at_risk = sum(r.payment_amount for r in results if _get_val(r.decision_status) == "needs_review")
+    total_reconciled_amount = sum(r.payment_amount for r in results if _get_val(r.decision_status) == "auto_reconciled")
+    total_risk_amount = sum(r.payment_amount for r in results if _get_val(r.decision_status) == "needs_review")
 
     per_class_recall = {}
     for exc, counts in class_stats.items():
         tp, fn = counts["tp"], counts["fn"]
         per_class_recall[exc] = round((tp / (tp + fn)) * 100, 2) if (tp + fn) > 0 else 0.0
 
+    run_id = f"eval_run_{datetime.now(timezone.utc).strftime('%Y%m%d_%H%M%S')}_s{seed}"
+
+    # Compute comprehensive breakdown for all 8 mandatory exception classes
+    all_8_exceptions = [
+        ("missing_bank_credit", "Missing Bank Credit Verification", "SOP-2026-BNK-03", "Nodal bank ledger search and UTR clearing claim"),
+        ("amount_mismatch", "Settlement Payout Shortfall", "SOP-2026-FEE-01", "Gateway fee clawback dispute or approved commercial waiver"),
+        ("partial_refund_not_reflected", "Customer Refund Unadjusted in Payout", "SOP-2026-ESC-02", "Clawback unadjusted refund in next settlement batch"),
+        ("fee_mismatch", "Commercial Fee Tier Deviation", "SOP-2026-FEE-01", "Demand fee reconciliation credit note from gateway"),
+        ("duplicate_payment", "Duplicate Customer Charge Detected", "SOP-102", "Initiate customer reversal refund for duplicate capture"),
+        ("missing_settlement", "Captured Gross Unremitted by Gateway", "SOP-2026-ESC-02", "Escalate T+2 SLA breach to payment gateway operations"),
+        ("duplicate_bank_credit", "Duplicate Bank Statement Credit", "SOP-204", "Audit nodal bank statement journal and reverse shadow credit"),
+        ("ambiguous_match", "Ambiguous Candidate Settlement Matches", "SOP-2026-FEE-01", "Manual timestamp and acquirer reference link"),
+    ]
+
+    exception_categories = []
+    for exc_code, label, sop, resolution in all_8_exceptions:
+        matching_cases = [c for c in detailed_cases if c["predicted_exception_type"] == exc_code and c["predicted_status"] == "needs_review"]
+        amt = sum((Decimal(c["payment_amount"]) for c in matching_cases), Decimal("0.00"))
+        first_case = matching_cases[0] if matching_cases else None
+        exception_categories.append({
+            "category": exc_code,
+            "label": label,
+            "count": len(matching_cases),
+            "exposure_inr": f"{amt:.2f}",
+            "policy_sop": sop,
+            "resolution_path": resolution,
+            "present_in_batch": len(matching_cases) > 0,
+            "representative_case_id": first_case["case_id"] if first_case else None,
+            "representative_payment_id": first_case["payment_id"] if first_case else None,
+        })
+
+    # Sort so active exceptions are first (descending count), followed by 0-count modes
+    exception_categories.sort(key=lambda x: (x["count"], float(x["exposure_inr"])), reverse=True)
+
     report_payload = {
         "benchmark_name": "reconciliation_evaluation_benchmark",
+        "has_run": True,
+        "run_id": run_id,
         "timestamp_utc": datetime.now(timezone.utc).isoformat(),
         "dataset_size": len(results),
         "seed": seed,
         "elapsed_seconds": round(elapsed_seconds, 6),
         "throughput_records_per_sec": throughput_rps,
+        "throughput_unit": "payment records/sec",
+        "throughput_command": f"python evaluation/run_benchmark.py --size {total_records} --seed {seed}",
+        "throughput_environment": "Apple Silicon local test harness (PostgreSQL + Python Decimal)",
         "match_rate_percentage": match_rate_pct,
+        "match_rate_formula": f"{auto_reconciled} auto_reconciled ÷ {len(results)} records_processed × 100 = {match_rate_pct:.2f}%",
+        "denominator_definition": "Total valid normalized payment records processed across 4 counterparty streams in the synthetic evaluation batch.",
+        "data_scope": f"Synthetic multi-source dataset ({len(payments)} payments, {len(bank_credits)} bank credits, {len(settlements)} settlements, {len(refunds)} refunds) with hidden ground truth",
+        "deterministic_vs_ai": "Deterministic rules execute 100% of mathematical matching, parity verification, and exception typing. AI (grounded RAG) acts as an advisory assistant retrieving governing SOP policies without authority to approve or move funds.",
         "precision_auto_reconcile": precision_auto,
         "recall_auto_reconcile": recall_auto,
         "false_approvals": fp_auto,
@@ -210,9 +255,10 @@ def run_reconciliation_benchmark(
             "auto_reconciled_count": auto_reconciled,
             "needs_review_count": needs_review,
             "unresolved_count": unresolved,
-            "total_amount_reconciled_inr": str(total_amount_reconciled),
-            "total_amount_at_risk_inr": str(total_amount_at_risk),
+            "total_amount_reconciled_inr": str(total_reconciled_amount),
+            "total_amount_at_risk_inr": str(total_risk_amount),
         },
+        "exception_categories": exception_categories,
         "recall_per_exception_class": per_class_recall,
         "confusion_matrix": confusion_matrix,
     }

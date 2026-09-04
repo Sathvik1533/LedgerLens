@@ -16,6 +16,7 @@ import backend.app.models.settlement
 import backend.app.models.bank_credit
 import backend.app.models.reconciliation
 import backend.app.models.review
+import backend.app.models.user
 
 config = context.config
 

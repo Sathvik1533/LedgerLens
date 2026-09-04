@@ -1,214 +1,184 @@
-import React, { useState } from 'react';
-import { motion } from 'framer-motion';
-import { Tooltip } from '../components/Tooltip';
-import {
-  CheckCircle2,
-  Lock,
-  Cpu,
-  Receipt,
-  Server,
-} from 'lucide-react';
+import React, { useState, useEffect } from 'react';
 
 export const SettingsPage: React.FC = () => {
   const [feeRate, setFeeRate] = useState('2.00');
   const [gstRate, setGstRate] = useState('18.00');
-  const [cosineFloor, setCosineFloor] = useState('0.35');
+  const [tolerance, setTolerance] = useState('0.01');
+  const [policyThreshold, setPolicyThreshold] = useState('0.35');
   const [isSaved, setIsSaved] = useState(false);
+
+  useEffect(() => {
+    const savedFee = localStorage.getItem('ll_fee_rate');
+    const savedGst = localStorage.getItem('ll_gst_rate');
+    const savedTol = localStorage.getItem('ll_tolerance');
+    const savedThresh = localStorage.getItem('ll_policy_threshold');
+    if (savedFee) setFeeRate(savedFee);
+    if (savedGst) setGstRate(savedGst);
+    if (savedTol) setTolerance(savedTol);
+    if (savedThresh) setPolicyThreshold(savedThresh);
+  }, []);
 
   const handleSave = (e: React.FormEvent) => {
     e.preventDefault();
+    localStorage.setItem('ll_fee_rate', feeRate);
+    localStorage.setItem('ll_gst_rate', gstRate);
+    localStorage.setItem('ll_tolerance', tolerance);
+    localStorage.setItem('ll_policy_threshold', policyThreshold);
     setIsSaved(true);
-    setTimeout(() => setIsSaved(false), 2000);
+    setTimeout(() => setIsSaved(false), 3000);
   };
 
   return (
-    <motion.div initial={{opacity:0, y:10}} animate={{opacity:1, y:0}} className="w-full max-w-6xl mx-auto p-6 lg:p-10 space-y-8 font-sans">
-      {/* Header Strip */}
-      <div className="space-y-2 border-b border-border pb-4">
-        <div className="flex items-center gap-2">
-          <span className="text-[11px] font-mono font-bold uppercase tracking-widest text-accent bg-accent/10 border border-accent px-2.5 py-0.5 rounded-full">
-            07 &mdash; SYSTEM CONFIGURATION & DATA CONTRACTS
+    <div className="w-full max-w-5xl mx-auto px-6 py-8 space-y-10 font-sans">
+      {/* 1. Masthead */}
+      <div className="space-y-1 border-b border-rule pb-6">
+        <div className="flex items-center gap-2 text-xs font-mono text-ink-secondary">
+          <span>OPERATIONAL GOVERNANCE</span>
+          <span>&bull;</span>
+          <span className="text-ink font-semibold">Contract Parameters</span>
+        </div>
+        <h1 className="font-editorial text-3xl sm:text-4xl font-medium text-ink">
+          Contract settings & reconciliation invariants
+        </h1>
+        <p className="text-xs sm:text-sm text-ink-secondary font-sans max-w-2xl leading-relaxed">
+          Define commercial gateway fee structures, statutory tax rates, and mathematical parity thresholds applied during continuous batch reconciliation.
+        </p>
+      </div>
+
+      {/* 2. Typographic Formula Centerpiece */}
+      <div className="border border-rule bg-surface p-8 rounded-xs space-y-4 shadow-subtle">
+        <span className="text-[11px] font-mono uppercase text-ink-secondary block tracking-wider">
+          Contractual Settlement Invariant
+        </span>
+        <div className="font-editorial text-2xl sm:text-3xl text-ink leading-relaxed">
+          Net Settlement = Gross Payment &minus; [Fee ({feeRate}%) + GST ({gstRate}% of Fee)] &minus; Customer Refunds
+        </div>
+        <div className="text-xs font-mono text-ink-secondary border-t border-rule/60 pt-3 flex flex-wrap justify-between items-center gap-2">
+          <span>Discrepancy threshold: |Reported Net &minus; Expected Net| &gt; ₹{tolerance}</span>
+          <span className="text-ledger-green font-medium">Float-Free Decimal Arithmetic Enforced</span>
+        </div>
+      </div>
+
+      {/* 3. Contract Rate Parameters Form */}
+      <form onSubmit={handleSave} className="border border-rule bg-surface p-8 rounded-xs space-y-6 shadow-subtle">
+        <div className="border-b border-rule pb-3 flex justify-between items-center">
+          <span className="font-editorial text-xl font-medium text-ink">
+            Commercial agreement terms
           </span>
-          <span className="text-text-secondary">&bull;</span>
-          <span className="text-xs text-text-secondary font-mono">FINANCIAL RECONCILIATION ENGINE</span>
+          <span className="text-[11px] font-mono text-ink-secondary">
+            Contract Ref: SOP-2026-COMM-01
+          </span>
         </div>
 
-        <div className="flex flex-col sm:flex-row sm:items-baseline sm:justify-between gap-2">
-          <h1 className="text-xl sm:text-2xl font-bold text-text-primary tracking-tight">
-            Settings & Contracts
-          </h1>
-          <div className="text-xs text-text-secondary font-sans flex items-center gap-2">
-            <span className="text-resolved font-mono flex items-center gap-1.5">
-              <CheckCircle2 className="w-3.5 h-3.5" /> All 4 Data Contracts Validated
-            </span>
-          </div>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Left Column: Contractual Formulas */}
-        <div className="lg:col-span-2 space-y-6">
-          <form onSubmit={handleSave} className="control-panel rounded-xl p-6 space-y-5 shadow-none">
-            <div className="flex items-center justify-between border-b border-border pb-3">
-              <div className="flex items-center gap-2">
-                <Receipt className="w-4 h-4 text-accent" />
-                <h3 className="text-sm font-semibold text-text-primary uppercase tracking-wider">
-                  Contractual Fee & Tax Formula
-                </h3>
-              </div>
-              <span className="text-xs font-mono text-text-secondary">SOP-2026-FEE-01</span>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
-              <div className="space-y-1.5">
-                <label className="block font-medium text-text-primary">
-                  Standard Gateway Fee Rate (%)
-                </label>
-                <input
-                  type="text"
-                  value={feeRate}
-                  onChange={(e) => setFeeRate(e.target.value)}
-                  className="w-full bg-canvas border border-border focus:border-accent rounded p-2.5 text-text-primary font-mono text-xs focus-ring"
-                />
-                <p className="text-[11px] text-text-secondary">Applied to gross payment capture amount</p>
-              </div>
-
-              <div className="space-y-1.5">
-                <label className="block font-medium text-text-primary">
-                  GST on Processing Fee (%)
-                </label>
-                <input
-                  type="text"
-                  value={gstRate}
-                  onChange={(e) => setGstRate(e.target.value)}
-                  className="w-full bg-canvas border border-border focus:border-accent rounded p-2.5 text-text-primary font-mono text-xs focus-ring"
-                />
-                <p className="text-[11px] text-text-secondary">Statutory goods & services tax rate</p>
-              </div>
-            </div>
-
-            <div className="bg-canvas border border-border rounded-lg p-3.5 text-xs font-mono text-text-secondary space-y-1">
-              <div className="text-text-primary font-semibold mb-1">Contractual Net Settlement Invariant:</div>
-              <div>Net = Gross &minus; [Fee (2%) + GST (18% of Fee)] &minus; Customer Refunds</div>
-              <div className="text-accent text-[11px] pt-1">&Delta; Discrepancy flagged if |Reported Net &minus; Expected Net| &gt; ₹0.01</div>
-            </div>
-
-            <div className="flex items-center justify-between pt-2">
-              <div className="flex items-center gap-2">
-                {isSaved && (
-                  <span className="text-xs text-resolved font-mono flex items-center gap-1">
-                    <CheckCircle2 className="w-3.5 h-3.5" /> Parameters Saved
-                  </span>
-                )}
-              </div>
-              <button
-                type="submit"
-                className="px-4 py-2 bg-surface-raised hover:bg-ink-700 text-text-primary font-semibold focus-ring text-xs rounded transition shadow-none"
-              >
-                Update Contract Rates
-              </button>
-            </div>
-          </form>
-
-          {/* RAG Grounding Floor */}
-          <div className="control-panel rounded-xl p-6 space-y-4 shadow-none">
-            <div className="flex items-center justify-between border-b border-border pb-3">
-              <div className="flex items-center gap-2">
-                <Cpu className="w-4 h-4 text-cyan-400" />
-                <h3 className="text-sm font-semibold text-text-primary uppercase tracking-wider">
-                  Evidence Confidence Settings
-                </h3>
-              </div>
-              
-            </div>
-
-            <div className="space-y-3 text-xs">
-              <div className="flex justify-between items-center">
-                <label className="text-text-primary font-medium">Minimum Policy Confidence</label>
-                <span className="font-mono text-text-primary bg-canvas px-2 py-0.5 rounded border border-border">
-                  Score &ge; {cosineFloor}
-                </span>
-              </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 text-xs">
+          {/* Fee Rate */}
+          <div className="space-y-1.5">
+            <label className="text-[11px] font-mono uppercase text-ink-secondary block">
+              Standard Gateway Fee Rate (%)
+            </label>
+            <div className="relative">
               <input
-                type="range"
-                min="0.10"
-                max="0.80"
-                step="0.05"
-                value={cosineFloor}
-                onChange={(e) => setCosineFloor(e.target.value)}
-                className="w-full accent-blue-500 cursor-pointer"
+                type="number"
+                step="0.01"
+                min="0"
+                max="100"
+                value={feeRate}
+                onChange={(e) => setFeeRate(e.target.value)}
+                required
+                className="w-full px-3.5 py-2 border border-rule bg-canvas text-ink font-mono text-xs rounded-xs focus:outline-none focus:border-ink"
               />
-              <p className="text-[11px] text-text-secondary">
-                Policy matches below this confidence level trigger a fallback to manual inspection.
-              </p>
+              <span className="absolute right-3 top-1/2 -translate-y-1/2 font-mono text-ink-secondary text-xs">%</span>
             </div>
+            <p className="text-[11px] text-ink-secondary">
+              Applied directly to merchant gross payment captured.
+            </p>
+          </div>
+
+          {/* GST Rate */}
+          <div className="space-y-1.5">
+            <label className="text-[11px] font-mono uppercase text-ink-secondary block">
+              GST on Gateway Processing Fee (%)
+            </label>
+            <div className="relative">
+              <input
+                type="number"
+                step="0.01"
+                min="0"
+                max="100"
+                value={gstRate}
+                onChange={(e) => setGstRate(e.target.value)}
+                required
+                className="w-full px-3.5 py-2 border border-rule bg-canvas text-ink font-mono text-xs rounded-xs focus:outline-none focus:border-ink"
+              />
+              <span className="absolute right-3 top-1/2 -translate-y-1/2 font-mono text-ink-secondary text-xs">%</span>
+            </div>
+            <p className="text-[11px] text-ink-secondary">
+              Statutory tax levied exclusively on the processing fee amount.
+            </p>
+          </div>
+
+          {/* Tolerance */}
+          <div className="space-y-1.5">
+            <label className="text-[11px] font-mono uppercase text-ink-secondary block">
+              Discrepancy Variance Tolerance (₹)
+            </label>
+            <div className="relative">
+              <input
+                type="number"
+                step="0.01"
+                min="0"
+                max="10"
+                value={tolerance}
+                onChange={(e) => setTolerance(e.target.value)}
+                required
+                className="w-full px-3.5 py-2 border border-rule bg-canvas text-ink font-mono text-xs rounded-xs focus:outline-none focus:border-ink"
+              />
+              <span className="absolute right-3 top-1/2 -translate-y-1/2 font-mono text-ink-secondary text-xs">₹</span>
+            </div>
+            <p className="text-[11px] text-ink-secondary">
+              Any settlement variance exceeding this amount flags an exception case.
+            </p>
+          </div>
+
+          {/* Policy Confidence Floor */}
+          <div className="space-y-1.5">
+            <label className="text-[11px] font-mono uppercase text-ink-secondary block">
+              Policy Match Threshold (Grounding Floor)
+            </label>
+            <input
+              type="number"
+              step="0.01"
+              min="0.1"
+              max="0.9"
+              value={policyThreshold}
+              onChange={(e) => setPolicyThreshold(e.target.value)}
+              required
+              className="w-full px-3.5 py-2 border border-rule bg-canvas text-ink font-mono text-xs rounded-xs focus:outline-none focus:border-ink"
+            />
+            <p className="text-[11px] text-ink-secondary">
+              Minimum semantic similarity required before policy citations are surfaced.
+            </p>
           </div>
         </div>
 
-        {/* Right Column: Database & Concurrency Invariants */}
-        <div className="space-y-6">
-          <div className="control-panel rounded-xl p-6 space-y-4 shadow-none">
-            <div className="flex items-center gap-2 border-b border-border pb-3">
-              <Lock className="w-4 h-4 text-resolved" />
-              <h3 className="text-sm font-semibold text-text-primary uppercase tracking-wider">
-                System Protections
-              </h3>
-            </div>
-
-            <div className="space-y-3 text-xs">
-              <div className="p-3 bg-canvas border border-border rounded">
-                <div className="font-semibold text-text-primary">Review Overwrite Protection</div>
-                <div className="text-text-secondary text-[11px] mt-0.5">
-                  Prevents one reviewer from overwriting a newer decision if they both open the case at the same time.
-                </div>
-              </div>
-
-              <div className="p-3 bg-canvas border border-border rounded">
-                <div className="font-semibold text-text-primary">Duplicate File Prevention</div>
-                <div className="text-text-secondary text-[11px] mt-0.5">
-                  Ensures that uploading the same file twice does not create duplicate financial records.
-                </div>
-              </div>
-
-              <div className="p-3 bg-canvas border border-border rounded">
-                <div className="font-semibold text-text-primary">Mathematical Accuracy</div>
-                <div className="text-text-secondary text-[11px] mt-0.5">
-                  The system uses exact penny-level math for all calculations instead of approximations, preventing invisible rounding errors.
-                </div>
-              </div>
-            </div>
+        <div className="border-t border-rule pt-4 flex flex-wrap justify-between items-center gap-4">
+          <div className="text-[11px] font-mono text-ink-secondary">
+            {isSaved ? (
+              <span className="text-ledger-green font-medium">✓ Contract parameters updated and stored in operator session</span>
+            ) : (
+              <span>Values persist across browser sessions</span>
+            )}
           </div>
 
-          <div className="control-panel rounded-xl p-6 space-y-4 shadow-none">
-            <div className="flex items-center gap-2 border-b border-border pb-3">
-              <Server className="w-4 h-4 text-accent" />
-              <h3 className="text-sm font-semibold text-text-primary uppercase tracking-wider">
-                Technical Details
-              </h3>
-            </div>
-
-            <div className="space-y-2.5 text-xs font-mono">
-              <div className="flex justify-between text-text-secondary">
-                <span>Configured Target DB:</span>
-                <span className="text-resolved font-semibold">PostgreSQL 16</span>
-              </div>
-              <div className="flex justify-between text-text-secondary">
-                <span>Backend Framework:</span>
-                <span className="text-text-primary">FastAPI 0.115+</span>
-              </div>
-              <div className="flex justify-between text-text-secondary">
-                <span>Vector Extension:</span>
-                <span className="text-text-primary">pgvector 0.7+</span>
-              </div>
-              <div className="flex justify-between text-text-secondary">
-                <span>Supported Feeds (Configured):</span>
-                <span className="text-resolved">4 Active</span>
-              </div>
-            </div>
-          </div>
+          <button
+            type="submit"
+            className="px-5 py-2.5 bg-ink hover:bg-ink/90 text-canvas font-medium text-xs rounded-xs transition-colors"
+          >
+            Update contract rates
+          </button>
         </div>
-      </div>
-    </motion.div>
+      </form>
+    </div>
   );
 };
 

@@ -1,72 +1,192 @@
-import { motion } from 'framer-motion';
-import { Database, Link, Scale, Search, Key, Box } from 'lucide-react';
-
-const STAGGER = {
-  hidden: { opacity: 0 },
-  show: { opacity: 1, transition: { staggerChildren: 0.1 } }
-};
-const FADE_UP = {
-  hidden: { opacity: 0, y: 15 },
-  show: { opacity: 1, y: 0, transition: { type: "spring" as const, stiffness: 300, damping: 24 } }
-};
+import { Link } from 'react-router-dom';
 
 export default function EvidencePage() {
-  const sources = [
-    { title: 'Payments Capture', desc: 'Internal system of truth for original transaction intent and requested amount.', icon: Database },
-    { title: 'Gateway Settlements', desc: 'External payload from Razorpay/Stripe detailing exact disbursed funds and MDR fees.', icon: Link },
-    { title: 'Bank Statement Credits', desc: 'Immutable ground truth of actual fiat arriving in the corporate bank account.', icon: Box },
-    { title: 'Refund Log', desc: 'Internal ledger of processed returns requiring corresponding deduction in settlement.', icon: Scale }
-  ];
-
   return (
-    <div className="bg-canvas min-h-screen pt-32 pb-24 px-6 overflow-hidden relative">
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,#C9C5BC20_1px,transparent_1px),linear-gradient(to_bottom,#C9C5BC20_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_60%_at_50%_0%,#000_70%,transparent_100%)] pointer-events-none" />
-      
-      <div className="max-w-5xl mx-auto relative z-10">
-        <motion.div variants={STAGGER} initial="hidden" animate="show" className="mb-20 text-center">
-          <motion.div variants={FADE_UP} className="inline-flex items-center gap-2 mb-6">
-             <span className="text-[10px] font-mono tracking-widest text-text-secondary uppercase border border-border px-3 py-1 rounded-full bg-surface shadow-none">
-              Data Model
+    <div className="w-full max-w-5xl mx-auto px-6 py-12 md:py-20 space-y-16 font-sans">
+      {/* 1. Header */}
+      <div className="space-y-4 max-w-2xl">
+        <span className="text-xs font-mono uppercase tracking-wider text-ink-secondary block">
+          TRANSPARENT MONEY COMMUNICATION
+        </span>
+        <h1 className="font-editorial text-4xl sm:text-5xl font-medium text-ink leading-tight">
+          The four-source evidence model
+        </h1>
+        <p className="text-base sm:text-lg text-ink-secondary font-normal leading-relaxed">
+          Reconciliation failure occurs when organizations rely on internal databases without cross-referencing external banking proof. Here is how LedgerLens verifies truth across all four financial counterparties.
+        </p>
+      </div>
+
+      {/* 2. Step-by-Step Calculation Walkthrough */}
+      <div className="border border-rule bg-surface p-8 rounded-xs space-y-6 shadow-subtle">
+        <div className="border-b border-rule pb-3">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-mono text-ink-secondary uppercase tracking-wider block">
+              Mathematical Parity Walkthrough
             </span>
-          </motion.div>
-          <motion.h1 variants={FADE_UP} className="text-5xl md:text-6xl text-text-primary font-display font-medium tracking-tight mb-6">
-            Multi-Source Evidence
-          </motion.h1>
-          <motion.p variants={FADE_UP} className="text-xl text-text-secondary font-sans max-w-2xl mx-auto leading-relaxed">
-            LedgerLens strictly enforces deterministic 4-way matching. We do not use LLMs to perform arithmetic or guess linkages.
-          </motion.p>
-        </motion.div>
+            <span className="px-1.5 py-0.5 rounded-xs bg-ink/5 border border-rule text-[10px] font-mono text-ink-secondary uppercase">
+              Illustrative Specimen
+            </span>
+          </div>
+          <h3 className="font-editorial text-2xl font-medium text-ink mt-0.5">
+            How a clean ₹10,000 transaction clears
+          </h3>
+        </div>
 
-        <motion.div variants={STAGGER} initial="hidden" whileInView="show" viewport={{ once: true }} className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-16">
-          {sources.map((src, i) => (
-            <motion.div key={i} variants={FADE_UP} className="bg-surface border border-border rounded-2xl p-8 shadow-none hover:shadow-none hover:border-accent/30 transition-all group">
-              <div className="w-12 h-12 bg-surface rounded-full flex items-center justify-center mb-6 group-hover:bg-accent/10 transition-colors">
-                <src.icon className="w-5 h-5 text-text-primary group-hover:text-accent" />
-              </div>
-              <h3 className="text-xl text-text-primary font-display font-medium mb-2">{src.title}</h3>
-              <p className="text-text-secondary text-sm leading-relaxed">{src.desc}</p>
-            </motion.div>
-          ))}
-        </motion.div>
-
-        <motion.div variants={FADE_UP} initial="hidden" whileInView="show" viewport={{ once: true }} className="bg-surface-raised text-paper-0 border border-ink-700 rounded-2xl p-8 shadow-none overflow-hidden">
-          <div className="flex flex-col md:flex-row gap-8 items-center justify-between">
-            <div className="max-w-lg">
-              <div className="flex items-center gap-2 mb-4">
-                <Key className="w-4 h-4 text-critical" />
-                <span className="text-[10px] font-mono text-critical uppercase tracking-widest">Invariant Protection</span>
-              </div>
-              <h3 className="text-2xl font-display font-medium mb-3">Optimistic Locking</h3>
-              <p className="text-text-secondary text-sm leading-relaxed text-paper-1/70">
-                Every case in the queue has a strict <code className="text-text-primary font-mono bg-surface/10 px-1 py-0.5 rounded text-xs">lock_version</code>. If the underlying settlement data changes via an asynchronous webhook while an operator is reviewing the case, the system safely rejects their commit with an HTTP 409 Conflict.
-              </p>
+        <div className="space-y-4 font-mono text-xs">
+          {/* Step 1 */}
+          <div className="p-4 bg-canvas border border-rule rounded-xs space-y-1">
+            <div className="flex justify-between items-center text-ink font-semibold">
+              <span>1. Merchant Captured Gross (Source 1: Payments)</span>
+              <span className="tabular-nums text-sm">₹10,000.00</span>
             </div>
-            <div className="w-full md:w-64 h-32 bg-surface/5 rounded-lg border border-white/10 flex items-center justify-center p-6 relative overflow-hidden">
-               <div className="absolute inset-0 bg-[linear-gradient(45deg,transparent_25%,rgba(255,255,255,0.05)_50%,transparent_75%)] bg-[length:250%_250%] animate-shimmer" />
-               <Search className="w-8 h-8 text-text-primary/40" />
+            <p className="font-sans text-xs text-ink-secondary">
+              The customer checked out on the merchant storefront. Payment captured with ID <code className="text-ink font-mono">pay_01JN...</code>.
+            </p>
+          </div>
+
+          {/* Step 2 */}
+          <div className="p-4 bg-canvas border border-rule rounded-xs space-y-1">
+            <div className="flex justify-between items-center text-ink font-semibold">
+              <span>2. Agreed Gateway Deductions (Source 2: Settlements)</span>
+              <span className="tabular-nums text-sm text-critical">-₹236.00</span>
+            </div>
+            <div className="font-sans text-xs text-ink-secondary space-y-0.5">
+              <div>&bull; Processing Fee (2.00% of ₹10,000): ₹200.00</div>
+              <div>&bull; Goods &amp; Services Tax (18.00% of Fee): ₹36.00</div>
+              <div className="font-semibold text-ink pt-0.5">Expected Net Payout: ₹9,764.00</div>
             </div>
           </div>
-        </motion.div>
+
+          {/* Step 3 */}
+          <div className="p-4 bg-canvas border border-rule rounded-xs space-y-1">
+            <div className="flex justify-between items-center text-ink font-semibold">
+              <span>3. Customer Reversals (Source 3: Refunds)</span>
+              <span className="tabular-nums text-sm">₹0.00</span>
+            </div>
+            <p className="font-sans text-xs text-ink-secondary">
+              No partial or full refunds were issued prior to gateway payout cutoff.
+            </p>
+          </div>
+
+          {/* Step 4 */}
+          <div className="p-4 bg-ledger-green/10 border border-ledger-green/30 rounded-xs space-y-1 text-ink">
+            <div className="flex justify-between items-center font-semibold">
+              <span className="text-ledger-green">4. Bank Deposit Verification (Source 4: Bank Credits)</span>
+              <span className="tabular-nums text-sm text-ledger-green">₹9,764.00</span>
+            </div>
+            <p className="font-sans text-xs text-ink-secondary">
+              HDFC Bank statement confirms NEFT credit with matching UTR <code className="text-ink font-mono">202604031847291</code>. Exact penny-level parity satisfied.
+            </p>
+          </div>
+        </div>
+
+        <div className="p-4 bg-canvas border border-rule rounded-xs flex flex-wrap justify-between items-center gap-2 text-xs font-mono">
+          <span className="text-ink-secondary">Calculated Variance: ₹0.00</span>
+          <span className="text-ledger-green font-semibold">✓ Automatically Reconciled</span>
+        </div>
+      </div>
+
+      {/* 3. The Eight Mandatory Exception Types Explained */}
+      <div className="space-y-6">
+        <div className="space-y-1 border-b border-rule pb-3">
+          <span className="text-xs font-mono uppercase text-ink-secondary">EXCEPTION TAXONOMY</span>
+          <h3 className="font-editorial text-2xl font-medium text-ink">
+            The eight financial exceptions surfaced by LedgerLens
+          </h3>
+          <p className="text-xs sm:text-sm text-ink-secondary font-sans">
+            Every exception represents a specific operational failure mode requiring human review.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs font-sans">
+          <div className="border border-rule bg-surface p-5 space-y-2 rounded-xs">
+            <div className="flex items-center justify-between font-mono text-[11px]">
+              <strong className="text-ink">1. Missing Settlement</strong>
+              <span className="text-high font-medium">Unsettled Payout</span>
+            </div>
+            <p className="text-ink-secondary leading-relaxed">
+              A merchant transaction was successfully captured, but the gateway payout batch never included the settlement line. Indicates delayed payout or gateway hold.
+            </p>
+          </div>
+
+          <div className="border border-rule bg-surface p-5 space-y-2 rounded-xs">
+            <div className="flex items-center justify-between font-mono text-[11px]">
+              <strong className="text-ink">2. Missing Bank Credit</strong>
+              <span className="text-critical font-medium">Material Exposure</span>
+            </div>
+            <p className="text-ink-secondary leading-relaxed">
+              The gateway reported that funds were deposited to the corporate bank account, but no credit entry appears on the bank statement. Immediate cash risk.
+            </p>
+          </div>
+
+          <div className="border border-rule bg-surface p-5 space-y-2 rounded-xs">
+            <div className="flex items-center justify-between font-mono text-[11px]">
+              <strong className="text-ink">3. Amount Mismatch</strong>
+              <span className="text-critical font-medium">Mathematical Discrepancy</span>
+            </div>
+            <p className="text-ink-secondary leading-relaxed">
+              The actual net payout deposited differs from the calculated expected net. Usually caused by unannounced gateway clawbacks or fee schedule alterations.
+            </p>
+          </div>
+
+          <div className="border border-rule bg-surface p-5 space-y-2 rounded-xs">
+            <div className="flex items-center justify-between font-mono text-[11px]">
+              <strong className="text-ink">4. Fee Mismatch</strong>
+              <span className="text-high font-medium">Contract Deviation</span>
+            </div>
+            <p className="text-ink-secondary leading-relaxed">
+              The gateway deducted processing fees or GST that depart from commercial contract terms (e.g. charging 2.5% instead of contracted 2.0%).
+            </p>
+          </div>
+
+          <div className="border border-rule bg-surface p-5 space-y-2 rounded-xs">
+            <div className="flex items-center justify-between font-mono text-[11px]">
+              <strong className="text-ink">5. Duplicate Payment</strong>
+              <span className="text-critical font-medium">Double Capture</span>
+            </div>
+            <p className="text-ink-secondary leading-relaxed">
+              Two captured payments cite the exact same merchant order ID. Indicates duplicate checkout submissions or web hook replay issues.
+            </p>
+          </div>
+
+          <div className="border border-rule bg-surface p-5 space-y-2 rounded-xs">
+            <div className="flex items-center justify-between font-mono text-[11px]">
+              <strong className="text-ink">6. Duplicate Bank Credit</strong>
+              <span className="text-high font-medium">Double Deposit</span>
+            </div>
+            <p className="text-ink-secondary leading-relaxed">
+              Multiple bank statement line items reference the same settlement batch ID. Requires ledger review before recognizing revenue.
+            </p>
+          </div>
+
+          <div className="border border-rule bg-surface p-5 space-y-2 rounded-xs">
+            <div className="flex items-center justify-between font-mono text-[11px]">
+              <strong className="text-ink">7. Partial Refund Not Reflected</strong>
+              <span className="text-high font-medium">Unadjusted Reversal</span>
+            </div>
+            <p className="text-ink-secondary leading-relaxed">
+              A customer return was processed in the merchant order system, but the gateway settled the full gross amount without deducting the refunded sum.
+            </p>
+          </div>
+
+          <div className="border border-rule bg-surface p-5 space-y-2 rounded-xs">
+            <div className="flex items-center justify-between font-mono text-[11px]">
+              <strong className="text-ink">8. Ambiguous Match</strong>
+              <span className="text-high font-medium">Equal Candidates</span>
+            </div>
+            <p className="text-ink-secondary leading-relaxed">
+              Two candidate settlement records satisfied the matching invariants with identical confidence scores. Routed to human review to prevent accidental misallocation.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* CTA */}
+      <div className="pt-6 border-t border-rule flex justify-between items-center text-xs">
+        <span className="text-ink-secondary font-mono">Explore how the queue categorizes these exceptions</span>
+        <Link to="/app/queue" className="px-4 py-2 bg-ink text-canvas font-medium rounded-xs hover:bg-ink/90">
+          Open review queue &rarr;
+        </Link>
       </div>
     </div>
   );

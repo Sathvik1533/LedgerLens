@@ -1,107 +1,137 @@
-import { motion } from 'framer-motion';
-import { BookOpen, FileCode, Shield, GitBranch } from 'lucide-react';
-
-const FADE_UP = { hidden: { opacity: 0, y: 15 }, show: { opacity: 1, y: 0, transition: { type: "spring" as const, stiffness: 300, damping: 24 } } };
+import { Link } from 'react-router-dom';
 
 export default function DocsPage() {
-  const categories = [
-    { title: 'Data Contracts', desc: 'Strict JSON schemas for payments, settlements, and webhooks.', icon: FileCode },
-    { title: 'Reconciliation Algorithms', desc: 'The exact deterministic formulas used to match multi-source streams.', icon: GitBranch },
-    { title: 'Security & Privacy', desc: 'How we enforce SOX compliance and isolate financial data.', icon: Shield },
-    { title: 'Policy Engine', desc: 'Writing natural-language SOPs that ground the AI Copilot.', icon: BookOpen }
-  ];
-
   return (
-    <div className="bg-canvas min-h-screen pt-32 pb-24 px-6">
-      <div className="max-w-5xl mx-auto relative z-10">
-        <motion.div initial="hidden" animate="show" variants={{ show: { transition: { staggerChildren: 0.1 } } }} className="mb-16 text-center">
-          <motion.div variants={FADE_UP} className="inline-flex items-center gap-2 mb-6">
-             <span className="text-[10px] font-mono tracking-widest text-text-secondary uppercase border border-border px-3 py-1 rounded-full bg-surface shadow-none">Technical Reference</span>
-          </motion.div>
-          <motion.h1 variants={FADE_UP} className="text-5xl md:text-6xl text-text-primary font-display font-medium tracking-tight mb-6">Documentation</motion.h1>
-          <motion.p variants={FADE_UP} className="text-xl text-text-secondary max-w-2xl mx-auto">Open-source architectural guides for implementing LedgerLens.</motion.p>
-        </motion.div>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {categories.map((c, i) => (
-             <motion.div key={i} initial="hidden" animate="show" variants={FADE_UP} className="bg-surface border border-border rounded-2xl p-8 shadow-none hover:shadow-none hover:border-accent/30 transition-all cursor-pointer group">
-               <c.icon className="w-6 h-6 mb-4 text-text-secondary group-hover:text-accent" />
-               <h3 className="text-xl text-text-primary font-display font-medium mb-2">{c.title}</h3>
-               <p className="text-text-secondary text-sm leading-relaxed">{c.desc}</p>
-             </motion.div>
-          ))}
-        </div>
-      
-        <motion.div variants={FADE_UP} className="mt-16 bg-surface border border-border rounded-2xl p-8 shadow-none">
-          <h3 className="text-xl text-text-primary font-display font-bold mb-6">Design System: Direction A (The Clear Ledger)</h3>
-          
-          <div className="space-y-8">
-            <div>
-              <h4 className="text-xs font-mono text-text-secondary uppercase tracking-widest mb-4">Typography</h4>
-              <div className="grid gap-4">
-                <div className="flex items-baseline gap-4 border-b border-border pb-2">
-                  <div className="font-display font-bold text-4xl text-text-primary w-32">Aa</div>
-                  <div className="text-sm">
-                    <span className="font-semibold block text-text-primary">Manrope (Display & Headings)</span>
-                    <span className="text-text-secondary">Weights: 500, 600, 700, 800</span>
-                  </div>
-                </div>
-                <div className="flex items-baseline gap-4 border-b border-border pb-2">
-                  <div className="font-sans text-3xl text-text-primary w-32">Aa</div>
-                  <div className="text-sm">
-                    <span className="font-semibold block text-text-primary">Inter (UI & Data)</span>
-                    <span className="text-text-secondary">Weights: 400, 500, 600</span>
-                  </div>
-                </div>
-                <div className="flex items-baseline gap-4">
-                  <div className="font-mono text-2xl text-text-primary w-32">0123</div>
-                  <div className="text-sm">
-                    <span className="font-semibold block text-text-primary">Geist Mono (Identifiers & Hashes)</span>
-                    <span className="text-text-secondary">Weights: 400, 500</span>
-                  </div>
-                </div>
-              </div>
-            </div>
+    <div className="w-full max-w-5xl mx-auto px-6 py-12 md:py-20 space-y-16 font-sans">
+      {/* Header */}
+      <div className="space-y-4 max-w-2xl">
+        <span className="text-xs font-mono uppercase tracking-wider text-ink-secondary block">
+          DEVELOPER &amp; OPERATOR DOCUMENTATION
+        </span>
+        <h1 className="font-editorial text-4xl sm:text-5xl font-medium text-ink leading-tight">
+          System documentation &amp; contracts
+        </h1>
+        <p className="text-base sm:text-lg text-ink-secondary font-normal leading-relaxed">
+          Technical specifications, data contracts, mathematical invariants, and operating principles for the LedgerLens reconciliation platform.
+        </p>
+      </div>
 
-            <div>
-              <h4 className="text-xs font-mono text-text-secondary uppercase tracking-widest mb-4">Color Palette</h4>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div className="space-y-2">
-                  <div className="h-12 w-full rounded border border-border bg-canvas"></div>
-                  <div className="text-xs"><span className="font-semibold text-text-primary block">Canvas</span><span className="text-text-secondary font-mono text-[10px]">#111111 (canvas)</span></div>
-                </div>
-                <div className="space-y-2">
-                  <div className="h-12 w-full rounded border border-border bg-surface"></div>
-                  <div className="text-xs"><span className="font-semibold text-text-primary block">Surface</span><span className="text-text-secondary font-mono text-[10px]">#1E1E1E (surface)</span></div>
-                </div>
-                <div className="space-y-2">
-                  <div className="h-12 w-full rounded bg-surface-raised"></div>
-                  <div className="text-xs"><span className="font-semibold text-text-primary block">Primary Text</span><span className="text-text-secondary font-mono text-[10px]">#F3F4F6 (text-primary)</span></div>
-                </div>
-                <div className="space-y-2">
-                  <div className="h-12 w-full rounded bg-ink-700"></div>
-                  <div className="text-xs"><span className="font-semibold text-text-primary block">Secondary Text</span><span className="text-text-secondary font-mono text-[10px]">#9CA3AF (text-secondary)</span></div>
-                </div>
-                <div className="space-y-2">
-                  <div className="h-12 w-full rounded bg-rule-300"></div>
-                  <div className="text-xs"><span className="font-semibold text-text-primary block">Borders</span><span className="text-text-secondary font-mono text-[10px]">#333333 (border)</span></div>
-                </div>
-                <div className="space-y-2">
-                  <div className="h-12 w-full rounded bg-critical"></div>
-                  <div className="text-xs"><span className="font-semibold text-text-primary block">Critical</span><span className="text-text-secondary font-mono text-[10px]">#EF4444 (critical)</span></div>
-                </div>
-                <div className="space-y-2">
-                  <div className="h-12 w-full rounded bg-high"></div>
-                  <div className="text-xs"><span className="font-semibold text-text-primary block">High / Review</span><span className="text-text-secondary font-mono text-[10px]">#F59E0B (high)</span></div>
-                </div>
-                <div className="space-y-2">
-                  <div className="h-12 w-full rounded bg-resolved"></div>
-                  <div className="text-xs"><span className="font-semibold text-text-primary block">Resolved</span><span className="text-text-secondary font-mono text-[10px]">#10B981 (resolved)</span></div>
-                </div>
-              </div>
-            </div>
+      {/* Grid of Actionable Documentation Sections */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Section 1: Invariants */}
+        <div className="border border-rule bg-surface p-6 rounded-xs space-y-4 shadow-subtle">
+          <span className="text-xs font-mono uppercase text-ink-secondary block">Specification 01</span>
+          <h3 className="font-editorial text-2xl font-medium text-ink">
+            Financial &amp; Math Invariants
+          </h3>
+          <p className="text-xs text-ink-secondary leading-relaxed">
+            All monetary math uses Python <code className="text-ink font-mono">Decimal</code> and PostgreSQL <code className="text-ink font-mono">numeric(18,2)</code>. Floating-point types are strictly forbidden across the pipeline.
+          </p>
+          <div className="p-3 bg-canvas border border-rule rounded-xs font-mono text-[11px] text-ink space-y-1">
+            <div>Expected Net = Gross - [Fee (2%) + GST (18%)] - Refunds</div>
+            <div className="text-ink-secondary">&Delta; Tolerable variance &le; ₹0.01</div>
           </div>
-        </motion.div>
+        </div>
+
+        {/* Section 2: Four-Source Architecture */}
+        <div className="border border-rule bg-surface p-6 rounded-xs space-y-4 shadow-subtle">
+          <span className="text-xs font-mono uppercase text-ink-secondary block">Specification 02</span>
+          <h3 className="font-editorial text-2xl font-medium text-ink">
+            Four-Source Evidence Contracts
+          </h3>
+          <p className="text-xs text-ink-secondary leading-relaxed">
+            Every transaction is evaluated across four distinct counterparty streams before auto-resolution or exception routing.
+          </p>
+          <ul className="text-xs font-mono text-ink-secondary space-y-1.5 list-disc pl-4">
+            <li><strong className="text-ink">Payments:</strong> captured merchant order references</li>
+            <li><strong className="text-ink">Settlements:</strong> reported net payout line items</li>
+            <li><strong className="text-ink">Refunds:</strong> customer returns and reversals</li>
+            <li><strong className="text-ink">Bank Credits:</strong> verified institutional statement UTRs</li>
+          </ul>
+        </div>
+
+        {/* Section 3: Idempotent Ingestion */}
+        <div className="border border-rule bg-surface p-6 rounded-xs space-y-4 shadow-subtle">
+          <span className="text-xs font-mono uppercase text-ink-secondary block">Specification 03</span>
+          <h3 className="font-editorial text-2xl font-medium text-ink">
+            ACID Ingestion &amp; Idempotency
+          </h3>
+          <p className="text-xs text-ink-secondary leading-relaxed">
+            Upload endpoints support optional <code className="text-ink font-mono">X-Idempotency-Key</code> headers. Replaying an identical batch returns the original receipt without duplicating records.
+          </p>
+          <div className="p-3 bg-canvas border border-rule rounded-xs font-mono text-[11px] text-ink space-y-1">
+            <div>POST /api/v1/ingestion/upload/:source_type</div>
+            <div className="text-ink-secondary">Enforces atomic multi-row commits &amp; hash deduplication</div>
+          </div>
+        </div>
+
+        {/* Section 4: Audit Trail Permanence */}
+        <div className="border border-rule bg-surface p-6 rounded-xs space-y-4 shadow-subtle">
+          <span className="text-xs font-mono uppercase text-ink-secondary block">Specification 04</span>
+          <h3 className="font-editorial text-2xl font-medium text-ink">
+            Audit Trail &amp; Safe Concurrency
+          </h3>
+          <p className="text-xs text-ink-secondary leading-relaxed">
+            Operator actions enforce optimistic concurrency (version checks). Colliding reviews return HTTP 409 to prevent accidental overwrites. All changes write to an append-only event ledger.
+          </p>
+          <div className="p-3 bg-canvas border border-rule rounded-xs font-mono text-[11px] text-ink space-y-1">
+            <div>Signer &bull; Action &bull; Version &bull; Timestamp &bull; Rationale</div>
+            <div className="text-ink-secondary">Shared persisted event store between case &amp; global views</div>
+          </div>
+        </div>
+      </div>
+
+      {/* Living Ledger Design Tokens Reference */}
+      <div className="border border-rule bg-surface p-8 rounded-xs space-y-6 shadow-subtle">
+        <div className="border-b border-rule pb-3">
+          <span className="text-xs font-mono uppercase text-ink-secondary block">DESIGN SYSTEM SPECIFICATION</span>
+          <h3 className="font-editorial text-2xl font-medium text-ink mt-0.5">
+            The Living Ledger Design Tokens
+          </h3>
+        </div>
+
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-xs font-mono">
+          <div className="p-3 bg-canvas border border-rule rounded-xs space-y-1">
+            <span className="text-ink-secondary text-[10px] block">CANVAS</span>
+            <div className="flex items-center gap-2">
+              <span className="w-3 h-3 rounded-full border border-rule" style={{ backgroundColor: '#F4F1EA' }} />
+              <span className="font-semibold text-ink">#F4F1EA</span>
+            </div>
+            <span className="text-[10px] text-ink-muted">Mineral paper</span>
+          </div>
+
+          <div className="p-3 bg-canvas border border-rule rounded-xs space-y-1">
+            <span className="text-ink-secondary text-[10px] block">PRIMARY INK</span>
+            <div className="flex items-center gap-2">
+              <span className="w-3 h-3 rounded-full" style={{ backgroundColor: '#1C1B19' }} />
+              <span className="font-semibold text-ink">#1C1B19</span>
+            </div>
+            <span className="text-[10px] text-ink-muted">Warm charcoal</span>
+          </div>
+
+          <div className="p-3 bg-canvas border border-rule rounded-xs space-y-1">
+            <span className="text-ink-secondary text-[10px] block">LEDGER GREEN</span>
+            <div className="flex items-center gap-2">
+              <span className="w-3 h-3 rounded-full" style={{ backgroundColor: '#3D6B55' }} />
+              <span className="font-semibold text-ink">#3D6B55</span>
+            </div>
+            <span className="text-[10px] text-ink-muted">Verified match</span>
+          </div>
+
+          <div className="p-3 bg-canvas border border-rule rounded-xs space-y-1">
+            <span className="text-ink-secondary text-[10px] block">OXIDE RED</span>
+            <div className="flex items-center gap-2">
+              <span className="w-3 h-3 rounded-full" style={{ backgroundColor: '#B94E3D' }} />
+              <span className="font-semibold text-ink">#B94E3D</span>
+            </div>
+            <span className="text-[10px] text-ink-muted">Discrepancy redline</span>
+          </div>
+        </div>
+
+        <div className="pt-2 text-xs font-sans text-ink-secondary flex justify-between items-center border-t border-rule/60">
+          <span>Typography: Newsreader (Headings), Instrument Sans (UI &amp; Body), IBM Plex Mono (Amounts &amp; IDs)</span>
+          <Link to="/app/queue" className="text-link hover:underline font-mono text-[11px]">Open review queue &rarr;</Link>
+        </div>
       </div>
     </div>
   );

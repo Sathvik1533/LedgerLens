@@ -18,6 +18,7 @@ from sqlalchemy import select
 from backend.app.models.payment import PaymentModel
 from backend.app.models.settlement import SettlementModel
 from backend.app.models.bank_credit import BankCreditModel
+from backend.app.models.refund import RefundModel
 from backend.app.models.reconciliation import ReconciliationCaseModel
 
 
@@ -61,6 +62,7 @@ class SQLEvidenceTool:
             "payment": None,
             "settlement": None,
             "bank_credits": [],
+            "refunds": [],
         }
 
         # Fetch payment
@@ -114,5 +116,22 @@ class SQLEvidenceTool:
                     }
                     for bc in credits
                 ]
+
+        # Fetch refunds linked to this payment
+        refund_records = self.db.execute(
+            select(RefundModel).where(RefundModel.payment_id == case.payment_id)
+        ).scalars().all()
+
+        evidence["refunds"] = [
+            {
+                "refund_id": r.refund_id,
+                "refund_amount": str(r.refund_amount),
+                "currency": r.currency,
+                "refund_status": r.refund_status,
+                "refund_type": r.refund_type,
+                "refund_timestamp": r.refund_timestamp.isoformat() if r.refund_timestamp else None,
+            }
+            for r in refund_records
+        ]
 
         return evidence
