@@ -1,18 +1,21 @@
-graph LR
-    subgraph CI["GitHub Actions CI Pipeline (.github/workflows/ci-tests.yml)"]
-        DOCKER["PostgreSQL 15 Docker Container"] --> ALEMBIC["Alembic Migrations"]
-        ALEMBIC --> SUITE["Pytest Suite (40 Tests Passing)"]
-    end
+flowchart TD
+    A["GitHub Actions CI\nPush and pull-request checks"] --> B["Isolated PostgreSQL 15\nDocker test database"]
+    B --> C["Migrations + test fixtures"]
+    C --> D["Automated verification"]
+    D --> E["Domain and money math\nDecimal precision · invariants"]
+    D --> F["Integration and API\nIngestion · reconciliation · review"]
+    D --> G["End-to-end workflow\nFour-source case from input to audit"]
+    D --> H["Evaluation harness\nSeeded 60-record ground truth benchmark"]
+    D --> I["Concurrency and safety\nOptimistic locking · conflict response"]
+    D --> J["Grounded investigation\nSQL facts · policy citations · read-only AI"]
+    H --> K["Measured outputs\nMatch rate · precision · recall · throughput"]
+    H --> L["Honest exception export\nUnresolved cases with reason codes"]
+    K --> M["Reviewer proof\nReproducible command + seed + denominator"]
+    L --> M
 
-    subgraph SUITE_BREAKDOWN["Test Coverage Breakdown"]
-        SUITE --> T1["Integration Tests<br>&bull; Two-Decimal Decimal Arithmetic<br>&bull; Ingestion Idempotency<br>&bull; Safety Checks"]
-        SUITE --> T2["E2E Financial Workflow<br>&bull; 4-Source Ingest & Reconciliation"]
-        SUITE --> T3["Evaluation Harness<br>&bull; 60-Record Ground Truth Benchmark<br>&bull; JSON/CSV Artifact Emission"]
-        SUITE --> T4["Concurrency & Race Conditions<br>&bull; 10-Worker Async Barrier<br>&bull; Optimistic Locking 409s"]
-        SUITE --> T5["Tested Read-Only Investigation Path<br>&bull; Before/after database row counts unchanged<br>&bull; 0.35 cosine grounding floor"]
-    end
-
-    subgraph ARTIFACTS["Emitted Reports"]
-        T3 --> JSON_OUT["artifacts/evaluation/reconciliation_benchmark_report.json"]
-        T3 --> CSV_OUT["artifacts/evaluation/reconciliation_metrics_summary.csv"]
-    end
+    classDef ci fill:#e9e3d7,stroke:#8b7f6d,color:#1c1b19,stroke-width:2px;
+    classDef verify fill:#dcebe4,stroke:#527c68,color:#1c1b19,stroke-width:2px;
+    classDef proof fill:#1c1b19,stroke:#1c1b19,color:#f4f1ea,stroke-width:2px;
+    class A,B,C ci;
+    class D,E,F,G,H,I,J,K,L verify;
+    class M proof;

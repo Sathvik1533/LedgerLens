@@ -199,6 +199,8 @@ The next build milestone is a real but minimal authenticated workflow: public ex
 - [Design decisions](docs/design-decisions.md)
 - [Failure and recovery plan](docs/FAILURE_AND_RECOVERY.md)
 - [Five-minute demo script](docs/demo-script.md)
+- [Reviewer guide and evidence map](docs/reviewer-guide.md)
+- [Research evidence and design rationale](docs/research-evidence.md)
 - [Competitor analysis](docs/COMPETITOR_ANALYSIS.md)
 - [Track 04 application outline](docs/application-outline.md)
 
