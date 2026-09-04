@@ -1,0 +1,29 @@
+flowchart TD
+    A["1 · Synthetic finance records\nPayments · settlements · refunds · bank credits"] --> B["2 · Batch intake\nCSV validation · duplicate checks · batch identity"]
+    B --> C["3 · Evidence storage\nRaw source records + normalized PostgreSQL entities"]
+    C --> D["4 · Deterministic reconciliation\nDecimal arithmetic · matching · exception classification"]
+    D --> E{"What did the records show?"}
+    E -->|"Records agree"| F["Automatic match\nMeasured and counted"]
+    E -->|"Records disagree"| G["Exception case\nAmount and reason isolated"]
+    F --> H["Track 04 evaluation\nMatch rate · measured accuracy · throughput"]
+    G --> I["Review queue\nHighest-risk work first"]
+    I --> J["Four-source case dossier\nCompare payment · settlement · refund · bank evidence"]
+    J --> K["Read-only policy assistant\nEvidence-grounded explanation"]
+    K --> L["Human decision\nApprove · reject · mark unresolved"]
+    L --> M["Saved audit history\nActor · reason · timestamp · outcome"]
+    H --> N["Proof for the reviewer\nHonest exception list + reproducible run context"]
+    M --> N
+
+    classDef source fill:#f4f1ea,stroke:#c8bfae,color:#1c1b19,stroke-width:2px;
+    classDef intake fill:#e9e3d7,stroke:#8b7f6d,color:#1c1b19,stroke-width:2px;
+    classDef truth fill:#dcebe4,stroke:#527c68,color:#1c1b19,stroke-width:2px;
+    classDef decision fill:#fff8e7,stroke:#b88a3b,color:#1c1b19,stroke-width:2px;
+    classDef risk fill:#f5dfda,stroke:#a64b3c,color:#1c1b19,stroke-width:2px;
+    classDef proof fill:#1c1b19,stroke:#1c1b19,color:#f4f1ea,stroke-width:2px;
+
+    class A source;
+    class B,C intake;
+    class D,F,H truth;
+    class E,I,J,K,L decision;
+    class G risk;
+    class M,N proof;

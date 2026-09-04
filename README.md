@@ -10,6 +10,9 @@
   [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15-4169E1?logo=postgresql&logoColor=white)](https://www.postgresql.org/)
   [![React](https://img.shields.io/badge/React-18-61DAFB?logo=react&logoColor=black)](https://react.dev/)
   [![TypeScript](https://img.shields.io/badge/TypeScript-5.2-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+
+  <br />
+  <img src="docs/assets/ledgerlens-social-preview.svg" alt="LedgerLens financial reconciliation control room" width="100%" />
 </div>
 
 > **Project status:** LedgerLens is a student-built prototype. The repository is intentionally private while the authenticated workflow, production deployment, and final Track 04 evidence are being completed.
@@ -97,19 +100,11 @@ The final submission must show that the second fixture changes the backend respo
 
 ## Architecture
 
-```mermaid
-flowchart LR
-    A[Payments, settlements, refunds, bank credits] --> B[Batch ingestion and validation]
-    B --> C[Raw and normalized PostgreSQL records]
-    C --> D[Deterministic reconciliation engine]
-    D --> E[Automatic matches]
-    D --> F[Exception cases]
-    F --> G[Evidence-first review queue]
-    G --> H[Human decision]
-    H --> I[Persisted audit history]
-    F --> J[Read-only policy RAG]
-    J --> G
-```
+The following map is intentionally vertical. The earlier wide flowchart was difficult to read on GitHub and on mobile screens, so this version keeps the product story in one readable column while making the deterministic, AI, and human-review boundaries visible.
+
+![LedgerLens system map](docs/assets/ledgerlens-system-map.svg.png)
+
+The editable diagram source is [`docs/assets/ledgerlens-system-map.mmd`](docs/assets/ledgerlens-system-map.mmd).
 
 The repository is organized around clear boundaries:
 
@@ -205,6 +200,7 @@ The next build milestone is a real but minimal authenticated workflow: public ex
 - [Failure and recovery plan](docs/FAILURE_AND_RECOVERY.md)
 - [Five-minute demo script](docs/demo-script.md)
 - [Competitor analysis](docs/COMPETITOR_ANALYSIS.md)
+- [Track 04 application outline](docs/application-outline.md)
 
 ## Project identity
 
