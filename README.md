@@ -3,8 +3,6 @@
   <h1>LedgerLens</h1>
   <p><strong>Evidence-first financial reconciliation for the AI Finance Controller track</strong></p>
   <p>LedgerLens finds where payment, settlement, refund, bank, and ledger records stop agreeing — then gives a human reviewer the evidence to decide what happens next.</p>
-
-  [![CI](https://github.com/Sathvik1533/razorpay-ai-finance-controller/actions/workflows/ci-tests.yml/badge.svg)](https://github.com/Sathvik1533/razorpay-ai-finance-controller/actions)
   [![Python](https://img.shields.io/badge/Python-3.11-3776AB?logo=python&logoColor=white)](https://www.python.org/)
   [![FastAPI](https://img.shields.io/badge/FastAPI-0.110%2B-009688?logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
   [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15-4169E1?logo=postgresql&logoColor=white)](https://www.postgresql.org/)
