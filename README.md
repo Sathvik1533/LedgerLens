@@ -106,6 +106,22 @@ The following map is intentionally vertical. The earlier wide flowchart was diff
 
 The editable diagram source is [`docs/assets/ledgerlens-system-map.mmd`](docs/assets/ledgerlens-system-map.mmd).
 
+### How an operator uses LedgerLens
+
+This workflow diagram makes the human review loop visible, including the read-only AI boundary and the optimistic-locking conflict path.
+
+![LedgerLens operator review workflow](docs/assets/ledgerlens-review-workflow.png)
+
+Editable source: [`docs/assets/review-workflow.mmd`](docs/assets/review-workflow.mmd).
+
+### How LedgerLens proves its claims
+
+This evidence map shows how CI, isolated PostgreSQL, test layers, benchmark metrics, and the honest exception export connect to the reviewer proof.
+
+![LedgerLens testing and evaluation evidence](docs/assets/ledgerlens-testing-evidence.png)
+
+Editable source: [`docs/assets/testing-evidence.mmd`](docs/assets/testing-evidence.mmd).
+
 The repository is organized around clear boundaries:
 
 - `backend/app/domain/` contains deterministic matching and financial calculations.
