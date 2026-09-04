@@ -35,12 +35,13 @@ async def csrf_origin_guard(request: Request, call_next):
                 )
 
         # For API requests with session cookies, require non-simple request header (application/json or custom header)
+        has_session = bool(request.cookies.get(settings.SESSION_COOKIE_NAME))
         content_type = request.headers.get("content-type", "")
         has_custom_header = bool(request.headers.get("x-requested-with") or request.headers.get("x-ledgerlens-csrf"))
         is_json_or_multipart = "application/json" in content_type or "multipart/form-data" in content_type
 
-        # Simple cross-site forms (application/x-www-form-urlencoded or text/plain) are rejected on API endpoints
-        if request.url.path.startswith(settings.API_V1_STR) and not (is_json_or_multipart or has_custom_header):
+        # Simple cross-site forms (application/x-www-form-urlencoded or text/plain) are rejected on authenticated API endpoints
+        if has_session and request.url.path.startswith(settings.API_V1_STR) and not (is_json_or_multipart or has_custom_header):
             return JSONResponse(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 content={"detail": "State-changing API requests require application/json or custom request header."}

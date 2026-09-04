@@ -24,6 +24,7 @@ def health_check(db: Session = Depends(get_db)):
         "service": settings.PROJECT_NAME,
         "api_version": "v1",
         "deployment_version": settings.DEPLOYMENT_VERSION,
+        "source_commit": settings.SOURCE_COMMIT,
         "backend_provider": settings.BACKEND_PROVIDER,
         "database_status": db_status,
         "timestamp_utc": datetime.now(timezone.utc).isoformat(),

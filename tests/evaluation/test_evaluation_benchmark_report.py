@@ -19,7 +19,7 @@ from evaluation.report_writer import write_evaluation_artifacts
 
 @pytest.mark.evaluation
 @pytest.mark.integration
-def test_evaluation_benchmark_report_e2e(client, db_session):
+def test_evaluation_benchmark_report_e2e(client, db_session, tmp_path):
     """
     Evaluation Benchmark & Reporting Test:
     1. Pre-test emptiness assertion on all relevant tables (Strategy D).
@@ -150,7 +150,7 @@ def test_evaluation_benchmark_report_e2e(client, db_session):
         "exception_type_distribution": actual_exception_counts,
     }
 
-    artifact_paths = write_evaluation_artifacts(report_data, output_dir="artifacts/evaluation")
+    artifact_paths = write_evaluation_artifacts(report_data, output_dir=str(tmp_path))
 
     # ── 7. Verify Artifact Files on Disk ─────────────────────────────────────
     assert os.path.exists(artifact_paths["json_artifact"])

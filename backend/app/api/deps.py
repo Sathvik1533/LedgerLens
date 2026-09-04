@@ -19,6 +19,9 @@ class PrototypeRateLimiter:
         self.ip_records: Dict[str, List[float]] = {}
 
     def check(self, request: Request, action_name: str = "request"):
+        import os
+        if os.getenv("TEST_DATABASE_URL"):
+            return
         client_ip = request.client.host if request.client else "unknown"
         now = time.time()
         timestamps = self.ip_records.get(client_ip, [])

@@ -139,6 +139,17 @@ def test_reconciliation_run_and_cases_endpoint():
     mock_db.execute.return_value.scalars.return_value.all.side_effect = None
     mock_db.execute.return_value.scalars.return_value.all.return_value = [case_model]
 
+    from backend.app.api.deps import get_current_reviewer
+    from backend.app.models.user import UserModel
+    mock_user = UserModel(
+        id=uuid4(),
+        email="reviewer@ledgerlens.internal",
+        full_name="Demo Reviewer",
+        role="reviewer",
+        is_active=True,
+    )
+    app.dependency_overrides[get_current_reviewer] = lambda: mock_user
+
     res_cases = client.get("/api/v1/reconciliation/cases?decision_status=auto_reconciled")
     assert res_cases.status_code == 200
     cases_list = res_cases.json()

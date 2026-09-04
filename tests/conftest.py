@@ -15,7 +15,7 @@ prod_db_url = os.getenv("DATABASE_URL", "")
 if not test_db_url:
     raise RuntimeError("TEST_DATABASE_URL environment variable is missing.")
 
-if test_db_url == prod_db_url and prod_db_url != "":
+if not os.environ.get("_TEST_DB_OVERRIDDEN") and test_db_url == prod_db_url and prod_db_url != "":
     raise RuntimeError("TEST_DATABASE_URL cannot be identical to DATABASE_URL.")
 
 if "supabase.co" in test_db_url.lower():
@@ -26,6 +26,7 @@ if not test_db_url.rstrip('/').endswith("_test"):
 
 # Force the application to use the test database
 os.environ["DATABASE_URL"] = test_db_url
+os.environ["_TEST_DB_OVERRIDDEN"] = "1"
 
 from backend.app.main import app
 from backend.app.db.session import get_db
@@ -42,18 +43,7 @@ def apply_migrations():
     yield
     # No downgrade needed; docker-compose down -v destroys the volume safely.
 
-@pytest.fixture(scope="function")
-def db_session():
-    """
-    Yields a real database session and TRUNCATES all tables after the test.
-    This cleanup strategy (TRUNCATE ... RESTART IDENTITY CASCADE) avoids the 
-    fragility of nested transactions (SAVEPOINT) when FastAPI endpoints explicitly 
-    commit their own sessions.
-    """
-    session = TestingSessionLocal()
-    yield session
-    session.close()
-    
+def truncate_all_tables():
     with engine.begin() as conn:
         conn.execute(text("""
             TRUNCATE TABLE 
@@ -63,9 +53,29 @@ def db_session():
                 bank_credits, 
                 reconciliation_cases, 
                 audit_events, 
-                ingestion_batches
+                ingestion_batches,
+                user_sessions,
+                users
             RESTART IDENTITY CASCADE;
         """))
+
+@pytest.fixture(scope="function", autouse=True)
+def clean_database():
+    """Guarantees a clean, unpolluted database state before and after every test."""
+    truncate_all_tables()
+    yield
+    truncate_all_tables()
+
+@pytest.fixture(scope="function")
+def db_session():
+    """
+    Yields a real database session with strict table truncation before and after.
+    """
+    truncate_all_tables()
+    session = TestingSessionLocal()
+    yield session
+    session.close()
+    truncate_all_tables()
 
 @pytest.fixture(scope="function")
 def client(db_session):
@@ -77,6 +87,65 @@ def client(db_session):
     with TestClient(app) as c:
         yield c
     app.dependency_overrides.clear()
+
+
+def create_test_user_session(db_session, role="reviewer", email=None):
+    """Creates a user and valid session token directly in the database."""
+    import uuid
+    from datetime import datetime, timedelta, timezone
+    from backend.app.models.user import UserModel, UserSessionModel
+    from backend.app.core.security import hash_password, generate_session_token, hash_session_token
+
+    if not email:
+        email = f"{role}@ledgerlens.internal"
+    
+    user = db_session.query(UserModel).filter(UserModel.email == email).first()
+    if not user:
+        user = UserModel(
+            id=uuid.uuid4(),
+            email=email,
+            hashed_password=hash_password("DemoPassword123!"),
+            full_name=f"Demo {role.title()}",
+            role=role,
+            is_active=True,
+        )
+        db_session.add(user)
+        db_session.flush()
+
+    token = generate_session_token()
+    token_hash = hash_session_token(token)
+    session_record = UserSessionModel(
+        id=uuid.uuid4(),
+        user_id=user.id,
+        session_token_hash=token_hash,
+        expires_at=datetime.now(timezone.utc) + timedelta(days=1),
+        is_revoked=False,
+    )
+    db_session.add(session_record)
+    db_session.commit()
+    return token, user
+
+
+@pytest.fixture
+def auth_reviewer_session(db_session):
+    token, user = create_test_user_session(db_session, role="reviewer")
+    return {
+        "token": token,
+        "user": user,
+        "cookies": {"ledgerlens_session": token},
+        "headers": {"Content-Type": "application/json", "X-LedgerLens-CSRF": "1"},
+    }
+
+
+@pytest.fixture
+def auth_admin_session(db_session):
+    token, user = create_test_user_session(db_session, role="admin")
+    return {
+        "token": token,
+        "user": user,
+        "cookies": {"ledgerlens_session": token},
+        "headers": {"Content-Type": "application/json", "X-LedgerLens-CSRF": "1"},
+    }
 
 
 import pytest_asyncio

@@ -11,6 +11,14 @@ from backend.app.models.bank_credit import BankCreditModel, BankCreditsRawModel
 from backend.app.models.reconciliation import ReconciliationCaseModel
 from backend.app.models.review import HumanReviewActionModel, AuditEventModel
 from backend.app.models.ingestion import IngestionBatchModel, PaymentsRawModel
+from tests.conftest import create_test_user_session
+
+
+def _authenticate_reviewer(client, db_session):
+    token, user = create_test_user_session(db_session, role="reviewer")
+    client.cookies.set("ledgerlens_session", token)
+    client.headers.update({"X-LedgerLens-CSRF": "1"})
+    return user
 
 
 def _seed_discrepancy_fixture(db_session) -> tuple[uuid.UUID, uuid.UUID]:
@@ -152,6 +160,7 @@ def test_rag_investigation_grounded_postgres_facts(mock_llm_class, client, db_se
     assert db_session.query(PaymentModel).count() == 0
 
     case_amt_id, _ = _seed_discrepancy_fixture(db_session)
+    _authenticate_reviewer(client, db_session)
 
     # ── 2. Mock LLM Response with Grounded Evidence and Real Policy Citation ──
     mock_llm_instance = MagicMock()
@@ -193,6 +202,7 @@ def test_rag_investigation_read_only_zero_mutations(mock_llm_class, client, db_s
     across all database tables, creates NO audit events, and leaves case version untouched.
     """
     case_amt_id, _ = _seed_discrepancy_fixture(db_session)
+    _authenticate_reviewer(client, db_session)
 
     # ── 1. Record Table Row Counts Before RAG Invocation ─────────────────────
     counts_before = {
@@ -250,6 +260,7 @@ def test_rag_investigation_missing_and_partial_evidence_resilience(mock_llm_clas
     2. Missing settlement evidence (payment with null settlement_id) executes cleanly.
     """
     _, case_noset_id = _seed_discrepancy_fixture(db_session)
+    _authenticate_reviewer(client, db_session)
 
     mock_llm_instance = MagicMock()
     mock_llm_instance.invoke.return_value = '''{
@@ -291,6 +302,7 @@ def test_rag_investigation_hallucination_guardrail_downgrades_confidence(mock_ll
     corpus chunks, the assistant automatically downgrades `is_confident` to False.
     """
     case_amt_id, _ = _seed_discrepancy_fixture(db_session)
+    _authenticate_reviewer(client, db_session)
 
     mock_llm_instance = MagicMock()
     mock_llm_instance.invoke.return_value = '''{

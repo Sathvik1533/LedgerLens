@@ -60,6 +60,7 @@ def test_rag_investigate_endpoint_success(mock_llm_class):
     
     # Setup the mock db to return case then payment then no settlement
     mock_db.execute.return_value.scalar_one_or_none.side_effect = [case, payment, None]
+    mock_db.execute.return_value.scalars.return_value.all.return_value = []
     app.dependency_overrides[get_db] = lambda: mock_db
     
     # Mock LLM Response
@@ -75,7 +76,22 @@ def test_rag_investigate_endpoint_success(mock_llm_class):
 ```'''
     mock_llm_class.return_value = mock_llm_instance
 
-    res = client.post(f"/api/v1/rag/investigate/{case_id}")
+    # Mock current reviewer authentication
+    from backend.app.api.deps import get_current_reviewer
+    from backend.app.models.user import UserModel
+    mock_user = UserModel(
+        id=uuid4(),
+        email="reviewer@ledgerlens.internal",
+        full_name="Demo Reviewer",
+        role="reviewer",
+        is_active=True,
+    )
+    app.dependency_overrides[get_current_reviewer] = lambda: mock_user
+
+    res = client.post(
+        f"/api/v1/rag/investigate/{case_id}",
+        headers={"Content-Type": "application/json", "X-LedgerLens-CSRF": "1"},
+    )
     assert res.status_code == 200
     
     data = res.json()

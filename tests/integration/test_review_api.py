@@ -23,7 +23,26 @@ from backend.app.db.session import get_db
 from backend.app.models.reconciliation import ReconciliationCaseModel
 from backend.app.models.review import HumanReviewActionModel, AuditEventModel
 
+from backend.app.api.deps import get_current_reviewer
+from backend.app.models.user import UserModel
+
 client = TestClient(app)
+
+CSRF_HEADERS = {"Content-Type": "application/json", "X-LedgerLens-CSRF": "1"}
+
+
+@pytest.fixture(autouse=True)
+def override_reviewer_auth():
+    mock_reviewer_user = UserModel(
+        id=uuid4(),
+        email="ops_lead@ledgerlens.internal",
+        full_name="Operations Lead",
+        role="reviewer",
+        is_active=True,
+    )
+    app.dependency_overrides[get_current_reviewer] = lambda: mock_reviewer_user
+    yield
+    app.dependency_overrides.pop(get_current_reviewer, None)
 
 
 def _make_needs_review_case(payment_id: str = "pay_001") -> ReconciliationCaseModel:
@@ -48,7 +67,7 @@ def _make_needs_review_case(payment_id: str = "pay_001") -> ReconciliationCaseMo
     return c
 
 
-def _make_review_action(case_id, actor="ops_lead", action="approve") -> HumanReviewActionModel:
+def _make_review_action(case_id, actor="ops_lead@ledgerlens.internal", action="approve") -> HumanReviewActionModel:
     now = datetime.now(timezone.utc)
     return HumanReviewActionModel(
         id=uuid4(),
@@ -57,7 +76,7 @@ def _make_review_action(case_id, actor="ops_lead", action="approve") -> HumanRev
         action=action,
         previous_decision_status="needs_review",
         new_decision_status="auto_reconciled" if action == "approve" else "rejected",
-        human_comment="Verified with bank",
+        human_comment="Verified with bank records.",
         actioned_at=now,
     )
 
@@ -67,7 +86,7 @@ def _make_audit_event(case_id, event_type="human_approved") -> AuditEventModel:
     return AuditEventModel(
         id=uuid4(),
         event_type=event_type,
-        actor="ops_lead",
+        actor="ops_lead@ledgerlens.internal",
         case_id=case_id,
         previous_status="needs_review",
         new_status="auto_reconciled",
@@ -96,7 +115,7 @@ def test_get_review_queue_returns_needs_review_cases():
     assert body["cases"][0]["decision_status"] == "needs_review"
     assert body["cases"][0]["exception_type"] == "amount_mismatch"
 
-    app.dependency_overrides.clear()
+    app.dependency_overrides.pop(get_db, None)
 
 
 # ── 2. Submit Review Action: Approve ───────────────────────────────────────────
@@ -119,11 +138,12 @@ def test_submit_review_approve_succeeds():
         res = client.post(
             f"/api/v1/review/cases/{case_id}/review",
             json={
-                "actor": "ops_lead",
+                "actor": "ops_lead@ledgerlens.internal",
                 "action": "approve",
-                "human_comment": "Verified with bank",
+                "human_comment": "Verified with bank records.",
                 "expected_version": 1,
             },
+            headers=CSRF_HEADERS,
         )
 
     assert res.status_code == 200
@@ -133,7 +153,7 @@ def test_submit_review_approve_succeeds():
     assert body["previous_decision_status"] == "needs_review"
     assert "audit_event_id" in body
 
-    app.dependency_overrides.clear()
+    app.dependency_overrides.pop(get_db, None)
 
 
 # ── 3. Submit Review Action: Reject ────────────────────────────────────────────
@@ -155,13 +175,19 @@ def test_submit_review_reject_succeeds():
         app.dependency_overrides[get_db] = lambda: mock_db
         res = client.post(
             f"/api/v1/review/cases/{case_id}/review",
-            json={"actor": "ops_lead", "action": "reject", "human_comment": "Duplicate entry.", "expected_version": 1},
+            json={
+                "actor": "ops_lead@ledgerlens.internal",
+                "action": "reject",
+                "human_comment": "Duplicate entry found in settlement records.",
+                "expected_version": 1,
+            },
+            headers=CSRF_HEADERS,
         )
 
     assert res.status_code == 200
     assert res.json()["action"] == "reject"
     assert res.json()["new_decision_status"] == "rejected"
-    app.dependency_overrides.clear()
+    app.dependency_overrides.pop(get_db, None)
 
 
 # ── 4. 409 Guard: Cannot Review an Auto-Reconciled Case ────────────────────────
@@ -176,11 +202,17 @@ def test_review_already_auto_reconciled_returns_409():
 
     res = client.post(
         f"/api/v1/review/cases/{case.id}/review",
-        json={"actor": "ops_lead", "action": "approve", "expected_version": 1},
+        json={
+            "actor": "ops_lead@ledgerlens.internal",
+            "action": "approve",
+            "human_comment": "Verified with bank records.",
+            "expected_version": 1,
+        },
+        headers=CSRF_HEADERS,
     )
     assert res.status_code == 409
     assert "auto_reconciled" in res.json()["detail"]
-    app.dependency_overrides.clear()
+    app.dependency_overrides.pop(get_db, None)
 
 
 # ── 5. 404 on Non-Existent Case ─────────────────────────────────────────────────
@@ -193,10 +225,16 @@ def test_review_nonexistent_case_returns_404():
     fake_id = uuid4()
     res = client.post(
         f"/api/v1/review/cases/{fake_id}/review",
-        json={"actor": "ops_lead", "action": "approve", "expected_version": 1},
+        json={
+            "actor": "ops_lead@ledgerlens.internal",
+            "action": "approve",
+            "human_comment": "Verified with bank records.",
+            "expected_version": 1,
+        },
+        headers=CSRF_HEADERS,
     )
     assert res.status_code == 404
-    app.dependency_overrides.clear()
+    app.dependency_overrides.pop(get_db, None)
 
 
 # ── 6. Append-Only Audit Trail ──────────────────────────────────────────────────
@@ -219,7 +257,7 @@ def test_get_audit_trail_returns_events_in_order():
     assert len(events) == 2
     assert events[0]["event_type"] == "human_approved"
     assert events[1]["event_type"] == "human_rejected"
-    app.dependency_overrides.clear()
+    app.dependency_overrides.pop(get_db, None)
 
 
 # ── 7. 404 on Audit Trail for Non-Existent Case ─────────────────────────────────
@@ -231,4 +269,4 @@ def test_audit_trail_nonexistent_case_returns_404():
 
     res = client.get(f"/api/v1/review/cases/{uuid4()}/audit")
     assert res.status_code == 404
-    app.dependency_overrides.clear()
+    app.dependency_overrides.pop(get_db, None)

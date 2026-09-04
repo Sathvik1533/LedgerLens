@@ -46,15 +46,25 @@ def _setup_case_in_db(db_session, version: int, decision_status: str = "needs_re
     db_session.commit()
     return case_id
 
+from tests.conftest import create_test_user_session
+
 @pytest.mark.integration
 def test_optimistic_locking_success(client, db_session):
     # Setup natural state: case is needs_review, version 1
     case_id = _setup_case_in_db(db_session, version=1, decision_status="needs_review")
+    token, user = create_test_user_session(db_session, role="reviewer")
+    client.cookies.set("ledgerlens_session", token)
 
     # Request with correct expected version
     res = client.post(
         f"/api/v1/review/cases/{case_id}/review",
-        json={"actor": "tester", "action": "approve", "expected_version": 1}
+        json={
+            "actor": user.email,
+            "action": "approve",
+            "human_comment": "Verified with banking settlement report.",
+            "expected_version": 1,
+        },
+        headers={"Content-Type": "application/json", "X-LedgerLens-CSRF": "1"},
     )
     assert res.status_code == 200
 
@@ -76,11 +86,19 @@ def test_optimistic_locking_success(client, db_session):
 def test_optimistic_locking_stale_version_rejection(client, db_session):
     # Setup natural state: case is needs_review, version 2
     case_id = _setup_case_in_db(db_session, version=2, decision_status="needs_review")
+    token, user = create_test_user_session(db_session, role="reviewer")
+    client.cookies.set("ledgerlens_session", token)
 
     # Submit a review request with stale expected_version = 1
     res = client.post(
         f"/api/v1/review/cases/{case_id}/review",
-        json={"actor": "tester2", "action": "reject", "expected_version": 1}
+        json={
+            "actor": user.email,
+            "action": "reject",
+            "human_comment": "Verified with banking settlement report.",
+            "expected_version": 1,
+        },
+        headers={"Content-Type": "application/json", "X-LedgerLens-CSRF": "1"},
     )
 
     # Assert HTTP 409

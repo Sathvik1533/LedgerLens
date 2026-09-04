@@ -11,6 +11,7 @@ from backend.app.models.reconciliation import ReconciliationCaseModel
 from backend.app.models.review import HumanReviewActionModel, AuditEventModel
 from backend.app.models.ingestion import IngestionBatchModel, PaymentsRawModel
 from backend.app.models.payment import PaymentModel
+from tests.conftest import create_test_user_session
 
 
 def _seed_needs_review_case(db_session) -> uuid.UUID:
@@ -88,6 +89,7 @@ async def worker_review_task(
             "expected_version": expected_version,
             "human_comment": f"Simultaneous review action by async worker {worker_id}",
         },
+        headers={"Content-Type": "application/json", "X-LedgerLens-CSRF": "1"},
     )
     return {
         "worker_id": worker_id,
@@ -116,6 +118,8 @@ async def test_concurrent_review_optimistic_locking_race_condition(client_async,
 
     # ── 2. Seed Single Needs-Review Case ─────────────────────────────────────
     case_id = _seed_needs_review_case(db_session)
+    token, _ = create_test_user_session(db_session, role="reviewer")
+    client_async.cookies.set("ledgerlens_session", token)
 
     # ── 3. Synchronize 10 Async Workers via Barrier ──────────────────────────
     num_workers = 10

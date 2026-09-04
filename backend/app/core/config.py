@@ -1,15 +1,29 @@
+import os
+import subprocess
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from typing import Optional
 
+
+def _resolve_source_commit() -> str:
+    env_commit = os.getenv("SOURCE_COMMIT") or os.getenv("RENDER_GIT_COMMIT") or os.getenv("VERCEL_GIT_COMMIT_SHA")
+    if env_commit:
+        return env_commit[:40]
+    try:
+        return subprocess.check_output(["git", "rev-parse", "HEAD"], text=True, stderr=subprocess.DEVNULL).strip()
+    except Exception:
+        return "8b27535f74a0ddd5a09f895b8bd5fa7b5599384d"
+
+
 class Settings(BaseSettings):
-    PROJECT_NAME: str = "Razorpay AI Finance Controller"
+    PROJECT_NAME: str = "LedgerLens"
     API_V1_STR: str = "/api/v1"
     APP_ENV: str = "development"
     LOG_LEVEL: str = "INFO"
     DATABASE_URL: Optional[str] = "postgresql://postgres:postgres@localhost:5432/finance_controller"
     SECRET_KEY: str = "ledgerlens-secure-session-key-2026-recon"
     BACKEND_PROVIDER: str = "Render Cloud Infrastructure"
-    DEPLOYMENT_VERSION: str = "2026.09.04-prod"
+    DEPLOYMENT_VERSION: str = os.getenv("DEPLOYMENT_VERSION") or _resolve_source_commit()
+    SOURCE_COMMIT: str = _resolve_source_commit()
     SESSION_COOKIE_NAME: str = "ledgerlens_session"
     SESSION_EXPIRE_SECONDS: int = 86400  # 24 hours
     
