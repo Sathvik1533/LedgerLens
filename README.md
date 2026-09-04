@@ -198,11 +198,34 @@ The next build milestone is a real but minimal authenticated workflow: public ex
 | Honest exception export | Implemented |
 | Read-only grounded policy assistant | Implemented and tested in the current prototype |
 | Human review and optimistic concurrency | Implemented in the current prototype |
-| Real authentication and secure sessions | Next implementation milestone |
-| Backend role authorization | Next implementation milestone |
-| Dynamic Evaluation UI with fresh no-run state | Required verification milestone |
-| Public deployment and final browser evidence | Pending final implementation and verification |
+| Real authentication and secure sessions | Implemented on latest `main`; production verification documented below |
+| Backend role authorization | Implemented on latest `main`; protected-route verification required |
+| Dynamic Evaluation UI with fresh no-run state | Implemented on latest `main`; Fixture A/B production proof required |
+| Public deployment and final browser evidence | Deployment reachable; final source/deployment reconciliation in progress |
 | Public GitHub repository | Intentionally deferred until the prototype is ready |
+
+## Clickable code and API map
+
+Reviewers should be able to move from a product claim directly to the file that implements it. The latest `main` source contains the following implementation map:
+
+| Product claim | Source file |
+|---|---|
+| Session hashing and cookie security | [`backend/app/core/security.py`](backend/app/core/security.py) |
+| Login, demo login, logout, and current-user endpoints | [`backend/app/api/v1/endpoints/auth.py`](backend/app/api/v1/endpoints/auth.py) |
+| Frontend authentication state | [`frontend/src/context/AuthContext.tsx`](frontend/src/context/AuthContext.tsx) |
+| Protected routes and Administrator gate | [`frontend/src/components/ProtectedRoute.tsx`](frontend/src/components/ProtectedRoute.tsx) |
+| Login experience | [`frontend/src/pages/auth/LoginPage.tsx`](frontend/src/pages/auth/LoginPage.tsx) |
+| Dynamic Evaluation page | [`frontend/src/pages/marketing/EvaluationPage.tsx`](frontend/src/pages/marketing/EvaluationPage.tsx) |
+| Reconciliation and benchmark routes | [`backend/app/api/v1/endpoints/reconciliation.py`](backend/app/api/v1/endpoints/reconciliation.py) |
+| Review decisions and audit routes | [`backend/app/api/v1/endpoints/review.py`](backend/app/api/v1/endpoints/review.py) |
+| Four-source ingestion routes | [`backend/app/api/v1/endpoints/ingestion.py`](backend/app/api/v1/endpoints/ingestion.py) |
+| Grounded policy assistant routes | [`backend/app/api/v1/endpoints/rag.py`](backend/app/api/v1/endpoints/rag.py) |
+| Reproducible benchmark runner | [`evaluation/run_benchmark.py`](evaluation/run_benchmark.py) |
+| Authentication and role tests | [`tests/integration/test_security_auth.py`](tests/integration/test_security_auth.py) |
+
+The deployed API surface is available through the [production OpenAPI document](https://ledgerlens-finance.vercel.app/api/v1/docs). The verified route families are `/api/v1/auth`, `/api/v1/ingestion`, `/api/v1/reconciliation`, `/api/v1/rag`, `/api/v1/review`, `/api/v1/health`, and `/api/v1/readiness`. The API route registration is visible in [`backend/app/api/v1/api.py`](backend/app/api/v1/api.py).
+
+The deployed health endpoint is [`/api/v1/health`](https://ledgerlens-finance.vercel.app/api/v1/health). It currently responds successfully, but its service label still says `Razorpay AI Finance Controller`; that label should be changed to `LedgerLens` before the final reviewer submission.
 
 ## Documentation
 
