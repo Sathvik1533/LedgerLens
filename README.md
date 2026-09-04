@@ -102,7 +102,7 @@ The final submission must show that the second fixture changes the backend respo
 
 The following map is intentionally vertical. The earlier wide flowchart was difficult to read on GitHub and on mobile screens, so this version keeps the product story in one readable column while making the deterministic, AI, and human-review boundaries visible.
 
-![LedgerLens system map](docs/assets/ledgerlens-system-map.svg.png)
+![LedgerLens system map](docs/assets/ledgerlens-system-map.png)
 
 The editable diagram source is [`docs/assets/ledgerlens-system-map.mmd`](docs/assets/ledgerlens-system-map.mmd).
 
