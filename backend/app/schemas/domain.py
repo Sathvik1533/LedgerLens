@@ -5,8 +5,8 @@ from pydantic import BaseModel, Field, ConfigDict
 
 class PaymentRecord(BaseModel):
     payment_id: str
-    order_id: str
-    merchant_id: str
+    order_id: str = "order_default"
+    merchant_id: str = "merch_default"
     payment_type: str = "card"
     payment_method: str = "upi"
     amount: Decimal = Field(..., decimal_places=2, max_digits=18)

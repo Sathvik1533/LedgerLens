@@ -143,6 +143,10 @@ class PolicyRetriever:
 
         return results
 
+    def is_ready(self) -> bool:
+        """Returns True if the embedding model and corpus embeddings are loaded into memory."""
+        return self._loaded and self._embeddings is not None
+
     @property
     def corpus_version(self) -> str:
         return CORPUS_VERSION

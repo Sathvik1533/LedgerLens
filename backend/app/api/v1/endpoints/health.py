@@ -33,10 +33,23 @@ def health_check(db: Session = Depends(get_db)):
 @router.get("/readiness")
 def readiness_check(db: Session = Depends(get_db)):
     """
-    Readiness check indicating the API can connect to the database.
+    Readiness check indicating the API can connect to the database and RAG engine is ready.
     """
+    db_status = "connected"
     try:
         db.execute(text("SELECT 1"))
-        return {"status": "ready", "database": "connected"}
     except Exception:
-        return {"status": "not_ready", "database": "disconnected"}
+        db_status = "disconnected"
+
+    try:
+        from backend.app.api.v1.endpoints.rag import _retriever
+        rag_ready = _retriever.is_ready()
+    except Exception:
+        rag_ready = False
+
+    is_ready = (db_status == "connected" and rag_ready)
+    return {
+        "status": "ready" if is_ready else "not_ready",
+        "database": db_status,
+        "rag_engine": "ready" if rag_ready else "unready",
+    }
