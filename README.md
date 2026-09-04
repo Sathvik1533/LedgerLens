@@ -1,325 +1,217 @@
 <div align="center">
-  <img src="docs/assets/ledgerlens-logo.svg" alt="LedgerLens Mark" width="56" height="56" />
-  <h1>LedgerLens &bull; Razorpay AI Finance Controller</h1>
-  <p><strong>Financial Reconciliation Control Room & Grounded AI Exception Inspector</strong></p>
-  <p>A deterministic multi-source reconciliation engine and human review dashboard for payment operations.</p>
+  <img src="docs/assets/ledgerlens-logo.svg" alt="LedgerLens logo" width="64" height="64" />
+  <h1>LedgerLens</h1>
+  <p><strong>Evidence-first financial reconciliation for the AI Finance Controller track</strong></p>
+  <p>LedgerLens finds where payment, settlement, refund, bank, and ledger records stop agreeing — then gives a human reviewer the evidence to decide what happens next.</p>
 
-  [![CI Test Gate](https://github.com/Sathvik1533/razorpay-ai-finance-controller/actions/workflows/ci-tests.yml/badge.svg)](https://github.com/Sathvik1533/razorpay-ai-finance-controller/actions)
-  ![Python 3.11](https://img.shields.io/badge/Python-3.11-3776AB?logo=python&logoColor=white)
-  ![FastAPI](https://img.shields.io/badge/FastAPI-%3E%3D0.110-009688?logo=fastapi&logoColor=white)
-  ![PostgreSQL 15](https://img.shields.io/badge/PostgreSQL-15-4169E1?logo=postgresql&logoColor=white)
-  ![React 18](https://img.shields.io/badge/React-18-61DAFB?logo=react&logoColor=black)
-  ![TypeScript 5.2](https://img.shields.io/badge/TypeScript-5.2-3178C6?logo=typescript&logoColor=white)
-  ![Vite 5.1](https://img.shields.io/badge/Vite-5.1-646CFF?logo=vite&logoColor=white)
-
-  <br />
-  <img src="docs/assets/ledgerlens-social-preview.svg" alt="LedgerLens Architecture Overview" width="100%" />
+  [![CI](https://github.com/Sathvik1533/razorpay-ai-finance-controller/actions/workflows/ci-tests.yml/badge.svg)](https://github.com/Sathvik1533/razorpay-ai-finance-controller/actions)
+  [![Python](https://img.shields.io/badge/Python-3.11-3776AB?logo=python&logoColor=white)](https://www.python.org/)
+  [![FastAPI](https://img.shields.io/badge/FastAPI-0.110%2B-009688?logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
+  [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15-4169E1?logo=postgresql&logoColor=white)](https://www.postgresql.org/)
+  [![React](https://img.shields.io/badge/React-18-61DAFB?logo=react&logoColor=black)](https://react.dev/)
+  [![TypeScript](https://img.shields.io/badge/TypeScript-5.2-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 </div>
 
----
+> **Project status:** LedgerLens is a student-built prototype. The repository is intentionally private while the authenticated workflow, production deployment, and final Track 04 evidence are being completed.
 
-## 1. Problem & Core Philosophy
+## The idea in one minute
 
-Financial reconciliation can break down when payment captures, settlement files, refunds, and bank-credit entries disagree. Typical causes include fee differences, partial refunds, missing settlements, and unlinked bank credits.
+Financial teams often have several records for the same payment. The payment gateway says one thing, the settlement file says another, a refund changes the expected amount, and the bank statement may show a different credit. Finding the exact disagreement is still a manual process.
 
-LedgerLens keeps financial matching deterministic. Python `Decimal` calculations and PostgreSQL-backed records determine the case outcome; the RAG component is limited to explaining evidence and retrieving relevant local policy excerpts.
+I built LedgerLens to close one focused finance-operations loop:
 
-```text
-┌──────────────────────────────────────────────────────────────────────────────┐
-│                            LEDGERLENS TRUST BOUNDARY                         │
-├──────────────────────────────────────┬───────────────────────────────────────┤
-│    DETERMINISTIC PYTHON ENGINE       │       READ-ONLY POLICY RAG COPILOT    │
-│    (State, Math, and Enforcement)    │       (Explanation and Guidance)      │
-├──────────────────────────────────────┼───────────────────────────────────────┤
-│ ✔ Pure Decimal arithmetic (scale=2)  │ ✔ Dense embedding similarity search   │
-│ ✔ Multi-source parity matching       │ ✔ Synthesizes DB facts + citations    │
-│ ✔ Dual raw + normalized persistence  │ ✔ Cosine grounding floor (>= 0.35)    │
-│ ✔ Optimistic locking (versioning)    │ ✘ Not used as reconciliation decider  │
-│ ✔ Persisted audit events log         │ ✘ Does not write decisions or ledger  │
-└──────────────────────────────────────┴───────────────────────────────────────┘
-```
+> **Records enter → LedgerLens checks them → a mismatch is isolated → evidence explains it → a human decides → the audit history remembers.**
 
----
+The product is designed for the **AI Finance Controller** track. It works over a synthetic batch of more than 50 records, measures automatic matching, reports throughput and accuracy, and lists the exceptions that still need human attention.
 
-## 2. What the System Does
+## What a reviewer should see
 
-LedgerLens closes an end-to-end financial operations loop:
+A complete LedgerLens walkthrough should take a reviewer through one believable story:
 
-1. **Multi-Source Batch Ingestion**: Ingests payments, gateway settlements, refunds, and bank credits via REST endpoints with duplicate idempotency checks.
-2. **Dual-Layer Persistence**: Preserves raw source payloads in dedicated JSONB tables while writing validated, normalized entities into relational PostgreSQL domain tables.
-3. **Deterministic 3-Stage Reconciliation**: Matches transactions across sources using exact scale-2 Decimal arithmetic, automatically approving clean parity matches and isolating 8 distinct financial exception types.
-4. **Operations Control Room**: A React dashboard providing exception filtering, 3-way comparative line-item inspection, and optimistic concurrency locking.
-5. **Grounded AI Copilot**: A read-only RAG assistant providing citation-aware policy retrieval with confidence signaling without mutating database state.
-6. **Persisted Audit Logging**: Successful review actions create persisted audit events with actor identity, timestamps, and state transitions.
+1. A synthetic batch of payment, settlement, refund, bank-credit, and ledger records enters the system.
+2. Deterministic rules calculate the expected financial relationships.
+3. Evaluation reports the batch size, match-rate formula, measured accuracy, throughput, and exceptions.
+4. The review queue highlights the problems that need attention first.
+5. A case dossier compares the four source streams and shows the amount at risk.
+6. The evidence and policy context explain why the records disagree.
+7. A human reviewer records a decision and a short reason.
+8. The audit history preserves what happened, who decided, and when.
 
----
+The important point is that LedgerLens does not stop at “the model found an anomaly.” It connects the anomaly to source records, a human decision, and an auditable outcome.
 
-## 3. Workflow at a Glance
+## Why the numbers can be trusted
 
-```mermaid
-sequenceDiagram
-    autonumber
-    actor Reviewer as Finance Operator
-    participant UI as React Control Room
-    participant API as FastAPI Backend
-    participant DB as PostgreSQL Database
-    participant RAG as Grounded Policy Assistant
+LedgerLens follows a **deterministic first, AI second** rule.
 
-    Reviewer->>UI: Select Case (#pay_synth_001)
-    UI->>API: GET /api/v1/review/cases/{case_id}
-    API->>DB: Fetch case facts, version, and multi-source records
-    DB-->>API: Return evidence (version = 1)
-    API-->>UI: Render 3-Source Comparison Grid
+The deterministic engine owns financial truth. It performs matching, fee and tax calculations, refund adjustments, discrepancy detection, exception classification, and final reconciliation status using Python `Decimal` arithmetic and PostgreSQL numeric values.
 
-    opt Advisory RAG Investigation
-        Reviewer->>UI: Open "AI Copilot" Tab
-        UI->>API: POST /api/v1/rag/investigate/{case_id}
-        API->>RAG: Synthesize DB facts + Policy Citations
-        RAG-->>UI: Return Summary, Root Cause & Quotes (Read-Only)
-    end
+The AI layer is a read-only assistant. It retrieves local policy text and database evidence to help explain a case. It does not calculate the ledger, approve a payment, move funds, or silently change a decision.
 
-    Reviewer->>UI: Submit Review Decision (Approve/Reject + Actor Stamp)
-    UI->>API: POST /api/v1/review/cases/{case_id}/review (expected_version = 1)
-    alt Version Matches (version == 1)
-        API->>DB: Atomic UPDATE version=2, status=new_status
-        API->>DB: INSERT INTO audit_events
-        DB-->>API: Commit Transaction
-        API-->>UI: HTTP 200 OK (Updated State)
-        UI-->>Reviewer: Render Case Closed & Append Audit Event
-    else Stale Version / Concurrent Update
-        DB-->>API: ConcurrentUpdateError
-        API-->>UI: HTTP 409 Conflict
-        UI-->>Reviewer: Display Collision Banner + Refresh Prompt
-    end
-```
+| Responsibility | LedgerLens approach |
+|---|---|
+| Financial arithmetic | Python `Decimal`, rounded to scale 2 |
+| Source reconciliation | Multi-stage deterministic matching |
+| Exceptions | Eight explicit financial exception categories |
+| AI role | Evidence-grounded explanation and policy context |
+| Human role | Review and decision on unresolved cases |
+| Audit | Persisted review and state-transition events |
+| Concurrency | Optimistic version checks with HTTP 409 conflicts |
 
----
+## Track 04 benchmark
 
-## 4. Architecture & Trust Boundaries
+The current benchmark is a deterministic synthetic fixture with a known ground truth. It is designed to satisfy the Track 04 requirement that the system be measured on a real batch rather than one cherry-picked match.
 
-The system separates raw ingestion, relational normalization, deterministic matching, and advisory AI into isolated functional layers across 13 PostgreSQL application tables:
+The baseline command is:
 
-```mermaid
-flowchart TD
-    subgraph INGEST["1. Multi-Source Ingestion & Validation"]
-        P_CSV["Payments CSV"] --> API["FastAPI Endpoints (/api/v1/ingestion)"]
-        S_CSV["Settlements CSV"] --> API
-        R_CSV["Refunds CSV"] --> API
-        B_CSV["Bank Credits CSV"] --> API
-        API --> IDEM["Batch Idempotency Check"]
-        IDEM --> RAW[("Retained Raw Source Records")]
-        IDEM --> NORM[("Normalized Domain Entities")]
-    end
-
-    subgraph ENGINE["2. Deterministic Reconciliation Engine"]
-        NORM --> MATCH["3-Stage Deterministic Matcher"]
-        MATCH --> AUTO["Auto-Reconciled (Parity Matches)"]
-        MATCH --> CASES[("Reconciliation Cases (needs_review)")]
-    end
-
-    subgraph REVIEW["3. Operations Review & Audit"]
-        CASES --> QUEUE_API["Review Queue API (GET /review/queue)"]
-        QUEUE_API --> UI["React Operations Dashboard"]
-        UI --> OPT_LOCK["Submit Decision (expected_version)"]
-        OPT_LOCK -->|Version Match| AUDIT[("Persisted Audit Events")]
-        OPT_LOCK -->|Version Mismatch| HTTP409["HTTP 409 Conflict Banner"]
-    end
-
-    subgraph COPILOT["4. Grounded Policy RAG (Read-Only)"]
-        CORPUS["Local Policy Markdown Files"] --> RETRIEVER["PolicyRetriever (Cosine >= 0.35)"]
-        CASES --> SQL_TOOL["SQLEvidenceTool (Read-Only DB Facts)"]
-        RETRIEVER --> ASST["InvestigationAssistant"]
-        SQL_TOOL --> ASST
-        ASST --> COPILOT_UI["Advisory Copilot Panel (Citations & Root Cause)"]
-    end
-
-    classDef db fill:#0f172a,stroke:#3b82f6,stroke-width:2px,color:#fff;
-    class RAW,NORM,CASES,AUDIT db;
-```
-
----
-
-## 5. Supported Financial Exception Types
-
-| Exception Category | Trigger Condition | Operational Handling |
-|---|---|---|
-| `amount_mismatch` | Net settlement or gross payment does not match bank credit or settlement line item. | Routed to human review; case records discrepancy breakdown. |
-| `missing_settlement` | Payment is captured but no settlement record exists after standard batch cutoff. | Routed to human review; flags missing settlement relationship. |
-| `missing_bank_credit` | Gateway reports processed settlement, but no matching bank statement UTR credit is found. | Routed to human review; reviewer investigates unallocated bank statements. |
-| `fee_mismatch` | Calculated 2% gateway fee or 18% GST deviates from reported settlement values. | Routed to human review; case isolates fee and tax variance. |
-| `duplicate_payment` | Multiple captured payments cite identical order references. | Routed to human review; reviewer investigates duplicate transactions. |
-| `duplicate_bank_credit` | Multiple bank statement entries reference the same UTR or settlement ID. | Routed to human review; flags secondary line item for operator triage. |
-| `partial_refund_not_reflected` | Customer refund was captured but net settlement payout was not adjusted. | Routed to human review; case records unreflected refund balance. |
-| `ambiguous_match` | Multiple settlement candidate lines match a single payment reference. | Matching is suppressed pending human review; candidate matches presented. |
-
----
-
-## 6. Evaluation Benchmark & Evidence
-
-A deterministic 60-record multi-source synthetic evaluation dataset (seed `42`) validates matching accuracy, anomaly detection, and boundary rejection:
-
-| Benchmark Metric | Ground Truth Target | Measured Result | Status |
-|---|---|---|---|
-| **Clean Auto-Reconciliation Rate** | 70.0% (42 / 60) | **70.00%** | Verified |
-| **Auto-Reconcile Precision** | 100.0% | **100.00%** | 0 False Auto-Approvals |
-| **Auto-Reconcile Recall** | 100.0% | **100.00%** | All clean records matched |
-| **Exception Isolation** | 18 anomalies flagged | **18 / 18 Flagged** | 0 Unflagged Exceptions |
-| **Ingestion Scale Validation** | 1 malformed row rejected | **1 Rejected (60/61)** | Boundary Enforced |
-
-Generated benchmark artifacts are version-controlled:
-- Machine-readable JSON report: [`artifacts/evaluation/reconciliation_benchmark_report.json`](artifacts/evaluation/reconciliation_benchmark_report.json)
-- Summary CSV metrics: [`artifacts/evaluation/reconciliation_metrics_summary.csv`](artifacts/evaluation/reconciliation_metrics_summary.csv)
-
----
-
-## 7. Automated Test Suite & CI
-
-```mermaid
-graph LR
-    subgraph CI["GitHub Actions CI Pipeline (.github/workflows/ci-tests.yml)"]
-        DOCKER["PostgreSQL 15 Docker Container"] --> ALEMBIC["Alembic Migrations"]
-        ALEMBIC --> SUITE["Pytest Suite (40 Tests Passing)"]
-    end
-
-    subgraph SUITE_BREAKDOWN["Test Coverage Breakdown"]
-        SUITE --> T1["Integration Tests<br>&bull; Two-Decimal Decimal Arithmetic<br>&bull; Ingestion Idempotency<br>&bull; Safety Checks"]
-        SUITE --> T2["E2E Financial Workflow<br>&bull; 4-Source Ingest & Reconciliation"]
-        SUITE --> T3["Evaluation Harness<br>&bull; 60-Record Ground Truth Benchmark<br>&bull; JSON/CSV Artifact Emission"]
-        SUITE --> T4["Concurrency & Race Conditions<br>&bull; 10-Worker Async Barrier<br>&bull; Optimistic Locking 409s"]
-        SUITE --> T5["Tested Read-Only Investigation Path<br>&bull; Before/after database row counts unchanged<br>&bull; 0.35 cosine grounding floor"]
-    end
-
-    subgraph ARTIFACTS["Emitted Reports"]
-        T3 --> JSON_OUT["artifacts/evaluation/reconciliation_benchmark_report.json"]
-        T3 --> CSV_OUT["artifacts/evaluation/reconciliation_metrics_summary.csv"]
-    end
-```
-
-The test suite consists of **40 automated tests** passing in GitHub Actions CI:
-- **Database & Money Scale**: Validates exact scale-2 numeric rounding and foreign key cascade behavior in PostgreSQL 15.
-- **Batch Ingestion & Idempotency**: Asserts identical hash duplicate rejection across all 4 CSV routes.
-- **Deterministic Reconciliation**: E2E multi-source matching and case generation.
-- **Optimistic Concurrency**: 10-worker async barrier tests asserting `HTTP 409 Conflict` under race conditions.
-- **RAG Grounding Invariant**: Confirms zero database mutations during policy investigation and verifies the 0.35 cosine grounding floor.
-
-To run the full test suite locally against an isolated test database container:
 ```bash
-make test-ci
+python evaluation/run_benchmark.py --size 60 --seed 42
 ```
 
----
+A recent local run produced the following result:
 
-## 8. Tech Stack
+| Metric | Result |
+|---|---:|
+| Valid payment records processed | 60 |
+| Intentionally malformed row blocked | 1 |
+| Records matched automatically | 42 |
+| Records needing review | 18 |
+| Match rate | 70.00% (`42 ÷ 60 × 100`) |
+| Automatic-match precision | 100.00% |
+| Automatic-match recall | 100.00% |
+| False automatic approvals | 0 |
+| Measured throughput | 52,612.24 payment records/sec in the local run |
+| Amount reconciled | INR 159,933.00 |
+| Amount still unexplained | INR 70,907.00 |
 
-- **Backend**: Python 3.11, FastAPI (`fastapi>=0.110.0`), SQLAlchemy (`sqlalchemy>=2.0.28`), Pydantic (`pydantic>=2.6.0`), Alembic (`alembic>=1.13.1`).
-- **Database**: PostgreSQL 15 (`postgres:15-alpine`), `psycopg2-binary`.
-- **Advisory AI & Retrieval**: Sentence Transformers (`sentence-transformers>=2.5.1`), Scikit-Learn (`scikit-learn>=1.4.1.post1`), Groq / Gemini API client integration.
-- **Frontend Control Room**: React 18 (`react@^18.2.0`), TypeScript 5.2 (`typescript@^5.2.2`), Vite 5.1 (`vite@^5.1.6`), Tailwind CSS (`tailwindcss@^3.4.3`), Lucide Icons (`lucide-react@^0.363.0`).
+The throughput value depends on the machine and execution environment. The benchmark writes its current run artifacts to `artifacts/evaluation/`; those generated files are local outputs and should not be treated as permanent truth unless they are regenerated for the run being reviewed.
 
----
+The benchmark reports an honest exception list. The current fixture includes amount mismatch, missing bank credit, partial refund not reflected, fee mismatch, duplicate payment, and missing settlement cases. The complete eight-category model also supports duplicate bank credit and ambiguous match categories when they occur.
 
-## 9. Quickstart Guide
+The next verification step is to run a second fixture, such as:
+
+```bash
+python evaluation/run_benchmark.py --size 75 --seed 99
+```
+
+The final submission must show that the second fixture changes the backend response and the displayed UI values rather than replaying static frontend numbers.
+
+## Architecture
+
+```mermaid
+flowchart LR
+    A[Payments, settlements, refunds, bank credits] --> B[Batch ingestion and validation]
+    B --> C[Raw and normalized PostgreSQL records]
+    C --> D[Deterministic reconciliation engine]
+    D --> E[Automatic matches]
+    D --> F[Exception cases]
+    F --> G[Evidence-first review queue]
+    G --> H[Human decision]
+    H --> I[Persisted audit history]
+    F --> J[Read-only policy RAG]
+    J --> G
+```
+
+The repository is organized around clear boundaries:
+
+- `backend/app/domain/` contains deterministic matching and financial calculations.
+- `backend/app/services/` coordinates ingestion and reconciliation.
+- `backend/app/models/` and `backend/app/repositories/` manage PostgreSQL persistence.
+- `backend/app/rag/` contains policy retrieval and the read-only investigation assistant.
+- `frontend/src/` contains the React review queue, case detail view, and shared UI components.
+- `evaluation/` contains the reproducible benchmark runner and artifact writers.
+- `tests/` contains unit, integration, evaluation, concurrency, RAG, and end-to-end workflow tests.
+- `docs/` contains the architecture, data contract, evaluation methodology, design decisions, security posture, and demo material.
+
+## Local setup
 
 ### Prerequisites
-- Docker & Docker Compose
-- Python 3.11+
-- Node.js 18+ and npm
 
-### 1. Start Database & Backend API
+- Docker and Docker Compose
+- Python 3.11 or newer
+- Node.js 18 or newer
+- npm
+
+### Start PostgreSQL and the API
+
 ```bash
-# Start PostgreSQL and FastAPI backend
 make up
-
-# Apply database migrations
-docker compose exec api alembic upgrade head
 ```
-The FastAPI documentation will be available at `http://localhost:8000/docs`.
 
-### 2. Start the Frontend Operations Dashboard
+The API is available at `http://localhost:8000`. FastAPI documentation is available at `http://localhost:8000/api/v1/docs`.
+
+### Start the frontend
+
 ```bash
 cd frontend
 npm install
 npm run dev
 ```
-The Vite development server starts at `http://localhost:5173` by default.
-The UI expects the FastAPI API to be reachable through the configured Vite proxy or API base URL.
 
-### 3. Run the CI Test Suite
+The Vite development server is available at `http://localhost:5173` and proxies API requests according to `frontend/vite.config.ts`.
+
+### Run the benchmark
+
+From the repository root:
+
 ```bash
-# Spins up isolated PostgreSQL test container on port 5433, runs all 40 tests, and tears down
+python evaluation/run_benchmark.py --size 60 --seed 42
+```
+
+### Run the test suite
+
+The CI workflow starts an isolated PostgreSQL 15 database before running the integration, evaluation, and end-to-end suites.
+
+```bash
 make test-ci
 ```
 
----
+Unit tests can be run separately when the Python development dependencies are installed:
 
-## 10. Repository Map
-
-```text
-razorpay-ai-finance-controller/
-├── backend/
-│   ├── alembic/                    # Database migrations (13 application tables)
-│   ├── app/
-│   │   ├── api/v1/endpoints/       # REST routes: ingestion, reconciliation, review, rag, health
-│   │   ├── core/                   # App configuration & environment settings
-│   │   ├── db/                     # SQLAlchemy session & base models
-│   │   ├── domain/                 # Deterministic matcher, settlement calculator, exceptions
-│   │   ├── models/                 # 13 SQLAlchemy ORM models
-│   │   ├── rag/                    # PolicyRetriever, SQLEvidenceTool, Assistant & policy corpus
-│   │   ├── repositories/           # Payment, reconciliation, and review data-access layers
-│   │   ├── schemas/                # Strict Pydantic v2 validation schemas
-│   │   └── services/               # Ingestion and reconciliation orchestrators
-│   └── requirements.txt            # Backend dependencies
-├── frontend/
-│   ├── src/
-│   │   ├── api/                    # API client with optimistic locking handling
-│   │   ├── components/             # MultiSourceCard, ReviewActionForm, RagCopilotPanel, Badges
-│   │   ├── pages/                  # ReviewQueuePage, CaseDetailPage
-│   │   └── types/                  # TypeScript domain interfaces
-│   ├── package.json                # React 18, Vite 5, Tailwind CSS
-│   └── vite.config.ts              # API proxy and build configuration
-├── tests/
-│   ├── integration/                # Database constraints, scale-2 money, RAG grounding, review API
-│   ├── e2e/                        # End-to-end 4-source reconciliation workflow
-│   ├── evaluation/                 # 60-record deterministic benchmark harness & artifact tests
-│   └── conftest.py                 # Isolated PostgreSQL container fixture & migration runner
-├── docs/
-│   ├── assets/                     # Architecture diagrams, brand mark, social preview SVG
-│   ├── ARCHITECTURE.md             # In-depth technical architecture reference
-│   ├── design-decisions.md         # Key Architectural Decision Records (ADRs)
-│   ├── evaluation.md               # 60-record benchmark methodology & evaluation schema
-│   └── demo-script.md              # 5-minute technical pitch and walkthrough script
-├── artifacts/                      # Emitted benchmark evaluation reports (JSON & CSV)
-├── docker-compose.yml              # Local development compose file
-├── docker-compose.test.yml         # Isolated test database container (port 5433)
-├── Makefile                        # Developer & CI command targets (test-ci, up, down)
-└── README.md                       # Main project documentation
+```bash
+PYTHONPATH=. pytest -q tests/unit/ tests/evaluation/
 ```
 
----
+## Current scope
 
-## 11. Architectural Decision Records (ADRs)
+The current prototype focuses on batch CSV ingestion and exception-first reconciliation for synthetic data. It does not implement streaming Kafka or ISO 20022 feeds, autonomous payout holds, bank-credit clawbacks, or a general-purpose multi-tenant finance platform.
 
-- **ADR 01: Python `Decimal` and PostgreSQL `numeric(18,2)`**: Eliminates IEEE 754 floating-point rounding errors across financial calculations. [Read details](docs/design-decisions.md#adr-01-python-decimal-and-postgresql-numeric182-for-currency)
-- **ADR 02: Deterministic Matching vs. AI Calculation**: Isolates financial arithmetic to deterministic Python rules; restricts LLM to read-only explanations. [Read details](docs/design-decisions.md#adr-02-deterministic-python-engine-vs-generative-ai-for-matching)
-- **ADR 03: Optimistic Concurrency Control (`expected_version`)**: Prevents race conditions during concurrent reviewer actions without persistent row locks. [Read details](docs/design-decisions.md#adr-03-optimistic-concurrency-control-expected_version-for-reviews)
-- **ADR 04: Read-Only RAG with 0.35 Grounding Floor**: Rejects ungrounded policy citations to prevent hallucinated compliance guidance. [Read details](docs/design-decisions.md#adr-04-read-only-rag-assistant-with-cosine-similarity-grounding-floor)
+The application is intentionally not described as ready for real money. Before live use, it still needs a full identity provider or hardened authentication system, role-based authorization, tenant isolation, stronger deployment controls, managed secrets, file security limits, operational monitoring, and a compliance review.
 
----
+The next build milestone is a real but minimal authenticated workflow: public explanatory pages remain open, while financial and operational pages require a server-enforced session. Reviewer and Administrator permissions must be enforced by the backend, and audit events must use the authenticated user as the actor.
 
-## 12. Known Limitations & Scope Boundaries
+## Repository status
 
-- **Batch Ingestion vs. Streaming**: The current release processes batch CSV payloads with duplicate hash idempotency; real-time Kafka or ISO20022 webhook streams are not implemented.
-- **Read-Only Advisory AI**: The RAG assistant provides structured root-cause explanations and policy quotes; it does not execute automated payout holds or bank credit clawbacks.
-- **Single-Tenant Scope**: Designed as an operations control room for single-tenant payment reconciliation without dynamic multi-tenant RBAC.
+| Area | Status |
+|---|---|
+| Deterministic multi-source reconciliation | Implemented in the current prototype |
+| Synthetic 60-record benchmark | Implemented and locally reproducible |
+| Honest exception export | Implemented |
+| Read-only grounded policy assistant | Implemented and tested in the current prototype |
+| Human review and optimistic concurrency | Implemented in the current prototype |
+| Real authentication and secure sessions | Next implementation milestone |
+| Backend role authorization | Next implementation milestone |
+| Dynamic Evaluation UI with fresh no-run state | Required verification milestone |
+| Public deployment and final browser evidence | Pending final implementation and verification |
+| Public GitHub repository | Intentionally deferred until the prototype is ready |
 
----
+## Documentation
 
-## 13. Project Context
+- [Architecture](docs/ARCHITECTURE.md)
+- [Evaluation methodology](docs/evaluation.md)
+- [Data contract](docs/DATA_CONTRACT.md)
+- [Security and production posture](docs/SECURITY_AND_PRODUCTION.md)
+- [UI/UX design system](docs/UI_UX_DESIGN_SYSTEM.md)
+- [Design decisions](docs/design-decisions.md)
+- [Failure and recovery plan](docs/FAILURE_AND_RECOVERY.md)
+- [Five-minute demo script](docs/demo-script.md)
+- [Competitor analysis](docs/COMPETITOR_ANALYSIS.md)
 
-LedgerLens is a student-built technical project. It is not affiliated with, endorsed by, or connected to Razorpay or any financial institution.
+## Project identity
 
----
+The intended product name is **LedgerLens**. The current repository slug remains `razorpay-ai-finance-controller` while the prototype is being completed. A repository rename will be handled separately after the implementation and deployment links are stable.
 
-## 14. License
+LedgerLens is a student-built technical project. It is not affiliated with, endorsed by, or connected to Razorpay or any financial institution. All benchmark data is synthetic.
 
-Distributed under the MIT License. See `LICENSE` for details.
+## License
+
+This project is distributed under the MIT License. See [LICENSE](LICENSE).
