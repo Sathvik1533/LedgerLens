@@ -3,11 +3,17 @@
   <h1>LedgerLens</h1>
   <p><strong>Evidence-first financial reconciliation for the AI Finance Controller track</strong></p>
   <p>LedgerLens finds where payment, settlement, refund, bank, and ledger records stop agreeing — then gives a human reviewer the evidence to decide what happens next.</p>
-  <p><sub>Python 3.11 · FastAPI · PostgreSQL · React · TypeScript</sub></p>
 
   <br />
   <img src="docs/assets/ledgerlens-social-preview.svg" alt="LedgerLens financial reconciliation control room" width="100%" />
 </div>
+
+[![Python](https://img.shields.io/badge/Python-3.11-3776AB?logo=python&logoColor=white)](https://www.python.org/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.110%2B-009688?logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15-4169E1?logo=postgresql&logoColor=white)](https://www.postgresql.org/)
+[![React](https://img.shields.io/badge/React-18-61DAFB?logo=react&logoColor=black)](https://react.dev/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.2-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![License](https://img.shields.io/badge/License-MIT-8B5E3C.svg)](LICENSE)
 
 > **Project status:** LedgerLens is a student-built prototype. The repository is intentionally private while the authenticated workflow, production deployment, and final Track 04 evidence are being completed.
 
