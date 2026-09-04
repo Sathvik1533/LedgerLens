@@ -33,7 +33,7 @@
   <!-- Title & Subtitle -->
   <text x="600" y="275" fill="#FFFFFF" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="44" font-weight="800" text-anchor="middle" letter-spacing="-0.5">LedgerLens</text>
   <text x="600" y="315" fill="#60A5FA" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="20" font-weight="600" text-anchor="middle" letter-spacing="0.5">Razorpay AI Finance Controller</text>
-  <text x="600" y="355" fill="#94A3B8" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="16" font-weight="400" text-anchor="middle">Financial Reconciliation Control Room &bull; Multi-Source Accounting &bull; Grounded Policy RAG</text>
+  <text x="600" y="355" fill="#94A3B8" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="16" font-weight="400" text-anchor="middle">Financial Reconciliation Control Room &#8226; Multi-Source Accounting &#8226; Grounded Policy RAG</text>
 
   <!-- 3 Flow Architecture Pillars -->
   <g transform="translate(180, 420)">
@@ -42,7 +42,7 @@
     <text x="24" y="36" fill="#38BDF8" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="14" font-weight="700">1. INGESTION</text>
     <text x="24" y="62" fill="#E2E8F0" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="500">4 CSV Source Feeds</text>
     <text x="24" y="82" fill="#94A3B8" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="11">Dual Raw + Normalized</text>
-    <text x="24" y="100" fill="#64748B" font-family="monospace" font-size="10">Idempotency &bull; PostgreSQL</text>
+    <text x="24" y="100" fill="#64748B" font-family="monospace" font-size="10">Idempotency &#8226; PostgreSQL</text>
 
     <!-- Pillar 2: Matcher -->
     <rect x="300" y="0" width="240" height="120" rx="12" fill="#0F172A" stroke="#3B82F6" stroke-width="1.5" />
@@ -55,7 +55,7 @@
     <rect x="600" y="0" width="240" height="120" rx="12" fill="#0F172A" stroke="#334155" stroke-width="1.5" />
     <text x="624" y="36" fill="#A78BFA" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="14" font-weight="700">3. OPS CONTROL ROOM</text>
     <text x="624" y="62" fill="#E2E8F0" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="500">Human Review &amp; Audit</text>
-    <text x="624" y="82" fill="#94A3B8" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="11">Optimistic Locking (v1 &rarr; v2)</text>
+    <text x="624" y="82" fill="#94A3B8" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="11">Optimistic Locking (v1 &#8594; v2)</text>
     <text x="624" y="100" fill="#06B6D4" font-family="monospace" font-size="10">Read-Only RAG Copilot</text>
   </g>
 </svg>

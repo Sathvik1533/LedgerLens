@@ -5,7 +5,7 @@
   <p>LedgerLens finds where payment, settlement, refund, bank, and ledger records stop agreeing — then gives a human reviewer the evidence to decide what happens next.</p>
 
   <br />
-  <img src="docs/assets/ledgerlens-social-preview.svg" alt="LedgerLens financial reconciliation control room" width="100%" />
+  <img src="docs/assets/ledgerlens-social-preview.png" alt="LedgerLens financial reconciliation control room" width="100%" />
 </div>
 
 [![Python](https://img.shields.io/badge/Python-3.11-3776AB?logo=python&logoColor=white)](https://www.python.org/)
