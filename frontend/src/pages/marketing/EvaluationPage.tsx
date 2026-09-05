@@ -316,7 +316,7 @@ function EvaluationContent() {
             </div>
 
             {/* Formula Banner */}
-            <div className="p-4 sm:p-5 bg-[#111315] text-[#EAE4D8] rounded-xs border border-white/10 space-y-2">
+            <div data-testid="evaluation-formula" className="p-4 sm:p-5 bg-[#111315] text-[#EAE4D8] rounded-xs border border-white/10 space-y-2">
               <span className="text-[10px] font-mono tracking-widest text-[#716E68] uppercase block">
                 Mathematical Formula &bull; Exact Decimal Parity
               </span>

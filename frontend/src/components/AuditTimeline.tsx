@@ -3,7 +3,7 @@ import { AuditEventItem } from '../types/api';
 
 export const AuditTimeline: React.FC<{ events: AuditEventItem[] }> = ({ events }) => {
   return (
-    <div className="border border-rule bg-surface p-4 rounded-xs space-y-3 font-sans shadow-subtle">
+    <div data-testid="audit-ledger" className="border border-rule bg-surface p-4 rounded-xs space-y-3 font-sans shadow-subtle">
       <div className="flex items-center justify-between border-b border-rule pb-2">
         <span className="font-editorial text-base font-medium text-ink">
           Case audit ledger

@@ -5,12 +5,23 @@ on:
     branches: [ main ]
   pull_request:
     branches: [ main ]
+  workflow_dispatch:
+    inputs:
+      run_production_smoke:
+        description: "Run read-only production smoke suite against live URL"
+        required: false
+        type: boolean
+        default: false
+      production_base_url:
+        description: "Target URL for production smoke tests"
+        required: false
+        type: string
+        default: "https://ledgerlens-finance.vercel.app"
 
 jobs:
-  test:
-    name: Run Full Integration, E2E & Evaluation Test Suite
+  backend-tests:
+    name: Backend Integration & Evaluation Tests
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -21,24 +32,161 @@ jobs:
           python-version: "3.11"
           cache: "pip"
 
-      - name: Install Dependencies
+      - name: Install Backend Dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r backend/requirements.txt
-          python -m playwright install --with-deps chromium
 
       - name: Start Isolated PostgreSQL Test Database
         run: |
           docker compose -f docker-compose.test.yml up -d --wait
 
-      - name: Run Full Test Suite (40 Tests)
+      - name: Run Backend Integration & Financial Workflow Tests
         env:
           TEST_DATABASE_URL: "postgresql://postgres:testpassword@localhost:5433/finance_controller_test"
           PYTHONPATH: .
         run: |
-          pytest -v tests/integration/ tests/e2e/ tests/evaluation/
+          pytest -v tests/integration/ tests/evaluation/ tests/e2e/test_financial_workflow_e2e.py
 
       - name: Teardown Test Database
         if: always()
         run: |
           docker compose -f docker-compose.test.yml down -v
+
+  frontend-build:
+    name: Frontend Production Build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Build Frontend Assets
+        working-directory: frontend
+        run: |
+          npm ci
+          npm run build
+
+  repository-security:
+    name: Repository Security & Credential Audit
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code with History
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 50
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Scan History for Leaked Secrets
+        run: |
+          python scripts/scan_secrets.py
+
+  browser-e2e-local:
+    name: Browser E2E Tests (Disposable Local Stack)
+    runs-on: ubuntu-latest
+    needs: [backend-tests, frontend-build]
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: Set up Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install Python Dependencies & Playwright
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r backend/requirements.txt
+          python -m playwright install --with-deps chromium
+
+      - name: Install Frontend Dependencies
+        working-directory: frontend
+        run: |
+          npm ci
+
+      - name: Start Isolated PostgreSQL Test Database
+        run: |
+          docker compose -f docker-compose.test.yml up -d --wait
+
+      - name: Deterministically Bootstrap Test Database
+        env:
+          TEST_DATABASE_URL: "postgresql://postgres:testpassword@localhost:5433/finance_controller_test"
+          PYTHONPATH: .
+        run: |
+          python scripts/bootstrap_test_db.py --test-db-url "postgresql://postgres:testpassword@localhost:5433/finance_controller_test"
+
+      - name: Launch Local Stack (FastAPI & Vite)
+        env:
+          DATABASE_URL: "postgresql://postgres:testpassword@localhost:5433/finance_controller_test"
+          TEST_DATABASE_URL: "postgresql://postgres:testpassword@localhost:5433/finance_controller_test"
+          PYTHONPATH: .
+        run: |
+          uvicorn backend.app.main:app --host 127.0.0.1 --port 8000 &
+          echo "BACKEND_PID=$!" >> $GITHUB_ENV
+          cd frontend && npm run dev -- --host 127.0.0.1 --port 5173 &
+          echo "FRONTEND_PID=$!" >> $GITHUB_ENV
+
+      - name: Wait for Services Readiness
+        run: |
+          python scripts/wait_for_services.py --backend http://127.0.0.1:8000 --frontend http://127.0.0.1:5173 --timeout 90
+
+      - name: Run Local Browser E2E Test Suite
+        env:
+          LOCAL_BASE_URL: "http://127.0.0.1:5173"
+          LOCAL_API_URL: "http://127.0.0.1:8000"
+          PYTHONPATH: .
+        run: |
+          pytest -v tests/e2e/test_browser_local_ci.py
+
+      - name: Clean Teardown of Local Stack
+        if: always()
+        run: |
+          if [ -n "$BACKEND_PID" ]; then kill -9 $BACKEND_PID || true; fi
+          if [ -n "$FRONTEND_PID" ]; then kill -9 $FRONTEND_PID || true; fi
+          docker compose -f docker-compose.test.yml down -v
+
+  production-smoke:
+    name: Production Read-Only POV Smoke Test
+    runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_dispatch' && inputs.run_production_smoke == true
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: Install Dependencies & Playwright
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r backend/requirements.txt
+          python -m playwright install --with-deps chromium
+
+      - name: Run Read-Only Production Smoke Suite
+        env:
+          LEDGERLENS_BASE_URL: ${{ inputs.production_base_url || 'https://ledgerlens-finance.vercel.app' }}
+          PYTHONPATH: .
+        run: |
+          pytest -v tests/e2e/test_browser_pov.py

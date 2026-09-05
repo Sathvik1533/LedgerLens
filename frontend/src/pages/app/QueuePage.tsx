@@ -166,7 +166,7 @@ export const QueuePage: React.FC = () => {
               {viewMode === 'unique' ? 'Unique Transactions Mode' : 'All Historical Runs'}
             </span>
           </div>
-          <h1 className="font-editorial text-3xl sm:text-4xl font-medium text-ink">
+          <h1 data-testid="queue-heading" className="font-editorial text-3xl sm:text-4xl font-medium text-ink">
             Exceptions requiring operator sign-off
           </h1>
           <p className="text-xs sm:text-sm text-ink-secondary max-w-2xl font-sans leading-relaxed">
@@ -330,6 +330,7 @@ export const QueuePage: React.FC = () => {
                   return (
                     <tr
                       key={c.case_id}
+                      data-testid="queue-row"
                       onClick={() => navigate(`/app/case/${c.case_id}`)}
                       className="hover:bg-canvas/80 transition-colors cursor-pointer group"
                     >

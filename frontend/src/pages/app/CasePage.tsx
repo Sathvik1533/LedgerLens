@@ -181,7 +181,7 @@ export const CaseDetailPage: React.FC<CaseDetailPageProps> = ({ caseId: propCase
 
       {/* Dated Ledger Receipt Notification */}
       {receiptBanner && (
-        <div className="p-4 bg-ledger-green/10 border border-ledger-green/30 rounded-xs flex items-center justify-between gap-4 text-xs font-mono text-ink">
+        <div data-testid="review-receipt-banner" className="p-4 bg-ledger-green/10 border border-ledger-green/30 rounded-xs flex items-center justify-between gap-4 text-xs font-mono text-ink">
           <div>
             <strong className="text-ledger-green block">
               ✓ Decision permanently recorded to ledger

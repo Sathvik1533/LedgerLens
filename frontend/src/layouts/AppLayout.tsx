@@ -117,8 +117,9 @@ export default function AppLayout() {
                   <span className="text-[10px] font-mono text-ink-secondary uppercase tracking-wider">{user.role === 'admin' ? 'Administrator' : 'Reviewer'}</span>
                 </div>
                 <button
+                  data-testid="nav-logout"
                   onClick={() => logout()}
-                  className="px-2 py-1 text-[11px] font-mono border border-rule hover:bg-canvas rounded-xs text-ink-secondary hover:text-ink transition-colors"
+                  className="px-2 py-1 text-[11px] font-mono border border-rule hover:bg-canvas rounded-xs text-ink-secondary hover:text-ink transition-colors cursor-pointer"
                   title="Sign out of LedgerLens"
                 >
                   Sign out

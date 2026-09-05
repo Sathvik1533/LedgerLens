@@ -17,8 +17,11 @@ ENV PYTHONPATH=/app
 COPY backend/ ./backend/
 COPY evaluation/ ./evaluation/
 COPY tests/ ./tests/
+COPY artifacts/ ./artifacts/
+COPY data/ ./data/
 COPY alembic.ini ./
 
 EXPOSE 8000
 
-CMD ["uvicorn", "backend.app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["sh", "-c", "alembic upgrade head && uvicorn backend.app.main:app --host 0.0.0.0 --port 8000"]
+

@@ -246,7 +246,7 @@ export const LoginPage: React.FC = () => {
                   Enter the control room
                 </h2>
                 <p className="text-xs text-ink-secondary leading-relaxed">
-                  Review financial exceptions, compare the evidence, read the approved rule, and record a human decision.
+                  Sign in to the protected LedgerLens reviewer control room to investigate financial exceptions and preserve human decisions.
                 </p>
               </div>
 
@@ -266,6 +266,7 @@ export const LoginPage: React.FC = () => {
               <div className="space-y-3">
                 <button
                   type="button"
+                  data-testid="login-demo-reviewer"
                   onClick={() => handleDemoAccess("reviewer")}
                   disabled={isSubmitting || isLoading}
                   className="w-full text-left p-4 border-2 border-resolved/80 bg-resolved/5 hover:bg-resolved/10 focus-visible:ring-2 focus-visible:ring-resolved focus-visible:outline-none rounded-xs transition-all group disabled:opacity-50 shadow-subtle cursor-pointer"
@@ -293,6 +294,7 @@ export const LoginPage: React.FC = () => {
                 {/* SECONDARY DEMO ACCESS: Administrator Access */}
                 <button
                   type="button"
+                  data-testid="login-demo-admin"
                   onClick={() => handleDemoAccess("admin")}
                   disabled={isSubmitting || isLoading}
                   className="w-full text-left p-3 border border-rule bg-canvas hover:bg-surface hover:border-ink/40 focus-visible:ring-1 focus-visible:ring-ink focus-visible:outline-none rounded-xs transition-all group disabled:opacity-50 cursor-pointer"

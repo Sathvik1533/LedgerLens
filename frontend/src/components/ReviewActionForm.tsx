@@ -65,7 +65,7 @@ export const ReviewActionForm: React.FC<ReviewActionFormProps> = ({
   };
 
   return (
-    <div className="border border-rule bg-surface p-5 rounded-xs space-y-4 font-sans shadow-subtle">
+    <div data-testid="review-action-form" className="border border-rule bg-surface p-5 rounded-xs space-y-4 font-sans shadow-subtle">
       {/* Header Styled as Institutional Sign-off */}
       <div className="border-b border-rule pb-3 space-y-1">
         <div className="flex items-center justify-between">
@@ -83,7 +83,7 @@ export const ReviewActionForm: React.FC<ReviewActionFormProps> = ({
 
       {/* Conflict collision notification */}
       {conflictError && (
-        <div className="p-3 bg-critical/10 border border-critical/30 rounded-xs space-y-2 text-xs text-critical font-sans">
+        <div data-testid="review-conflict-error" className="p-3 bg-critical/10 border border-critical/30 rounded-xs space-y-2 text-xs text-critical font-sans">
           <div className="font-semibold">Case updated by another reviewer</div>
           <p className="text-[11px] leading-normal">{errorMsg}</p>
           <button
@@ -97,14 +97,14 @@ export const ReviewActionForm: React.FC<ReviewActionFormProps> = ({
 
       {/* General Error banner */}
       {errorMsg && !conflictError && (
-        <div className="p-2.5 bg-critical/10 border border-critical/30 rounded-xs text-xs text-critical font-mono">
+        <div data-testid="review-error-banner" className="p-2.5 bg-critical/10 border border-critical/30 rounded-xs text-xs text-critical font-mono">
           {errorMsg}
         </div>
       )}
 
       {/* Post-submission Dated Ledger Receipt */}
       {lastReceipt && (
-        <div className="p-4 bg-ledger-green/10 border border-ledger-green/30 rounded-xs space-y-2 font-mono text-xs text-ink">
+        <div data-testid="review-receipt-banner" className="p-4 bg-ledger-green/10 border border-ledger-green/30 rounded-xs space-y-2 font-mono text-xs text-ink">
           <div className="flex items-center justify-between text-ledger-green font-semibold">
             <span>✓ Decision recorded to ledger</span>
             <span>v{lastReceipt.current_version}</span>
@@ -122,7 +122,7 @@ export const ReviewActionForm: React.FC<ReviewActionFormProps> = ({
       )}
 
       {/* Decision Form */}
-      <form onSubmit={handleSubmit} className="space-y-4 text-xs">
+      <form onSubmit={handleSubmit} className="space-y-4 text-xs font-sans">
         {/* Verified Reviewer Identity */}
         <div className="p-2.5 bg-canvas border border-rule rounded-xs space-y-1">
           <div className="text-[11px] font-mono uppercase text-ink-secondary tracking-wider">
@@ -141,11 +141,12 @@ export const ReviewActionForm: React.FC<ReviewActionFormProps> = ({
         {/* Action Choice */}
         <div className="space-y-1.5">
           <label className="text-[11px] font-mono uppercase text-ink-secondary block">
-            Review Determination
+            Resolution Action
           </label>
           <div className="grid grid-cols-3 gap-2">
             <button
               type="button"
+              data-testid="review-action-approve"
               onClick={() => setAction('approve')}
               className={`py-2 px-2 border text-center font-medium rounded-xs transition-colors ${
                 action === 'approve'
@@ -157,6 +158,7 @@ export const ReviewActionForm: React.FC<ReviewActionFormProps> = ({
             </button>
             <button
               type="button"
+              data-testid="review-action-reject"
               onClick={() => setAction('reject')}
               className={`py-2 px-2 border text-center font-medium rounded-xs transition-colors ${
                 action === 'reject'
@@ -168,6 +170,7 @@ export const ReviewActionForm: React.FC<ReviewActionFormProps> = ({
             </button>
             <button
               type="button"
+              data-testid="review-action-escalate"
               onClick={() => setAction('mark_unresolved')}
               className={`py-2 px-2 border text-center font-medium rounded-xs transition-colors ${
                 action === 'mark_unresolved'
@@ -191,6 +194,7 @@ export const ReviewActionForm: React.FC<ReviewActionFormProps> = ({
             </span>
           </div>
           <textarea
+            data-testid="review-action-comment"
             value={comment}
             onChange={(e) => setComment(e.target.value)}
             rows={3}
@@ -204,8 +208,9 @@ export const ReviewActionForm: React.FC<ReviewActionFormProps> = ({
         {/* Submit button */}
         <button
           type="submit"
+          data-testid="review-action-submit"
           disabled={isSubmitting}
-          className="w-full py-2.5 bg-ink hover:bg-ink/90 text-canvas font-medium text-xs rounded-xs transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+          className="w-full py-2.5 bg-ink hover:bg-ink/90 text-canvas font-medium text-xs rounded-xs transition-colors disabled:opacity-50 flex items-center justify-center gap-2 cursor-pointer"
         >
           {isSubmitting ? (
             <span>Recording to ledger...</span>

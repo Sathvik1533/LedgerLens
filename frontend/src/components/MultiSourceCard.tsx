@@ -128,7 +128,7 @@ export const MultiSourceCard: React.FC<{ evidence: CaseEvidenceResponse }> = ({ 
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {/* Slip 1: Merchant Payment */}
-          <div className={`evidence-slip p-4 space-y-3 rounded-xs border ${summary.divergenceStreamIndex === 1 ? 'border-critical/60 bg-critical/5' : ''}`}>
+          <div data-testid="evidence-payment" className={`evidence-slip p-4 space-y-3 rounded-xs border ${summary.divergenceStreamIndex === 1 ? 'border-critical/60 bg-critical/5' : ''}`}>
             <div className="flex items-center justify-between border-b border-rule pb-2">
               <div className="flex items-center gap-2">
                 <span className="text-xs font-semibold text-ink">1. Merchant Payment Record</span>
@@ -178,7 +178,7 @@ export const MultiSourceCard: React.FC<{ evidence: CaseEvidenceResponse }> = ({ 
           </div>
 
           {/* Slip 2: Gateway Settlement */}
-          <div className={`evidence-slip p-4 space-y-3 rounded-xs border ${summary.divergenceStreamIndex === 2 ? 'border-critical/60 bg-critical/5' : ''}`}>
+          <div data-testid="evidence-settlement" className={`evidence-slip p-4 space-y-3 rounded-xs border ${summary.divergenceStreamIndex === 2 ? 'border-critical/60 bg-critical/5' : ''}`}>
             <div className="flex items-center justify-between border-b border-rule pb-2">
               <div className="flex items-center gap-2">
                 <span className="text-xs font-semibold text-ink">2. Gateway Settlement Slip</span>
@@ -226,7 +226,7 @@ export const MultiSourceCard: React.FC<{ evidence: CaseEvidenceResponse }> = ({ 
           </div>
 
           {/* Slip 3: Customer Refund State */}
-          <div className={`evidence-slip p-4 space-y-3 rounded-xs border ${summary.divergenceStreamIndex === 3 ? 'border-critical/60 bg-critical/5' : ''}`}>
+          <div data-testid="evidence-refund" className={`evidence-slip p-4 space-y-3 rounded-xs border ${summary.divergenceStreamIndex === 3 ? 'border-critical/60 bg-critical/5' : ''}`}>
             <div className="flex items-center justify-between border-b border-rule pb-2">
               <div className="flex items-center gap-2">
                 <span className="text-xs font-semibold text-ink">3. Customer Refund Slip</span>
@@ -254,12 +254,18 @@ export const MultiSourceCard: React.FC<{ evidence: CaseEvidenceResponse }> = ({ 
                       <span className="capitalize">{ref.refund_type}</span>
                     </div>
                     <div className="flex justify-between items-center text-ink-secondary text-[11px] font-mono">
-                      <span>Refund ID</span>
-                      <span>{ref.refund_id}</span>
+                      <span>Refund Identifier</span>
+                      <button
+                        onClick={() => copyText(ref.refund_id, 'ref_id')}
+                        className="text-link hover:underline flex items-center gap-1"
+                      >
+                        <span>{ref.refund_id}</span>
+                        {copiedKey === 'ref_id' ? <span className="text-ledger-green">✓</span> : null}
+                      </button>
                     </div>
                     {ref.refund_timestamp && (
                       <div className="flex justify-between items-center text-ink-muted text-[11px] font-mono">
-                        <span>Timestamp</span>
+                        <span>Initiated</span>
                         <span>{new Date(ref.refund_timestamp).toLocaleString('en-IN')}</span>
                       </div>
                     )}
@@ -274,7 +280,7 @@ export const MultiSourceCard: React.FC<{ evidence: CaseEvidenceResponse }> = ({ 
           </div>
 
           {/* Slip 4: Bank Statement Credit */}
-          <div className={`evidence-slip p-4 space-y-3 rounded-xs border ${summary.divergenceStreamIndex === 4 ? 'border-critical/60 bg-critical/5' : ''}`}>
+          <div data-testid="evidence-bank-credit" className={`evidence-slip p-4 space-y-3 rounded-xs border ${summary.divergenceStreamIndex === 4 ? 'border-critical/60 bg-critical/5' : ''}`}>
             <div className="flex items-center justify-between border-b border-rule pb-2">
               <div className="flex items-center gap-2">
                 <span className="text-xs font-semibold text-ink">4. Bank Credit Statement</span>

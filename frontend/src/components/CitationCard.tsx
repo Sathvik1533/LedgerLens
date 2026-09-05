@@ -6,7 +6,7 @@ export const CitationCard: React.FC<{ citation: Citation; index?: number }> = ({
   const [isExpanded, setIsExpanded] = useState(false);
 
   return (
-    <div className="rounded bg-canvas/80 border border-border overflow-hidden transition">
+    <div data-testid="policy-citation" className="rounded bg-canvas/80 border border-border overflow-hidden transition">
       <button
         type="button"
         onClick={() => setIsExpanded(!isExpanded)}
