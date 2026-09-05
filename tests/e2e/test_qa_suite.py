@@ -4,10 +4,11 @@ import os
 import sys
 from playwright.async_api import async_playwright
 
-BASE_URL = "https://ledgerlens-finance.vercel.app"
-OUTPUT_DIR = "/Users/k.sathvik/.gemini/antigravity/brain/97c78bf4-5ca5-48c6-81cd-e75821d671fc/scratch/qa_proof/final_verif"
-
-os.makedirs(OUTPUT_DIR, exist_ok=True)
+BASE_URL = os.environ.get("BASE_URL", "https://ledgerlens-finance.vercel.app")
+OUTPUT_DIR = os.environ.get(
+    "QA_OUTPUT_DIR",
+    os.path.join(os.path.dirname(os.path.abspath(__file__)), "../../scratch/qa_proof/final_verif")
+)
 
 test_results = {
     "scenarios": {},
@@ -17,6 +18,7 @@ test_results = {
 }
 
 async def run_qa_suite():
+    os.makedirs(OUTPUT_DIR, exist_ok=True)
     print("================================================================================")
     print("  LEDGERLENS COMPREHENSIVE E2E & SCENARIO-BASED VERIFICATION SUITE")
     print("================================================================================")
