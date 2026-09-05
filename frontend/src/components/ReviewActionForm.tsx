@@ -115,6 +115,9 @@ export const ReviewActionForm: React.FC<ReviewActionFormProps> = ({
             <div>Recorded: {new Date(lastReceipt.actioned_at).toLocaleString('en-IN')}</div>
             <div>Audit Event: {lastReceipt.audit_event_id}</div>
           </div>
+          <div className="text-[11px] text-ledger-green/90 pt-1.5 border-t border-ledger-green/20 font-sans font-medium">
+            This outcome is now part of the record.
+          </div>
         </div>
       )}
 

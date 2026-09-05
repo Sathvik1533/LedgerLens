@@ -162,6 +162,23 @@ export const CaseDetailPage: React.FC<CaseDetailPageProps> = ({ caseId: propCase
         </div>
       </div>
 
+      {/* 1.5 Plain-Language Finding Summary */}
+      <div className="p-4 border border-rule bg-surface rounded-xs shadow-subtle flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div className="space-y-0.5">
+          <span className="text-[10px] font-mono uppercase tracking-wider text-ink-secondary block">
+            Plain-Language Finding
+          </span>
+          <p className="text-xs sm:text-sm font-sans text-ink leading-relaxed">
+            {evidence.settlement_discrepancy && parseFloat(evidence.settlement_discrepancy) !== 0
+              ? `₹${Math.abs(parseFloat(evidence.settlement_discrepancy)).toLocaleString('en-IN', { minimumFractionDigits: 2 })} difference surfaced between expected calculation and reported settlement payout.`
+              : `Discrepancy identified under invariant rule "${evidence.exception_type || 'unclassified'}". Review the four-source evidence below.`}
+          </p>
+        </div>
+        <span className="text-[11px] font-mono px-2 py-0.5 bg-canvas border border-rule text-ink-secondary rounded-xs shrink-0 self-start sm:self-auto">
+          Status: {evidence.decision_status || 'needs_review'}
+        </span>
+      </div>
+
       {/* Dated Ledger Receipt Notification */}
       {receiptBanner && (
         <div className="p-4 bg-ledger-green/10 border border-ledger-green/30 rounded-xs flex items-center justify-between gap-4 text-xs font-mono text-ink">

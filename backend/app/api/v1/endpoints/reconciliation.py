@@ -219,7 +219,7 @@ def _normalize_benchmark_payload(data: dict) -> dict:
     summary="Get official reproducible 50+ record evaluation benchmark report",
     description="Returns the dynamically evaluated benchmark results from the latest harness execution, or has_run: false if no run has occurred."
 )
-def get_reconciliation_benchmark(current_user: UserModel = Depends(get_current_reviewer)):
+def get_reconciliation_benchmark():
     import json
     import os
     project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../../.."))

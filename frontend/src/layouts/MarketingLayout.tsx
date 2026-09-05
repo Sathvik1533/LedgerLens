@@ -1,8 +1,10 @@
+import { useState } from 'react';
 import { Outlet, Link, useLocation } from 'react-router-dom';
 import { Logo } from '../components/Logo';
 
 export default function MarketingLayout() {
   const location = useLocation();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const navLinks = [
     { path: '/how-it-works', label: 'How it works' },
@@ -51,12 +53,56 @@ export default function MarketingLayout() {
           <div className="flex items-center space-x-4">
             <Link
               to="/app/queue"
-              className="px-4 py-1.5 border border-ink text-ink hover:bg-ink hover:text-canvas text-xs font-medium rounded-xs transition-colors"
+              className="hidden sm:inline-block px-4 py-1.5 border border-ink text-ink hover:bg-ink hover:text-canvas text-xs font-medium rounded-xs transition-colors"
             >
               Open ledger
             </Link>
+            
+            {/* Mobile Menu Toggle Button */}
+            <button
+              type="button"
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="md:hidden p-2 text-ink hover:bg-surface border border-rule rounded-xs text-xs font-mono"
+              aria-label="Toggle navigation menu"
+              aria-expanded={mobileMenuOpen}
+            >
+              {mobileMenuOpen ? '✕ Close' : '☰ Menu'}
+            </button>
           </div>
         </div>
+
+        {/* Mobile Navigation Drawer */}
+        {mobileMenuOpen && (
+          <nav
+            aria-label="Mobile navigation"
+            className="md:hidden border-t border-rule bg-canvas px-6 py-4 space-y-3 font-sans text-sm animate-fadeIn"
+          >
+            {navLinks.map((item) => {
+              const isActive = location.pathname === item.path;
+              return (
+                <Link
+                  key={item.path}
+                  to={item.path}
+                  onClick={() => setMobileMenuOpen(false)}
+                  className={`block py-1.5 border-b border-rule/40 transition-colors ${
+                    isActive ? 'text-ink font-semibold' : 'text-ink-secondary hover:text-ink'
+                  }`}
+                >
+                  {item.label}
+                </Link>
+              );
+            })}
+            <div className="pt-2">
+              <Link
+                to="/app/queue"
+                onClick={() => setMobileMenuOpen(false)}
+                className="block text-center w-full py-2 bg-ink text-canvas text-xs font-medium rounded-xs"
+              >
+                Open ledger &rarr;
+              </Link>
+            </div>
+          </nav>
+        )}
       </header>
 
       {/* Main Content Area */}

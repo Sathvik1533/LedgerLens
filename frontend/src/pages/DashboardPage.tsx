@@ -113,6 +113,30 @@ export const DashboardPage: React.FC = () => {
       {/* 2. Key Metrics Row */}
       {stats && (
         <div className="space-y-8">
+          {/* Action Required Callout Banner */}
+          {stats.needs_review_count > 0 && (
+            <div className="p-4 bg-critical/5 border-l-4 border-l-critical border border-rule rounded-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-subtle">
+              <div className="space-y-0.5">
+                <div className="flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-critical animate-pulse" />
+                  <span className="text-[11px] font-mono uppercase tracking-wider text-critical font-semibold">
+                    Action Required &bull; Review Queue
+                  </span>
+                </div>
+                <p className="text-xs sm:text-sm font-sans text-ink">
+                  <strong className="font-semibold">{stats.needs_review_count} exception{stats.needs_review_count === 1 ? '' : 's'}</strong> awaiting human sign-off ({stats.total_amount_at_risk ? `₹${parseFloat(stats.total_amount_at_risk).toLocaleString('en-IN', { minimumFractionDigits: 2 })}` : '₹0.00'} total exposure).
+                </p>
+              </div>
+              <Link
+                to="/app/queue"
+                className="inline-flex items-center justify-center gap-1.5 px-4 py-2 bg-critical text-canvas text-xs font-medium rounded-xs hover:bg-critical/90 transition-colors shrink-0 shadow-subtle"
+              >
+                <span>Open highest-risk exception</span>
+                <span>&rarr;</span>
+              </Link>
+            </div>
+          )}
+
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {/* Clean Match Parity */}
             <div className="border border-rule bg-surface p-5 space-y-2 rounded-xs shadow-subtle">

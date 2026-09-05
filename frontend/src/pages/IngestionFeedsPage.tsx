@@ -178,14 +178,18 @@ export const IngestionFeedsPage: React.FC = () => {
 
           {/* Success / Duplicate Replay Result */}
           {uploadResult && (
-            <div className="p-4 bg-ledger-green/10 border border-ledger-green/40 rounded-xs space-y-2 text-xs font-mono text-ink">
+            <div
+              role="status"
+              aria-live="polite"
+              className="p-4 bg-ledger-green/10 border border-ledger-green/40 rounded-xs space-y-2 text-xs font-mono text-ink"
+            >
               <div className="flex items-center justify-between font-semibold text-ledger-green">
                 <span>✓ {uploadResult.status === 'duplicate_replayed' ? 'Duplicate Batch Replayed' : 'Batch Ingested Successfully'}</span>
                 <span>Batch: {uploadResult.batch_id}</span>
               </div>
               <div className="text-[11px] text-ink-secondary space-y-1 pt-1 border-t border-ledger-green/20">
-                <div>Accepted rows: <strong className="text-ink">{uploadResult.accepted_rows ?? uploadResult.total_rows ?? 0}</strong></div>
-                <div>Rejected rows: <strong className="text-ink">{uploadResult.rejected_rows ?? 0}</strong></div>
+                <div>Accepted rows: <strong className="text-ink">{uploadResult.row_count_accepted ?? uploadResult.accepted_rows ?? uploadResult.total_rows ?? 0}</strong></div>
+                <div>Rejected rows: <strong className="text-ink">{uploadResult.row_count_rejected ?? uploadResult.rejected_rows ?? 0}</strong></div>
                 <div>Idempotency key: {uploadResult.idempotency_key || 'Auto-generated'}</div>
                 {uploadResult.status === 'duplicate_replayed' && (
                   <div className="text-brass italic pt-1">

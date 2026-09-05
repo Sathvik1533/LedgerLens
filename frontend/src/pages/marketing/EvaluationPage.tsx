@@ -617,36 +617,39 @@ function EvaluationContent() {
         </div>
       </div>
 
-      {/* 7. Reproducibility Console Box */}
-      <div className="p-6 border border-rule bg-[#111315] text-[#EAE4D8] rounded-xs space-y-4 shadow-subtle font-mono text-xs">
-        <div className="flex items-center justify-between border-b border-white/10 pb-3">
-          <span className="text-[11px] uppercase tracking-widest text-[#716E68]">
-            Local Reproducibility Verification Console
-          </span>
-          <span className="text-[10px] text-[#3D6B55] font-semibold">
-            ● HARNESS READY
-          </span>
-        </div>
-        <p className="text-xs text-[#D8D2C8] leading-relaxed font-sans">
-          To reproduce the benchmark and verify synthetic records with ground truth, run the following commands in the project repository:
-        </p>
-        <div className="p-3.5 bg-black/50 border border-white/10 rounded-xs space-y-2 text-xs">
+      {/* 7. Reproducibility Console Box (Expandable Disclosure) */}
+      <details className="border border-rule bg-[#111315] text-[#EAE4D8] rounded-xs p-6 shadow-subtle font-mono text-xs group">
+        <summary className="flex items-center justify-between cursor-pointer select-none">
           <div className="flex items-center gap-2">
-            <span className="text-[#3D6B55]">$</span>
-            <span className="text-white">pytest tests/ -v</span>
-            <span className="text-[#716E68] text-[11px] ml-auto"># 54 passing unit &amp; e2e tests</span>
+            <span className="text-[10px] text-[#3D6B55] font-semibold">● HARNESS READY</span>
+            <span className="text-[11px] uppercase tracking-widest text-[#D8D2C8] font-medium">
+              Technical Details &bull; Local CLI Verification &amp; Reproduction
+            </span>
           </div>
-          <div className="flex items-center gap-2">
-            <span className="text-[#3D6B55]">$</span>
-            <span className="text-white">python evaluation/run_benchmark.py --size {datasetSize || 60} --seed {benchmark?.seed || 42}</span>
-            <span className="text-[#716E68] text-[11px] ml-auto"># Generates benchmark artifacts</span>
+          <span className="text-[11px] text-[#716E68] group-open:text-[#D8D2C8]">Expand CLI commands ▼</span>
+        </summary>
+        <div className="mt-4 pt-4 border-t border-white/10 space-y-4">
+          <p className="text-xs text-[#D8D2C8] leading-relaxed font-sans">
+            To reproduce the benchmark and verify synthetic records with ground truth, run the following commands in the project repository:
+          </p>
+          <div className="p-3.5 bg-black/50 border border-white/10 rounded-xs space-y-2 text-xs">
+            <div className="flex items-center gap-2">
+              <span className="text-[#3D6B55]">$</span>
+              <span className="text-white">pytest tests/ -v</span>
+              <span className="text-[#716E68] text-[11px] ml-auto"># 54 passing unit &amp; e2e tests</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-[#3D6B55]">$</span>
+              <span className="text-white">python evaluation/run_benchmark.py --size {datasetSize || 60} --seed {benchmark?.seed || 42}</span>
+              <span className="text-[#716E68] text-[11px] ml-auto"># Generates benchmark artifacts</span>
+            </div>
+          </div>
+          <div className="flex flex-wrap items-center justify-between gap-4 text-[11px] text-[#716E68] pt-1">
+            <span>Engine: PostgreSQL 16 + Pure Python Decimal</span>
+            <span>Zero Floating Point Tolerance</span>
           </div>
         </div>
-        <div className="flex flex-wrap items-center justify-between gap-4 text-[11px] text-[#716E68] pt-1">
-          <span>Engine: PostgreSQL 16 + Pure Python Decimal</span>
-          <span>Zero Floating Point Tolerance</span>
-        </div>
-      </div>
+      </details>
     </div>
   );
 }

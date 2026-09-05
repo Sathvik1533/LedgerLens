@@ -249,18 +249,22 @@ export const QueuePage: React.FC = () => {
         </div>
 
         {/* View Mode Toggle */}
-        <div className="flex items-center justify-between pt-1 text-xs font-mono">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between pt-1 text-xs font-mono gap-2">
           <div className="flex items-center gap-2">
             <span className="text-ink-secondary text-[11px]">Grouping:</span>
             <button
+              type="button"
               onClick={() => updateParam('view', 'unique')}
-              className={`px-2 py-0.5 rounded-xs border text-[11px] ${viewMode === 'unique' ? 'bg-ink text-canvas border-ink font-medium' : 'bg-surface text-ink-secondary border-rule hover:text-ink'}`}
+              title="Shows one row per payment transaction, deduplicating multiple runs"
+              className={`px-2 py-0.5 rounded-xs border text-[11px] transition-colors ${viewMode === 'unique' ? 'bg-ink text-canvas border-ink font-medium' : 'bg-surface text-ink-secondary border-rule hover:text-ink'}`}
             >
               Unique Transactions ({Array.from(new Set(cases.map(c => c.payment_id))).length})
             </button>
             <button
+              type="button"
               onClick={() => updateParam('view', 'all')}
-              className={`px-2 py-0.5 rounded-xs border text-[11px] ${viewMode === 'all' ? 'bg-ink text-canvas border-ink font-medium' : 'bg-surface text-ink-secondary border-rule hover:text-ink'}`}
+              title="Shows every raw flagged exception case across all batch runs"
+              className={`px-2 py-0.5 rounded-xs border text-[11px] transition-colors ${viewMode === 'all' ? 'bg-ink text-canvas border-ink font-medium' : 'bg-surface text-ink-secondary border-rule hover:text-ink'}`}
             >
               All Case Instances ({cases.length})
             </button>
@@ -268,7 +272,7 @@ export const QueuePage: React.FC = () => {
           {(searchQuery || selectedCategory !== 'all' || selectedSeverity !== 'all') && (
             <button
               onClick={() => setSearchParams(new URLSearchParams())}
-              className="text-[11px] text-link hover:underline"
+              className="text-[11px] text-link hover:underline self-start sm:self-auto"
             >
               Reset all active filters
             </button>
@@ -308,10 +312,10 @@ export const QueuePage: React.FC = () => {
             <table className="w-full text-left border-collapse">
               <thead>
                 <tr className="border-b border-rule bg-canvas text-[11px] font-mono text-ink-secondary uppercase tracking-wider">
-                  <th className="py-2.5 px-4 font-normal">Priority & Risk</th>
-                  <th className="py-2.5 px-4 font-normal">Financial Discrepancy</th>
+                  <th className="py-2.5 px-4 font-normal">Severity</th>
+                  <th className="py-2.5 px-4 font-normal">What Happened</th>
                   <th className="py-2.5 px-4 font-normal">Payment Reference</th>
-                  <th className="py-2.5 px-4 font-normal text-right">Exposure Variance</th>
+                  <th className="py-2.5 px-4 font-normal text-right">Amount at Risk</th>
                   <th className="py-2.5 px-4 font-normal text-center">Action</th>
                 </tr>
               </thead>

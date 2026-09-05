@@ -76,23 +76,9 @@ function App() {
               <Route path="/docs" element={<DocsPage />} />
               <Route path="/about" element={<AboutPage />} />
 
-              {/* Protected Evaluation & Evidence */}
-              <Route
-                path="/evidence"
-                element={
-                  <ProtectedRoute>
-                    <EvidencePage />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/evaluation"
-                element={
-                  <ProtectedRoute>
-                    <EvaluationPage />
-                  </ProtectedRoute>
-                }
-              />
+              {/* Public Evaluation & Evidence */}
+              <Route path="/evidence" element={<EvidencePage />} />
+              <Route path="/evaluation" element={<EvaluationPage />} />
             </Route>
 
             {/* App Shell (Authenticated Financial Control Room) */}
