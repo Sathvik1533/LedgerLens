@@ -3,6 +3,8 @@ import { Link } from 'react-router-dom';
 import { fetchAllAuditTrail } from '../api/client';
 import { AuditEventItem } from '../types/api';
 import { CustomSelect } from '../components/CustomSelect';
+import { useDemoSimulation } from '../context/DemoSimulationContext';
+import { DemoRunControls } from '../components/DemoRunControls';
 
 export const AuditLogPage: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -11,6 +13,8 @@ export const AuditLogPage: React.FC = () => {
   const [events, setEvents] = useState<AuditEventItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  const { isDemoMode, demoRun } = useDemoSimulation();
 
   const loadAudit = async () => {
     setIsLoading(true);
@@ -29,25 +33,32 @@ export const AuditLogPage: React.FC = () => {
     loadAudit();
   }, []);
 
+  const allEvents = useMemo(() => {
+    if (isDemoMode && demoRun && demoRun.auditEvents.length > 0) {
+      return [...demoRun.auditEvents, ...events];
+    }
+    return events;
+  }, [events, isDemoMode, demoRun]);
+
   // Dynamically extract distinct actors and event types
   const distinctActors = useMemo(() => {
     const s = new Set<string>();
-    events.forEach((e) => {
+    allEvents.forEach((e) => {
       if (e.actor) s.add(e.actor);
     });
     return Array.from(s).sort();
-  }, [events]);
+  }, [allEvents]);
 
   const distinctTypes = useMemo(() => {
     const s = new Set<string>();
-    events.forEach((e) => {
+    allEvents.forEach((e) => {
       if (e.event_type) s.add(e.event_type);
     });
     return Array.from(s).sort();
-  }, [events]);
+  }, [allEvents]);
 
   const filteredEvents = useMemo(() => {
-    let result = [...events];
+    let result = [...allEvents];
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase().trim();
       result = result.filter(
@@ -55,7 +66,9 @@ export const AuditLogPage: React.FC = () => {
           (e.case_id && e.case_id.toLowerCase().includes(q)) ||
           (e.batch_id && e.batch_id.toLowerCase().includes(q)) ||
           (e.actor && e.actor.toLowerCase().includes(q)) ||
-          (e.event_type && e.event_type.toLowerCase().includes(q))
+          (e.event_type && e.event_type.toLowerCase().includes(q)) ||
+          (e.new_status && e.new_status.toLowerCase().includes(q)) ||
+          (e.previous_status && e.previous_status.toLowerCase().includes(q))
       );
     }
     if (selectedActor !== 'all') {
@@ -65,7 +78,7 @@ export const AuditLogPage: React.FC = () => {
       result = result.filter((e) => e.event_type === selectedType);
     }
     return result;
-  }, [events, searchQuery, selectedActor, selectedType]);
+  }, [allEvents, searchQuery, selectedActor, selectedType]);
 
   return (
     <div className="w-full max-w-7xl mx-auto px-6 py-8 space-y-8 font-sans">
@@ -95,6 +108,9 @@ export const AuditLogPage: React.FC = () => {
           </button>
         </div>
       </div>
+
+      {/* Dynamic Demo Simulation Controls Banner */}
+      <DemoRunControls />
 
       {/* 2. Filter Controls */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs font-mono">

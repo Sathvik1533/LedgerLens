@@ -2,11 +2,15 @@ import { useState, useEffect } from 'react';
 import { Outlet, Link, useLocation } from 'react-router-dom';
 import { fetchReviewQueue, triggerReconciliationRun } from '../api/client';
 import { useAuth } from '../context/AuthContext';
+import { useDemoSimulation } from '../context/DemoSimulationContext';
+import { HowToUseRoomGuide } from '../components/HowToUseRoomGuide';
 import { Logo } from '../components/Logo';
 
 export default function AppLayout() {
   const location = useLocation();
   const { user, logout, showOnboarding, dismissOnboarding } = useAuth();
+  const { isDemoMode, demoRun } = useDemoSimulation();
+  const [isGuideOpen, setIsGuideOpen] = useState<boolean>(false);
   const [queueCount, setQueueCount] = useState<number>(0);
   const [isRunningRecon, setIsRunningRecon] = useState(false);
   const [reconMessage, setReconMessage] = useState<string | null>(null);
@@ -42,9 +46,11 @@ export default function AppLayout() {
     }
   };
 
+  const activeQueueBadge = isDemoMode && demoRun ? demoRun.reviewCount : queueCount;
+
   const navItems = [
     { path: '/app/dashboard', label: 'Overview' },
-    { path: '/app/queue', label: 'Cases to review', badge: queueCount },
+    { path: '/app/queue', label: 'Cases to review', badge: activeQueueBadge },
     { path: '/app/ingestion', label: 'Source files' },
     { path: '/app/audit', label: 'Saved review history' },
     { path: '/app/policies', label: 'Approved rules' },
@@ -101,6 +107,16 @@ export default function AppLayout() {
                 {reconMessage}
               </span>
             )}
+            <button
+              type="button"
+              data-testid="guided-tour-btn"
+              onClick={() => setIsGuideOpen(true)}
+              className="px-2.5 py-1.5 border border-rule hover:border-ink bg-surface hover:bg-canvas text-ink text-xs font-medium rounded-xs transition-colors flex items-center gap-1.5"
+              title="Open interactive room tour"
+            >
+              <span className="text-brass font-bold">✦</span>
+              <span className="hidden sm:inline">Guided tour</span>
+            </button>
             <button
               onClick={handleTriggerRecon}
               disabled={isRunningRecon}
@@ -170,6 +186,9 @@ export default function AppLayout() {
           <span>Human decisions saved</span>
         </div>
       </footer>
+
+      {/* Dynamic Operational Room Guide */}
+      <HowToUseRoomGuide isOpen={isGuideOpen} onClose={() => setIsGuideOpen(false)} />
     </div>
   );
 }

@@ -18,6 +18,7 @@ import { RagCopilotPanel } from '../components/RagCopilotPanel';
 import { ExceptionBadge } from '../components/ExceptionBadge';
 import { AmountDisplay } from '../components/AmountDisplay';
 import { CaseWorkspaceSkeleton } from '../components/SkeletonLoaders';
+import { useDemoSimulation } from '../context/DemoSimulationContext';
 
 interface CaseDetailPageProps {
   caseId?: string;
@@ -29,11 +30,13 @@ export const CaseDetailPage: React.FC<CaseDetailPageProps> = ({ caseId: propCase
   const navigate = useNavigate();
   const activeCaseId = propCaseId || params.caseId || '';
 
+  const { demoRun } = useDemoSimulation();
+
   const handleBack = () => {
     if (propOnBack) {
       propOnBack();
     } else {
-      navigate('/exceptions');
+      navigate('/app/queue');
     }
   };
   const [evidence, setEvidence] = useState<CaseEvidenceResponse | null>(null);
@@ -46,6 +49,15 @@ export const CaseDetailPage: React.FC<CaseDetailPageProps> = ({ caseId: propCase
   const loadCaseData = async () => {
     setIsLoading(true);
     setError(null);
+
+    // Support dynamic demo simulation case records
+    if (demoRun && demoRun.caseEvidenceMap[activeCaseId]) {
+      setEvidence(demoRun.caseEvidenceMap[activeCaseId]);
+      setAuditEvents(demoRun.auditEvents || []);
+      setIsLoading(false);
+      return;
+    }
+
     try {
       const [evData, auditData] = await Promise.all([
         fetchCaseDetail(activeCaseId),
@@ -241,13 +253,6 @@ export const CaseDetailPage: React.FC<CaseDetailPageProps> = ({ caseId: propCase
                   <span>Version</span>
                   <span className="text-text-primary font-mono text-xs font-medium">v{evidence.version}</span>
                 </div>
-                <details className="pt-2 border-t border-border font-mono text-[10px] text-ink-muted">
-                  <summary className="cursor-pointer hover:text-text-primary">Technical details</summary>
-                  <div className="mt-1 space-y-0.5">
-                    <div>Exception code: {evidence.exception_type}</div>
-                    <div>Raw status: {evidence.decision_status}</div>
-                  </div>
-                </details>
               </div>
             </div>
           </div>

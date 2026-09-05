@@ -5,6 +5,7 @@ import { TooltipProvider } from './components/Tooltip';
 
 
 import { AuthProvider } from './context/AuthContext';
+import { DemoSimulationProvider } from './context/DemoSimulationContext';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { LoginPage } from './pages/auth/LoginPage';
 
@@ -64,7 +65,8 @@ function App() {
   return (
     <TooltipProvider>
       <AuthProvider>
-        <BrowserRouter>
+        <DemoSimulationProvider>
+          <BrowserRouter>
           <Routes>
             {/* Public Login */}
             <Route path="/login" element={<LoginPage />} />
@@ -120,7 +122,8 @@ function App() {
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </BrowserRouter>
-      </AuthProvider>
+      </DemoSimulationProvider>
+    </AuthProvider>
     </TooltipProvider>
   );
 }

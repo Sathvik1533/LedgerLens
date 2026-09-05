@@ -339,16 +339,6 @@ export const MultiSourceCard: React.FC<{ evidence: CaseEvidenceResponse }> = ({ 
           </div>
         </div>
       </div>
-
-      {/* 3. Raw Data Inspection Disclosure */}
-      <details className="text-xs font-mono text-ink-secondary border border-rule rounded-xs p-3.5 bg-surface/50">
-        <summary className="cursor-pointer hover:text-ink select-none font-medium">
-          Technical details
-        </summary>
-        <pre className="mt-3 p-3 bg-ink text-[#EAE4D8] overflow-x-auto text-[11px] leading-relaxed rounded-xs">
-          {JSON.stringify(evidence, null, 2)}
-        </pre>
-      </details>
     </div>
   );
 };

@@ -1,66 +1,83 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Link } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 interface GuideStep {
   step: number;
   title: string;
   badge: string;
-  description: string;
-  actionLabel?: string;
-  actionLink?: string;
-  keyRule: string;
+  route: string;
+  pageName: string;
+  whatToLookFor: string;
+  reviewerCheck: string;
+  governingRule: string;
+  nextButtonLabel: string;
 }
 
-const GUIDE_STEPS: GuideStep[] = [
+const DYNAMIC_STEPS: GuideStep[] = [
   {
     step: 1,
-    title: 'Inspect Batch Parity Result',
-    badge: 'Step 1 of 5 • Batch Telemetry',
-    description:
-      'Begin by reviewing overall throughput, processed denominator, and deterministic match rates across all four financial counterparties. Verify that clean matches satisfy strict penny-level parity (≤ ₹0.01).',
-    actionLabel: 'View Evaluation Docket',
-    actionLink: '/evaluation',
-    keyRule: 'Formula: auto_reconciled ÷ records_processed × 100',
+    title: 'Overview & Batch Results',
+    badge: 'Step 1 of 5 • Overview',
+    route: '/app/dashboard',
+    pageName: 'Records compared & open cases',
+    whatToLookFor:
+      'Check the overall records received across payments, provider payouts, customer refunds, and bank credits. See the matched rate and money in open cases.',
+    reviewerCheck:
+      'Verify that auto-reconciled records satisfy exact mathematical parity down to the paisa (≤ ₹0.01 difference).',
+    governingRule: 'Rule: Four records must agree. Clean matches close automatically.',
+    nextButtonLabel: 'Next: Open review queue →',
   },
   {
     step: 2,
-    title: 'Prioritize Highest-Risk Exceptions',
-    badge: 'Step 2 of 5 • Risk Triage',
-    description:
-      'Open the Operational Review Queue. Immediately triage direct cash risks—missing bank credits and unapproved settlement shortfalls—before analyzing secondary fee tier deviations.',
-    actionLabel: 'Open Review Queue',
-    actionLink: '/app/queue',
-    keyRule: 'Rule: Cash exposure & missing UTRs take priority over fee variations',
+    title: 'Review Queue & Risk Triage',
+    badge: 'Step 2 of 5 • Cases to review',
+    route: '/app/queue',
+    pageName: 'Cases waiting for a human decision',
+    whatToLookFor:
+      'Inspect cases flagged by the rule engine. Exceptions are prioritized by money to check. Missing bank deposits and unreceived payouts are triaged first.',
+    reviewerCheck:
+      'Filter by category or click on any case (e.g. CASE-1014) to open its four-source investigation dossier.',
+    governingRule: 'Rule: Unreceived cash deposits take priority over fee rate variances.',
+    nextButtonLabel: 'Next: Examine case dossier →',
   },
   {
     step: 3,
-    title: 'Examine Four-Source Evidence',
-    badge: 'Step 3 of 5 • Multi-Stream Audit',
-    description:
-      'Open the case docket to inspect side-by-side evidence: merchant gross captured, gateway fee deductions, customer refunds, and bank credits. The exact divergence is redlined down to the single paisa.',
-    actionLabel: 'Inspect Sample Case',
-    actionLink: '/app/case/264548b2-c896-42b7-a2a4-c0f3f0f614b9',
-    keyRule: 'Standard: Gross − Fee − Tax − Refund == Net Bank Deposit',
+    title: 'Case Investigation Dossier',
+    badge: 'Step 3 of 5 • Case Dossier',
+    route: '/app/case/CASE-1014',
+    pageName: 'Case dossier',
+    whatToLookFor:
+      'Inspect the side-by-side evidence: what the customer paid, what the provider sent, what was refunded, and what reached the bank. Notice the exact difference highlighted.',
+    reviewerCheck:
+      'Review the approved rule guidance panel on the right. Note that AI provides policy guidance only; a human reviewer makes the decision.',
+    governingRule: 'Standard: Gross captured − Fee − Tax − Refund == Bank deposit.',
+    nextButtonLabel: 'Next: Read approved rules →',
   },
   {
     step: 4,
-    title: 'Consult Policy Guidance via Grounded RAG',
-    badge: 'Step 4 of 5 • Advisory AI',
-    description:
-      'The deterministic engine isolates the numbers; the Grounded RAG assistant retrieves the governing operational SOP (e.g. SOP-2026-FEE-01). The AI advises with direct policy citations, but has zero financial authority.',
-    actionLabel: 'Browse Policy Corpus',
-    actionLink: '/app/policies',
-    keyRule: 'Invariant: No LLM arithmetic & zero autonomous financial approval',
+    title: 'Approved Operating Rules',
+    badge: 'Step 4 of 5 • Approved rules',
+    route: '/app/policies',
+    pageName: 'Approved rules',
+    whatToLookFor:
+      'Read the three clean approved policy cards: Provider fee and tax rule (SOP-2026-FEE-01), Missing payout time limit (SOP-2026-ESC-02), and Bank credit check (SOP-2026-BNK-03).',
+    reviewerCheck:
+      'Each rule explains the plain meaning, what the reviewer should check, and what action to take. Guidance assists the reviewer.',
+    governingRule: 'Invariant: No AI automated approvals; human authority governs money.',
+    nextButtonLabel: 'Next: Check saved review history →',
   },
   {
     step: 5,
-    title: 'Record Human Decision & Audit Receipt',
-    badge: 'Step 5 of 5 • Operator Sign-off',
-    description:
-      'The human finance controller selects a resolution (Dispute Escalation, Credit Note Request, or Commercial Waiver) and signs off with a mandatory justification. An append-only audit event is permanently committed.',
-    actionLabel: 'View Immutable Audit Ledger',
-    actionLink: '/app/audit',
-    keyRule: 'Integrity: Tamper-evident, cryptographically sequenced audit log',
+    title: 'Immutable Audit History',
+    badge: 'Step 5 of 5 • Saved review history',
+    route: '/app/audit',
+    pageName: 'Saved review history',
+    whatToLookFor:
+      'See every action permanently recorded: who decided what, the exact timestamp, the previous and new status, and the mandatory justification note.',
+    reviewerCheck:
+      'Confirm that decisions cannot be silently altered or backdated.',
+    governingRule: 'Integrity: Tamper-evident saved review history with full reviewer accountability.',
+    nextButtonLabel: 'Finish tour ✓',
   },
 ];
 
@@ -75,8 +92,11 @@ export const HowToUseRoomGuide: React.FC<HowToUseRoomGuideProps> = ({
   onClose: externalOnClose,
   className = '',
 }) => {
+  const navigate = useNavigate();
+  const location = useLocation();
   const [internalIsOpen, setInternalIsOpen] = useState(false);
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
+  const [isMinimized, setIsMinimized] = useState(false);
 
   const isControlled = externalIsOpen !== undefined;
   const isOpen = isControlled ? externalIsOpen : internalIsOpen;
@@ -89,151 +109,174 @@ export const HowToUseRoomGuide: React.FC<HowToUseRoomGuideProps> = ({
     }
   }, [isControlled, externalOnClose]);
 
-  const handleOpen = () => {
-    setInternalIsOpen(true);
-  };
+  const goToStep = useCallback(
+    (stepIdx: number) => {
+      const target = DYNAMIC_STEPS[stepIdx];
+      if (target) {
+        setCurrentStepIndex(stepIdx);
+        navigate(target.route);
+      }
+    },
+    [navigate]
+  );
 
   const nextStep = useCallback(() => {
-    setCurrentStepIndex((prev) => (prev < GUIDE_STEPS.length - 1 ? prev + 1 : prev));
-  }, []);
+    if (currentStepIndex < DYNAMIC_STEPS.length - 1) {
+      goToStep(currentStepIndex + 1);
+    } else {
+      handleClose();
+    }
+  }, [currentStepIndex, goToStep, handleClose]);
 
   const prevStep = useCallback(() => {
-    setCurrentStepIndex((prev) => (prev > 0 ? prev - 1 : prev));
-  }, []);
+    if (currentStepIndex > 0) {
+      goToStep(currentStepIndex - 1);
+    }
+  }, [currentStepIndex, goToStep]);
 
-  // Keyboard navigation: Escape to close, arrows to step, numbers 1-5 to jump
+  // Sync step index if user manually navigated to one of the target routes
+  useEffect(() => {
+    const matchedIdx = DYNAMIC_STEPS.findIndex((s) => {
+      if (s.route === '/app/case/CASE-1014') {
+        return location.pathname.startsWith('/app/case');
+      }
+      return location.pathname === s.route;
+    });
+    if (matchedIdx !== -1 && matchedIdx !== currentStepIndex) {
+      setCurrentStepIndex(matchedIdx);
+    }
+  }, [location.pathname, currentStepIndex]);
+
+  // Keyboard navigation
   useEffect(() => {
     if (!isOpen) return;
 
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
         handleClose();
-      } else if (e.key === 'ArrowRight' || e.key === 'n') {
+      } else if (e.key === 'ArrowRight') {
         nextStep();
-      } else if (e.key === 'ArrowLeft' || e.key === 'p') {
+      } else if (e.key === 'ArrowLeft') {
         prevStep();
       } else if (['1', '2', '3', '4', '5'].includes(e.key)) {
-        setCurrentStepIndex(parseInt(e.key, 10) - 1);
+        goToStep(parseInt(e.key, 10) - 1);
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isOpen, handleClose, nextStep, prevStep]);
+  }, [isOpen, handleClose, nextStep, prevStep, goToStep]);
 
-  const currentStep = GUIDE_STEPS[currentStepIndex];
+  if (!isOpen) return null;
+
+  const currentStep = DYNAMIC_STEPS[currentStepIndex];
 
   return (
-    <>
-      {/* Launch trigger button if uncontrolled */}
-      {!isControlled && !isOpen && (
-        <button
-          onClick={handleOpen}
-          aria-label="Open how to use this room guide"
-          className={`inline-flex items-center gap-2 px-3 py-1.5 bg-surface border border-rule hover:border-ink text-ink font-mono text-xs rounded-xs shadow-subtle hover:bg-canvas transition-colors ${className}`}
-        >
-          <span className="text-brass font-bold">✦</span>
-          <span>How to use this room</span>
-          <span className="text-[10px] text-ink-muted bg-canvas border border-rule px-1 rounded-xs">
-            5 steps
+    <div
+      role="region"
+      aria-label="Interactive room guide tour"
+      data-testid="how-to-use-room-guide"
+      className={`fixed bottom-6 right-6 z-50 w-full max-w-md bg-canvas border border-ink/40 shadow-2xl rounded-xs overflow-hidden font-sans transition-all duration-200 ${className}`}
+    >
+      {/* Top Header Bar */}
+      <div className="flex items-center justify-between px-4 py-3 bg-surface border-b border-rule">
+        <div className="flex items-center gap-2">
+          <span className="w-2 h-2 rounded-full bg-brass animate-pulse" />
+          <span className="text-xs font-mono tracking-wider text-ink font-semibold uppercase">
+            Room Guide &bull; Step {currentStep.step} of {DYNAMIC_STEPS.length}
           </span>
-        </button>
-      )}
+        </div>
 
-      {/* Non-blocking, accessible guide panel */}
-      {isOpen && (
-        <div
-          role="region"
-          aria-label="How to use LedgerLens operational guide"
-          className="fixed bottom-6 right-6 z-50 w-full max-w-lg bg-[#111315] text-[#FCFBF8] border border-white/20 rounded-xs shadow-2xl overflow-hidden animate-in slide-in-from-bottom-4 duration-200"
-        >
-          {/* Header Bar */}
-          <div className="flex items-center justify-between px-5 py-3.5 border-b border-white/10 bg-white/5">
-            <div className="flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-brass animate-pulse" />
-              <span className="text-xs font-mono tracking-wider text-[#EAE4D8] uppercase">
-                Operator Guide &bull; The 5-Step Workflow
-              </span>
-            </div>
-            <button
-              onClick={handleClose}
-              aria-label="Close operator guide (Escape)"
-              className="text-[#A8A49C] hover:text-[#FCFBF8] text-xs font-mono px-1.5 py-0.5 border border-transparent hover:border-white/20 rounded-xs transition-colors"
-            >
-              Close [Esc]
-            </button>
-          </div>
+        <div className="flex items-center gap-2 text-xs font-mono">
+          <button
+            type="button"
+            onClick={() => setIsMinimized((prev) => !prev)}
+            className="text-ink-secondary hover:text-ink px-1.5 py-0.5 rounded-xs"
+            title={isMinimized ? 'Expand tour guide' : 'Minimize tour guide'}
+          >
+            {isMinimized ? '[Expand]' : '[_]'}
+          </button>
+          <button
+            type="button"
+            onClick={handleClose}
+            className="text-ink-secondary hover:text-ink px-1.5 py-0.5 rounded-xs"
+            title="Close guided tour (Escape)"
+          >
+            [Esc]
+          </button>
+        </div>
+      </div>
 
-          {/* Step Progress Indicators */}
-          <div className="grid grid-cols-5 border-b border-white/10 bg-black/20 text-center text-[10px] font-mono">
-            {GUIDE_STEPS.map((s, idx) => (
-              <button
-                key={s.step}
-                onClick={() => setCurrentStepIndex(idx)}
-                className={`py-2 border-r last:border-r-0 border-white/10 transition-colors ${
-                  idx === currentStepIndex
-                    ? 'bg-white/15 text-white font-semibold border-b-2 border-b-brass'
-                    : 'text-[#A8A49C] hover:bg-white/5'
-                }`}
-              >
-                0{s.step}
-              </button>
-            ))}
-          </div>
+      {/* Step Tabs for direct navigation */}
+      <div className="grid grid-cols-5 border-b border-rule bg-canvas text-center text-[10px] font-mono">
+        {DYNAMIC_STEPS.map((s, idx) => (
+          <button
+            key={s.step}
+            type="button"
+            onClick={() => goToStep(idx)}
+            className={`py-2 border-r last:border-r-0 border-rule transition-colors ${
+              idx === currentStepIndex
+                ? 'bg-surface font-semibold text-ink border-b-2 border-b-brass'
+                : 'text-ink-secondary hover:bg-surface/50'
+            }`}
+          >
+            0{s.step}
+          </button>
+        ))}
+      </div>
 
-          {/* Step Body */}
-          <div className="p-6 space-y-4">
-            <div className="flex items-center justify-between text-xs font-mono">
+      {/* Content Body (collapsible) */}
+      {!isMinimized && (
+        <div className="p-5 space-y-3.5 text-xs text-ink">
+          <div className="space-y-1">
+            <div className="flex items-center justify-between text-[11px] font-mono text-ink-secondary">
               <span className="text-brass font-medium">{currentStep.badge}</span>
-              <span className="text-[#A8A49C]">Press [1-5] or &larr; &rarr;</span>
+              <span>Active route: {currentStep.route}</span>
             </div>
-
-            <h3 className="font-editorial text-2xl font-medium text-[#FCFBF8] leading-snug">
+            <h3 className="font-editorial text-xl font-medium text-ink leading-snug">
               {currentStep.title}
             </h3>
+          </div>
 
-            <p className="text-xs sm:text-sm text-[#D8D2C8] leading-relaxed font-sans">
-              {currentStep.description}
+          <p className="text-ink leading-relaxed">
+            {currentStep.whatToLookFor}
+          </p>
+
+          <div className="p-3 bg-surface border border-rule rounded-xs space-y-1">
+            <span className="text-[10px] font-mono uppercase tracking-wider text-ink-secondary block font-semibold">
+              What to check here:
+            </span>
+            <p className="text-[11px] text-ink leading-normal">
+              {currentStep.reviewerCheck}
             </p>
+          </div>
 
-            <div className="p-3 bg-white/5 border border-white/10 rounded-xs font-mono text-[11px] text-[#EAE4D8] space-y-1">
-              <div className="text-[10px] uppercase text-[#A8A49C] tracking-wider">Governing Invariant:</div>
-              <div>{currentStep.keyRule}</div>
-            </div>
+          <div className="text-[10px] font-mono text-ink-muted italic border-l-2 border-brass pl-2 py-0.5">
+            {currentStep.governingRule}
+          </div>
 
-            {/* Step Actions & Navigation */}
-            <div className="flex items-center justify-between pt-2 border-t border-white/10 text-xs font-mono">
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={prevStep}
-                  disabled={currentStepIndex === 0}
-                  className="px-2.5 py-1.5 border border-white/20 rounded-xs text-[#D8D2C8] hover:text-white disabled:opacity-30 disabled:hover:text-[#D8D2C8] transition-colors"
-                >
-                  &larr; Prev
-                </button>
-                <button
-                  onClick={nextStep}
-                  disabled={currentStepIndex === GUIDE_STEPS.length - 1}
-                  className="px-2.5 py-1.5 border border-white/20 rounded-xs text-[#D8D2C8] hover:text-white disabled:opacity-30 disabled:hover:text-[#D8D2C8] transition-colors"
-                >
-                  Next &rarr;
-                </button>
-              </div>
+          {/* Action Footer */}
+          <div className="pt-2 border-t border-rule flex items-center justify-between">
+            <button
+              type="button"
+              onClick={prevStep}
+              disabled={currentStepIndex === 0}
+              className="px-2.5 py-1.5 border border-rule hover:bg-surface text-ink-secondary hover:text-ink font-mono text-xs rounded-xs disabled:opacity-30 disabled:hover:bg-transparent transition-colors"
+            >
+              &larr; Prev
+            </button>
 
-              {currentStep.actionLink && (
-                <Link
-                  to={currentStep.actionLink}
-                  onClick={handleClose}
-                  className="px-3 py-1.5 bg-[#FCFBF8] text-[#111315] hover:bg-[#EAE4D8] font-medium rounded-xs transition-colors flex items-center gap-1"
-                >
-                  <span>{currentStep.actionLabel}</span>
-                  <span>&rarr;</span>
-                </Link>
-              )}
-            </div>
+            <button
+              type="button"
+              data-testid="guide-next-btn"
+              onClick={nextStep}
+              className="px-3.5 py-1.5 bg-ink text-canvas hover:bg-ink/90 font-medium text-xs rounded-xs transition-colors shadow-subtle flex items-center gap-1.5"
+            >
+              <span>{currentStep.nextButtonLabel}</span>
+            </button>
           </div>
         </div>
       )}
-    </>
+    </div>
   );
 };

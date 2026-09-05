@@ -6,6 +6,8 @@ import { ExceptionBadge } from '../../components/ExceptionBadge';
 import { QueueTableSkeleton } from '../../components/SkeletonLoaders';
 import { RollingNumberTicker } from '../../components/ui/RollingNumberTicker';
 import { CustomSelect } from '../../components/CustomSelect';
+import { useDemoSimulation } from '../../context/DemoSimulationContext';
+import { DemoRunControls } from '../../components/DemoRunControls';
 
 const EXCEPTION_CATEGORIES: { label: string; value: string }[] = [
   { label: 'All categories', value: 'all' },
@@ -33,6 +35,9 @@ export const QueuePage: React.FC = () => {
   const [cases, setCases] = useState<ReviewQueueItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  const { isDemoMode, demoRun } = useDemoSimulation();
+  const activeCases = isDemoMode && demoRun ? demoRun.cases : cases;
 
   const updateParam = (key: string, value: string) => {
     const next = new URLSearchParams(searchParams);
@@ -93,17 +98,17 @@ export const QueuePage: React.FC = () => {
   // Deduplicate by payment_id for unique transaction mode
   const displayCases = useMemo(() => {
     if (viewMode === 'all') {
-      return cases;
+      return activeCases;
     }
     const paymentMap = new Map<string, ReviewQueueItem>();
-    for (const c of cases) {
+    for (const c of activeCases) {
       const existing = paymentMap.get(c.payment_id);
       if (!existing || parseTime(c.case_opened_at) > parseTime(existing.case_opened_at)) {
         paymentMap.set(c.payment_id, c);
       }
     }
     return Array.from(paymentMap.values());
-  }, [cases, viewMode]);
+  }, [activeCases, viewMode]);
 
   // Filter and sort
   const processedCases = useMemo(() => {
@@ -188,6 +193,9 @@ export const QueuePage: React.FC = () => {
           </span>
         </div>
       </div>
+
+      {/* Dynamic Demo Simulation Controls Banner */}
+      <DemoRunControls />
 
       {/* 2. Restrained Filter Controls (URL-Persisted) */}
       <div className="space-y-3">
