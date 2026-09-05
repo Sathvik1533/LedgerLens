@@ -2,7 +2,7 @@
   "rewrites": [
     {
       "source": "/api/:path*",
-      "destination": "https://rely-yesterday-salmon-postage.trycloudflare.com/api/:path*"
+      "destination": "https://creature-thru-since-montana.trycloudflare.com/api/:path*"
     },
     {
       "source": "/(.*)",
