@@ -35,6 +35,7 @@ jobs:
       - name: Install Backend Dependencies
         run: |
           python -m pip install --upgrade pip
+          pip install --no-cache-dir torch --index-url https://download.pytorch.org/whl/cpu
           pip install -r backend/requirements.txt
 
       - name: Start Isolated PostgreSQL Test Database
@@ -115,6 +116,7 @@ jobs:
       - name: Install Python Dependencies & Playwright
         run: |
           python -m pip install --upgrade pip
+          pip install --no-cache-dir torch --index-url https://download.pytorch.org/whl/cpu
           pip install -r backend/requirements.txt
           python -m playwright install --with-deps chromium
 
