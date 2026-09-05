@@ -182,6 +182,10 @@ def test_four_source_financial_workflow_e2e(client, db_session):
     assert c4.currency == "INR"
 
     # ── 4. Case Triage & Review Queue Endpoints via HTTP ─────────────────────
+    from tests.conftest import create_test_user_session
+    token, _ = create_test_user_session(db_session, role="reviewer", email="finance_lead_sathvik")
+    client.cookies.set("ledgerlens_session", token)
+
     res_queue = client.get("/api/v1/review/queue")
     assert res_queue.status_code == 200
     queue_data = res_queue.json()
