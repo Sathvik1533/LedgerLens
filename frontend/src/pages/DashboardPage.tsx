@@ -317,7 +317,7 @@ export const DashboardPage: React.FC = () => {
                 <span className="text-xs font-mono text-ink-muted">0 differences found</span>
               </div>
               <div className="p-8 text-center border border-dashed border-rule/70 bg-canvas/40 rounded-xs space-y-1">
-                <span className="font-mono text-xs text-ink-secondary block font-medium">No record check active</span>
+                <span className="font-mono text-xs text-ink-secondary block font-medium">No reconciliation run active &bull; 0 differences found</span>
                 <p className="text-[11px] text-ink-muted max-w-sm mx-auto">
                   Compare records after bringing in source files to see differences and open cases needing human attention.
                 </p>

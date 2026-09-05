@@ -153,10 +153,10 @@ export const AuditLogPage: React.FC = () => {
         <div data-testid="audit-empty-state" className="p-12 text-center border border-dashed border-rule bg-surface/50 rounded-xs space-y-3">
           <div className="w-2.5 h-2.5 rounded-full bg-brass mx-auto" />
           <span className="font-editorial text-2xl text-ink font-medium block">
-            No review history yet
+            No reconciliation run active &bull; No review history yet
           </span>
           <p className="text-xs font-sans text-ink-secondary max-w-md mx-auto leading-relaxed">
-            Decisions and record comparisons will appear here in chronological order once records are reviewed.
+            The saved review history contains no events. Decisions and record comparisons will appear here in chronological order once records are reviewed.
           </p>
           <button
             onClick={loadAudit}

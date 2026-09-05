@@ -7,6 +7,43 @@ interface PolicyNoteProps {
   autoRun?: boolean;
 }
 
+const getHumanDocTitle = (filename: string, fallback: string = 'Approved operating rule') => {
+  if (filename.includes('fee')) return 'Provider fee and tax rule';
+  if (filename.includes('exception')) return 'Missing payout time limit';
+  if (filename.includes('settlement')) return 'Bank credit check';
+  return fallback;
+};
+
+const sanitizeRuleText = (text: string): string => {
+  return text
+    .replace(/^#{1,6}\s+/gm, '')
+    .replace(/\*\*(.*?)\*\*/g, '$1')
+    .replace(/\*(.*?)\*/g, '$1')
+    .replace(/\bpayment\.settlement_id\b/g, 'payment payout reference')
+    .replace(/\bbank_credit\.credited_amount\b/g, 'bank credit amount')
+    .replace(/\bsettlement\.net_settlement_amount\b/g, 'provider payout amount')
+    .replace(/\bsettlement\.fee_amount\b/g, 'provider fee amount')
+    .replace(/\bsettlement\.tax_amount\b/g, 'tax on fee amount')
+    .replace(/\bsettlement\.refund_amount\b/g, 'refund deduction')
+    .replace(/\bbank_credit\.bank_reference\b/g, 'bank reference number (UTR)')
+    .replace(/\bsettlement_id\b/g, 'payout reference')
+    .replace(/\border_id\b/g, 'order reference')
+    .replace(/\bmissing_settlement\b/g, 'missing provider payout')
+    .replace(/\bmissing_bank_credit\b/g, 'bank payment not received')
+    .replace(/\bamount_mismatch\b/g, 'amount difference')
+    .replace(/\bfee_mismatch\b/g, 'provider fee or tax difference')
+    .replace(/\bduplicate_payment\b/g, 'duplicate customer payment')
+    .replace(/\bduplicate_bank_credit\b/g, 'duplicate bank credit')
+    .replace(/\bpartial_refund_not_reflected\b/g, 'undeducted refund')
+    .replace(/\bambiguous_match\b/g, 'multiple potential matches')
+    .replace(/\bneeds_review\b/g, 'requires human review')
+    .replace(/\bauto_reconciled\b/g, 'matched automatically')
+    .replace(/^source:.*$/gm, '')
+    .replace(/^Version:.*$/gm, '')
+    .replace(/^Status:.*$/gm, '')
+    .trim();
+};
+
 export const RagCopilotPanel: React.FC<PolicyNoteProps> = ({ caseId, autoRun = true }) => {
   const [result, setResult] = useState<InvestigationResult | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -104,10 +141,10 @@ export const RagCopilotPanel: React.FC<PolicyNoteProps> = ({ caseId, autoRun = t
                 {result.citations.map((cite, idx) => (
                   <div key={idx} data-testid="policy-citation" className="p-2.5 bg-canvas/60 border border-rule rounded-xs space-y-1 text-[11px]">
                     <div className="flex justify-between font-mono text-ink-secondary">
-                      <span className="font-semibold text-ink">{cite.source_file}</span>
+                      <span className="font-semibold text-ink">{getHumanDocTitle(cite.source_file)}</span>
                       <span>Approved rule</span>
                     </div>
-                    <p className="italic text-ink-secondary font-serif leading-normal">&ldquo;{cite.quote}&rdquo;</p>
+                    <p className="italic text-ink-secondary font-serif leading-normal">&ldquo;{sanitizeRuleText(cite.quote)}&rdquo;</p>
                   </div>
                 ))}
               </div>
@@ -117,7 +154,7 @@ export const RagCopilotPanel: React.FC<PolicyNoteProps> = ({ caseId, autoRun = t
           {/* Secondary Disclosure for Technical Retrieval Metadata */}
           <details className="pt-2 text-[11px] font-mono text-ink-muted border-t border-rule/40">
             <summary className="cursor-pointer hover:text-ink">
-              How this rule was found
+              Technical details
             </summary>
             <div className="mt-2 p-2 bg-canvas/40 border border-rule/60 rounded-xs space-y-1">
               <div>Rule match confidence: {result.is_confident ? 'Matched approved library' : 'Low confidence match'}</div>

@@ -181,10 +181,14 @@ function EvaluationContent() {
           BENCHMARK TEST RESULTS
         </span>
         <h1 className="font-editorial text-3xl sm:text-5xl font-medium text-ink leading-tight">
-          In this test, 42 of 60 records matched. 18 cases need a human review. No incorrect approvals were made.
+          {hasRun
+            ? `In this test, ${autoCount} of ${datasetSize} records matched. ${reviewCount} cases need a human review. No incorrect approvals were made.`
+            : 'No reconciliation run active. Benchmark harness awaiting execution.'}
         </h1>
         <p className="text-base sm:text-lg text-ink-secondary font-normal leading-relaxed">
-          This test uses reproducible demo data across payments, provider payouts, refunds, and bank credits to check all 8 common differences. No live payment provider API is connected.
+          {hasRun
+            ? 'This test uses reproducible demo data across payments, provider payouts, refunds, and bank credits to check all 8 common differences. No live payment provider API is connected.'
+            : 'No evaluation run recorded. Execute reconciliation or the benchmark harness to compute verifiable match rates, discrepancy exposures, and exception distributions.'}
         </p>
       </div>
 
@@ -227,13 +231,13 @@ function EvaluationContent() {
 
       {/* STATE 3: TRUTHFUL NO-RUN EMPTY STATE */}
       {!loading && !error && !hasRun && (
-        <div className="border border-rule bg-surface rounded-xs p-8 sm:p-12 space-y-8 shadow-subtle text-center">
+        <div data-testid="evaluation-empty-state" className="border border-rule bg-surface rounded-xs p-8 sm:p-12 space-y-8 shadow-subtle text-center">
           <div className="max-w-xl mx-auto space-y-3">
             <span className="px-3 py-1 bg-canvas border border-rule text-ink-secondary text-[11px] font-mono uppercase tracking-wider rounded-xs inline-block">
-              Status: No Evaluation Run Recorded
+              Status: No Evaluation Run Recorded &bull; No Reconciliation Run Active
             </span>
             <h2 className="font-editorial text-3xl sm:text-4xl font-medium text-ink">
-              Evaluation benchmark harness has not been executed
+              No reconciliation run active
             </h2>
             <p className="text-xs sm:text-sm text-ink-secondary leading-relaxed font-sans">
               To guarantee zero false claims and strict empirical auditability, LedgerLens does not show simulated mock percentages, placeholder counts, or cached snapshots.
@@ -537,7 +541,6 @@ function EvaluationContent() {
                             <span className={`w-1.5 h-1.5 rounded-full ${isActive ? 'bg-critical' : 'bg-ink-muted'}`} />
                             <span className="font-semibold">{exc.label}</span>
                           </div>
-                          <div className="text-[10px] text-ink-muted pl-3.5">{exc.category}</div>
                         </td>
                         <td className="py-3 px-4 text-center font-mono font-semibold text-ink">
                           {exc.count}

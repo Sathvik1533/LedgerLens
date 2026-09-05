@@ -206,18 +206,48 @@ export const CaseDetailPage: React.FC<CaseDetailPageProps> = ({ caseId: propCase
               </div>
 
               <div className="pt-2 border-t border-border space-y-2 text-xs">
-                <div className="flex justify-between items-center text-text-secondary">
+                <div className="flex justify-between items-start text-text-secondary">
                   <span>Category</span>
-                  <span className="text-text-primary font-mono text-xs font-medium">{evidence.exception_type}</span>
+                  <div className="text-right space-y-0.5">
+                    <span className="text-text-primary font-medium text-xs block">
+                      {evidence.exception_type
+                        ? (({
+                            missing_settlement: 'Missing provider payout',
+                            missing_bank_credit: 'Bank payment not received',
+                            amount_mismatch: 'Amounts do not match',
+                            fee_mismatch: 'Provider fee is different',
+                            duplicate_payment: 'Customer may have paid twice',
+                            duplicate_bank_credit: 'Bank payment may appear twice',
+                            partial_refund_not_reflected: 'Refund missing from payout',
+                            ambiguous_match: 'More than one possible match',
+                          } as Record<string, string>)[evidence.exception_type] || evidence.exception_type)
+                        : 'Clean'}
+                    </span>
+                  </div>
                 </div>
                 <div className="flex justify-between items-center text-text-secondary">
                   <span>Status</span>
-                  <span className="text-text-primary font-mono text-xs font-medium">{evidence.decision_status}</span>
+                  <span className="text-text-primary font-mono text-xs font-medium">
+                    {(({
+                      needs_review: 'Needs a human decision',
+                      auto_reconciled: 'Automatically resolved',
+                      unresolved: 'Waiting for records',
+                      rejected: 'Rejected by reviewer',
+                      approved: 'Approved',
+                    } as Record<string, string>)[evidence.decision_status] || 'Needs a human decision')}
+                  </span>
                 </div>
                 <div className="flex justify-between items-center text-text-secondary">
                   <span>Version</span>
                   <span className="text-text-primary font-mono text-xs font-medium">v{evidence.version}</span>
                 </div>
+                <details className="pt-2 border-t border-border font-mono text-[10px] text-ink-muted">
+                  <summary className="cursor-pointer hover:text-text-primary">Technical details</summary>
+                  <div className="mt-1 space-y-0.5">
+                    <div>Exception code: {evidence.exception_type}</div>
+                    <div>Raw status: {evidence.decision_status}</div>
+                  </div>
+                </details>
               </div>
             </div>
           </div>

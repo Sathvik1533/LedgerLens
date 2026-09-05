@@ -14,6 +14,25 @@ interface CaseDetailPageProps {
   onBack?: () => void;
 }
 
+const EXCEPTION_LABELS: Record<string, string> = {
+  missing_settlement: 'Missing provider payout',
+  missing_bank_credit: 'Bank payment not received',
+  amount_mismatch: 'Amounts do not match',
+  fee_mismatch: 'Provider fee or tax is different',
+  duplicate_payment: 'Customer may have paid twice',
+  duplicate_bank_credit: 'Bank payment may appear twice',
+  partial_refund_not_reflected: 'Refund is missing from the payout',
+  ambiguous_match: 'More than one possible match',
+};
+
+const DECISION_STATUS_LABELS: Record<string, string> = {
+  needs_review: 'Needs a human decision',
+  auto_reconciled: 'Automatically resolved',
+  unresolved: 'Waiting for records',
+  rejected: 'Rejected by reviewer',
+  approved: 'Approved',
+};
+
 export const CaseDetailPage: React.FC<CaseDetailPageProps> = ({ caseId: propCaseId, onBack: propOnBack }) => {
   const params = useParams<{ caseId: string }>();
   const navigate = useNavigate();
@@ -88,13 +107,13 @@ export const CaseDetailPage: React.FC<CaseDetailPageProps> = ({ caseId: propCase
 
   if (error || !evidence) {
     return (
-      <div className="w-full max-w-2xl mx-auto my-16 p-8 border border-critical/40 bg-surface rounded-xs text-center space-y-4 font-sans">
+      <div data-testid="case-empty-state" className="w-full max-w-2xl mx-auto my-16 p-8 border border-critical/40 bg-surface rounded-xs text-center space-y-4 font-sans">
         <div className="w-2 h-2 rounded-full bg-critical mx-auto" />
         <h3 className="font-editorial text-2xl font-medium text-ink">
-          Reconciliation record unreachable
+          No reconciliation run active &bull; Record unreachable
         </h3>
         <p className="text-xs font-mono text-ink-secondary max-w-md mx-auto">
-          {error || 'The case identifier does not correspond to an active ledger record.'}
+          {error || 'No active reconciliation case found. Ingest source feeds and execute reconciliation to inspect case dossiers.'}
         </p>
         <button
           onClick={handleBack}
@@ -171,11 +190,11 @@ export const CaseDetailPage: React.FC<CaseDetailPageProps> = ({ caseId: propCase
           <p className="text-xs sm:text-sm font-sans text-ink leading-relaxed">
             {evidence.settlement_discrepancy && parseFloat(evidence.settlement_discrepancy) !== 0
               ? `₹${Math.abs(parseFloat(evidence.settlement_discrepancy)).toLocaleString('en-IN', { minimumFractionDigits: 2 })} difference found between expected payout and reported provider payout.`
-              : `A rule found a difference under "${evidence.exception_type || 'unclassified'}". Review the four financial records below.`}
+              : `A rule found a difference under "${(evidence.exception_type && EXCEPTION_LABELS[evidence.exception_type]) || 'review'}". Review the four financial records below.`}
           </p>
         </div>
         <span className="text-[11px] font-mono px-2 py-0.5 bg-canvas border border-rule text-ink-secondary rounded-xs shrink-0 self-start sm:self-auto">
-          Status: {evidence.decision_status === 'needs_review' ? 'Needs a human decision' : evidence.decision_status || 'Needs a human decision'}
+          Status: {DECISION_STATUS_LABELS[evidence.decision_status] || 'Needs a human decision'}
         </span>
       </div>
 

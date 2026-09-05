@@ -46,115 +46,115 @@ export function calculateCaseReconciliation(evidence: CaseEvidenceResponse): Cas
       const expectedBank = repNet > 0 ? repNet : (expNet > 0 ? expNet : gross * 0.9764);
       const excess = bankTotal > expectedBank ? bankTotal - expectedBank : expectedBank;
       return {
-        expectedLabel: '1. Expected Bank Remittance',
+        expectedLabel: '1. Expected provider payout',
         expectedAmount: expectedBank,
         expectedFormatted: fmt(expectedBank),
-        expectedFormula: 'Single gateway settlement payout remittance',
+        expectedFormula: 'Single payment sent by the provider to the bank',
 
-        actualLabel: '2. Total Bank Credits Received',
+        actualLabel: '2. Total bank payments received',
         actualAmount: bankTotal,
         actualFormatted: `${fmt(bankTotal)} (${bankCredits.length} Credits)`,
-        actualSourceDescription: 'Reported in cleared institutional bank statements',
+        actualSourceDescription: 'Reported in cleared bank statements',
 
-        varianceLabel: '3. Variance / Unearned Exposure',
+        varianceLabel: '3. Difference / extra bank payment',
         varianceAmount: excess,
         varianceFormatted: `+${fmt(excess)} Duplicate Entry`,
         varianceStatus: 'excess',
-        varianceDescription: 'Second credit of identical UTR credited by bank; requires reversal',
+        varianceDescription: 'A second bank payment with the same bank reference number (UTR) arrived; the extra payment needs to be reversed',
 
         divergenceStreamIndex: 4,
         divergenceStreamName: 'Bank Statement Credit',
-        traceOffsetLabel: `+${fmt(excess)} DUP CREDIT`,
+        traceOffsetLabel: `+${fmt(excess)} DUPLICATE CREDIT`,
         hasDiscrepancy: true,
 
-        recommendedActionHeadline: 'Reverse unearned shadow credit per SOP-204',
-        recommendedActionDetail: 'Audit nodal bank statement journal and verify double-credit entry. Mark duplicate UTR entry for banking reversal.'
+        recommendedActionHeadline: 'Reverse the duplicate bank payment per SOP-2026-BNK-03',
+        recommendedActionDetail: 'Check the bank statement and verify the duplicate credit entry. Mark the extra entry for reversal.'
       };
     }
 
     case 'missing_settlement': {
       return {
-        expectedLabel: '1. Contractual Expected Payout',
+        expectedLabel: '1. Expected provider payout',
         expectedAmount: expNet,
         expectedFormatted: fmt(expNet),
-        expectedFormula: 'Gross payment captured minus 2% fee & 18% GST',
+        expectedFormula: 'Customer payment captured minus 2% fee & 18% tax',
 
-        actualLabel: '2. Gateway Settlement Payout',
+        actualLabel: '2. Provider payout',
         actualAmount: 0,
-        actualFormatted: '₹0.00 (Unremitted)',
-        actualSourceDescription: 'No settlement batch item received from payment gateway',
+        actualFormatted: '₹0.00 (Not received)',
+        actualSourceDescription: 'No payout record received from provider',
 
-        varianceLabel: '3. Variance / Payout Shortfall',
+        varianceLabel: '3. Difference / missing payout',
         varianceAmount: -expNet,
-        varianceFormatted: `-${fmt(expNet)} Missing Payout`,
+        varianceFormatted: `-${fmt(expNet)} Missing`,
         varianceStatus: 'missing',
-        varianceDescription: 'T+2 settlement SLA breached; gateway has not disbursed captured gross',
+        varianceDescription: '2-day waiting period exceeded; provider has not sent payout for captured payment',
 
         divergenceStreamIndex: 2,
-        divergenceStreamName: 'Gateway Settlement',
-        traceOffsetLabel: 'MISSING SETTLEMENT (T+2)',
+        divergenceStreamName: 'Provider Payout',
+        traceOffsetLabel: 'MISSING PAYOUT (2 DAYS)',
         hasDiscrepancy: true,
 
-        recommendedActionHeadline: 'Escalate missing settlement batch to gateway operations',
-        recommendedActionDetail: 'Check acquirer capture status with payment gateway. Issue SLA penalty notice per SOP-2026-ESC-02.'
+        recommendedActionHeadline: 'Ask provider for missing payout record',
+        recommendedActionDetail: 'Check payment capture status with provider. Verify whether payout is in transit or delayed.'
       };
     }
 
     case 'missing_bank_credit': {
       const expectedDeposit = repNet > 0 ? repNet : expNet;
       return {
-        expectedLabel: '1. Net Settlement Remittance',
+        expectedLabel: '1. Expected provider payout',
         expectedAmount: expectedDeposit,
         expectedFormatted: fmt(expectedDeposit),
-        expectedFormula: 'Net payout confirmed by gateway settlement batch',
+        expectedFormula: 'Net payout confirmed by the provider settlement record',
 
-        actualLabel: '2. Institutional Bank Deposit',
+        actualLabel: '2. Bank payment received',
         actualAmount: 0,
-        actualFormatted: '₹0.00 (Missing UTR)',
-        actualSourceDescription: 'No matching transaction reference in nodal bank statement feed',
+        actualFormatted: '₹0.00 (Not received)',
+        actualSourceDescription: 'No matching bank reference number (UTR) found in bank statement',
 
-        varianceLabel: '3. Variance / Uncredited Cash',
+        varianceLabel: '3. Difference / missing bank payment',
         varianceAmount: -expectedDeposit,
-        varianceFormatted: `-${fmt(expectedDeposit)} Missing Deposit`,
+        varianceFormatted: `-${fmt(expectedDeposit)} Missing`,
         varianceStatus: 'missing',
-        varianceDescription: 'Bank credit missing despite gateway payout confirmation',
+        varianceDescription: 'Bank payment has not arrived despite the provider confirming it was sent',
 
         divergenceStreamIndex: 4,
         divergenceStreamName: 'Bank Statement Credit',
-        traceOffsetLabel: 'MISSING BANK UTR',
+        traceOffsetLabel: 'MISSING BANK PAYMENT',
         hasDiscrepancy: true,
 
-        recommendedActionHeadline: 'Chase bank operations for UTR credit confirmation per SOP-2026-BNK-03',
-        recommendedActionDetail: 'Request nodal account ledger search from clearing bank using settlement UTR reference.'
+        recommendedActionHeadline: 'Ask the bank to confirm the bank reference number (UTR) per SOP-2026-BNK-03',
+        recommendedActionDetail: 'Request the bank to search for the payment using the provider\'s reference. Confirm whether it was received or is still in transit.'
       };
     }
 
     case 'amount_mismatch': {
       const diff = repNet - expNet;
       return {
-        expectedLabel: '1. Contractual Expected Net',
+        expectedLabel: '1. Expected payout',
         expectedAmount: expNet,
         expectedFormatted: fmt(expNet),
-        expectedFormula: 'Gross captured minus agreed 2% fee & 18% GST',
+        expectedFormula: 'Customer payment minus standard 2% fee & 18% tax',
 
-        actualLabel: '2. Actual Gateway Payout',
+        actualLabel: '2. Reported provider payout',
         actualAmount: repNet,
         actualFormatted: fmt(repNet),
-        actualSourceDescription: 'Disbursed in gateway settlement batch report',
+        actualSourceDescription: 'Reported in provider payout record',
 
-        varianceLabel: '3. Variance / Settlement Shortfall',
+        varianceLabel: '3. Difference / payout amount',
         varianceAmount: diff,
-        varianceFormatted: `${diff < 0 ? '-' : '+'}${fmt(Math.abs(diff))} Shortfall`,
+        varianceFormatted: `${diff < 0 ? '-' : '+'}${fmt(Math.abs(diff))} Difference`,
         varianceStatus: 'deficit',
-        varianceDescription: 'Gateway withheld funds in excess of contractual fee schedule',
+        varianceDescription: 'Provider payout differs from expected calculation',
 
         divergenceStreamIndex: 2,
-        divergenceStreamName: 'Gateway Settlement',
-        traceOffsetLabel: `Δ -${fmt(Math.abs(diff))} SHORTFALL`,
+        divergenceStreamName: 'Provider Payout',
+        traceOffsetLabel: `Δ -${fmt(Math.abs(diff))} DIFFERENCE`,
         hasDiscrepancy: true,
 
-        recommendedActionHeadline: 'Initiate gateway fee dispute or review commercial concession',
-        recommendedActionDetail: 'Verify whether a temporary dispute clawback or promotional fee applies per SOP-2026-FEE-01.'
+        recommendedActionHeadline: 'Check provider deduction against approved fee rule',
+        recommendedActionDetail: 'Verify whether any dispute deduction or special rate applies under SOP-2026-FEE-01.'
       };
     }
 
@@ -163,114 +163,114 @@ export function calculateCaseReconciliation(evidence: CaseEvidenceResponse): Cas
       const expectedFee = gross * 0.02 * 1.18;
       const feeDiff = actualFee - expectedFee;
       return {
-        expectedLabel: '1. Contractual Fee + GST',
+        expectedLabel: '1. Approved fee and tax',
         expectedAmount: expectedFee,
         expectedFormatted: fmt(expectedFee),
-        expectedFormula: 'Contractual 2% MDR + 18% GST on gross payment',
+        expectedFormula: 'Standard 2% fee + 18% tax on payment amount',
 
-        actualLabel: '2. Actual Gateway Deductions',
+        actualLabel: '2. Reported provider deductions',
         actualAmount: actualFee,
         actualFormatted: fmt(actualFee),
-        actualSourceDescription: 'Reported fee_amount + tax_amount in gateway settlement',
+        actualSourceDescription: 'Reported fee and tax in provider payout',
 
-        varianceLabel: '3. Variance / Fee Overcharge',
+        varianceLabel: '3. Difference / fee deduction',
         varianceAmount: feeDiff,
         varianceFormatted: `${feeDiff > 0 ? '+' : ''}${fmt(feeDiff)} Variance`,
         varianceStatus: feeDiff > 0 ? 'deficit' : 'excess',
-        varianceDescription: 'Fee or tax deduction deviated from contractual commercial tier',
+        varianceDescription: 'Fee or tax deduction differs from approved 2% + 18% rate',
 
         divergenceStreamIndex: 2,
-        divergenceStreamName: 'Gateway Settlement',
-        traceOffsetLabel: 'FEE / TAX VARIANCE',
+        divergenceStreamName: 'Provider Payout',
+        traceOffsetLabel: 'FEE / TAX DIFFERENCE',
         hasDiscrepancy: true,
 
-        recommendedActionHeadline: 'Demand fee reconciliation credit note from gateway',
-        recommendedActionDetail: 'Issue dispute to acquirer citing contractual fee tier schedule SOP-2026-FEE-01.'
+        recommendedActionHeadline: 'Check fee difference with provider',
+        recommendedActionDetail: 'Contact provider regarding fee difference citing approved rule SOP-2026-FEE-01.'
       };
     }
 
     case 'duplicate_payment': {
       return {
-        expectedLabel: '1. Authorized Order Capture',
+        expectedLabel: '1. Expected order payment',
         expectedAmount: gross,
         expectedFormatted: fmt(gross),
-        expectedFormula: 'Single customer charge authorized on checkout order',
+        expectedFormula: 'Single customer payment for checkout order',
 
-        actualLabel: '2. Captured Payment Transactions',
+        actualLabel: '2. Customer payments received',
         actualAmount: gross * 2,
         actualFormatted: `${fmt(gross * 2)} (2 Captures)`,
-        actualSourceDescription: 'Two separate payment IDs captured for same order ID',
+        actualSourceDescription: 'Two separate customer payments found for same order',
 
-        varianceLabel: '3. Variance / Duplicate Capture',
+        varianceLabel: '3. Difference / extra payment',
         varianceAmount: gross,
-        varianceFormatted: `+${fmt(gross)} Excess Charge`,
+        varianceFormatted: `+${fmt(gross)} Extra payment`,
         varianceStatus: 'excess',
-        varianceDescription: 'Customer billed twice due to client retry or webhook race condition',
+        varianceDescription: 'Customer appears to have been charged twice for the same order',
 
         divergenceStreamIndex: 1,
-        divergenceStreamName: 'Merchant Payment',
-        traceOffsetLabel: `+${fmt(gross)} DUP CAPTURE`,
+        divergenceStreamName: 'Customer Payment',
+        traceOffsetLabel: `+${fmt(gross)} DUPLICATE PAYMENT`,
         hasDiscrepancy: true,
 
-        recommendedActionHeadline: 'Initiate immediate customer refund for duplicate capture',
-        recommendedActionDetail: 'Void duplicate capture transaction and verify single net settlement per SOP-102.'
+        recommendedActionHeadline: 'Issue customer refund for extra payment',
+        recommendedActionDetail: 'Verify customer payment records and issue a refund for the extra charge.'
       };
     }
 
     case 'partial_refund_not_reflected': {
       const expectedAdjusted = expNet - refundTotal;
       return {
-        expectedLabel: '1. Adjusted Net Payout',
+        expectedLabel: '1. Adjusted net payout',
         expectedAmount: expectedAdjusted,
         expectedFormatted: fmt(expectedAdjusted),
         expectedFormula: 'Gross payment minus fees minus customer refund',
 
-        actualLabel: '2. Unadjusted Gateway Remittance',
+        actualLabel: '2. Provider payout (refund not deducted)',
         actualAmount: repNet,
         actualFormatted: fmt(repNet),
-        actualSourceDescription: 'Gateway batch remitted payout without deducting customer refund',
+        actualSourceDescription: 'Payment sent by the provider without deducting the customer refund',
 
-        varianceLabel: '3. Variance / Unadjusted Refund',
+        varianceLabel: '3. Difference / refund not deducted',
         varianceAmount: -refundTotal,
-        varianceFormatted: `-${fmt(refundTotal)} Unreflected`,
+        varianceFormatted: `-${fmt(refundTotal)} Not deducted`,
         varianceStatus: 'deficit',
-        varianceDescription: 'Customer refund was cleared but not netted against gateway settlement',
+        varianceDescription: 'The customer refund was processed but was not deducted from the provider payout',
 
         divergenceStreamIndex: 3,
         divergenceStreamName: 'Customer Refund',
         traceOffsetLabel: `-${fmt(refundTotal)} REFUND GAP`,
         hasDiscrepancy: true,
 
-        recommendedActionHeadline: 'Clawback unadjusted refund deduction in next settlement cycle',
-        recommendedActionDetail: 'Confirm customer refund settlement batch status and adjust net payout ledger.'
+        recommendedActionHeadline: 'Reclaim the undeducted refund in the next settlement cycle',
+        recommendedActionDetail: 'Confirm the customer refund status and adjust the net payout record accordingly.'
       };
     }
 
     case 'ambiguous_match': {
       return {
-        expectedLabel: '1. Deterministic Settlement Line',
+        expectedLabel: '1. Expected provider payout',
         expectedAmount: expNet,
         expectedFormatted: fmt(expNet),
-        expectedFormula: 'Single 1:1 settlement candidate for payment ID',
+        expectedFormula: 'One provider payout expected for this payment',
 
-        actualLabel: '2. Candidate Settlement Matches',
+        actualLabel: '2. Possible matching payouts',
         actualAmount: repNet,
         actualFormatted: `${fmt(repNet)} (Multiple)`,
-        actualSourceDescription: 'Multiple candidate settlement lines match with equal confidence',
+        actualSourceDescription: 'Multiple provider payouts could match this payment',
 
-        varianceLabel: '3. Variance / Ambiguous Volume',
+        varianceLabel: '3. Difference / multiple matches',
         varianceAmount: expNet,
         varianceFormatted: `${fmt(expNet)} Under Review`,
         varianceStatus: 'deficit',
-        varianceDescription: 'Candidate ambiguity requires human manual link determination',
+        varianceDescription: 'Reviewer needs to choose which payout record matches',
 
         divergenceStreamIndex: 2,
-        divergenceStreamName: 'Gateway Settlement',
-        traceOffsetLabel: 'AMBIGUOUS CANDIDATES',
+        divergenceStreamName: 'Provider Payout',
+        traceOffsetLabel: 'MULTIPLE MATCHES',
         hasDiscrepancy: true,
 
-        recommendedActionHeadline: 'Inspect candidate settlement timestamps and manually link',
-        recommendedActionDetail: 'Evaluate candidate batch identifiers and confirm matching acquirer reference.'
+        recommendedActionHeadline: 'Choose the matching provider payout',
+        recommendedActionDetail: 'Compare reference numbers and timestamps to link the correct provider payout.'
       };
     }
 
@@ -278,29 +278,29 @@ export function calculateCaseReconciliation(evidence: CaseEvidenceResponse): Cas
       const diff = repNet - expNet;
       const isClean = Math.abs(diff) < 0.01;
       return {
-        expectedLabel: '1. Contractual Expected Net',
+        expectedLabel: '1. Expected payout',
         expectedAmount: expNet,
         expectedFormatted: fmt(expNet),
-        expectedFormula: 'Gross minus contractual fees and taxes',
+        expectedFormula: 'Customer payment minus approved fees and taxes',
 
-        actualLabel: '2. Actual Reported Net',
+        actualLabel: '2. Reported provider payout',
         actualAmount: repNet,
         actualFormatted: fmt(repNet),
-        actualSourceDescription: 'Reported in gateway settlement batch',
+        actualSourceDescription: 'Reported in provider payout',
 
-        varianceLabel: '3. Variance / Exposure',
+        varianceLabel: '3. Difference',
         varianceAmount: diff,
         varianceFormatted: isClean ? '₹0.00 Clean' : `${diff < 0 ? '-' : '+'}${fmt(Math.abs(diff))}`,
         varianceStatus: isClean ? 'clean' : 'deficit',
-        varianceDescription: isClean ? 'Deterministic parity verified across all streams' : 'Settlement variance detected',
+        varianceDescription: isClean ? 'All four records match' : 'Difference detected between records',
 
         divergenceStreamIndex: 2,
-        divergenceStreamName: 'Gateway Settlement',
-        traceOffsetLabel: isClean ? 'BALANCED PARITY' : 'VARIANCE',
+        divergenceStreamName: 'Provider Payout',
+        traceOffsetLabel: isClean ? 'MATCHED' : 'DIFFERENCE',
         hasDiscrepancy: !isClean,
 
-        recommendedActionHeadline: isClean ? 'Reconciliation verified; seal case to immutable ledger' : 'Review discrepancy with payment gateway',
-        recommendedActionDetail: isClean ? 'All four source counterparties verify with zero balance delta.' : 'Investigate variance against operating policy.'
+        recommendedActionHeadline: isClean ? 'Records match; ready to close' : 'Review difference with provider',
+        recommendedActionDetail: isClean ? 'All records match with zero difference.' : 'Investigate difference against approved rule.'
       };
     }
   }
