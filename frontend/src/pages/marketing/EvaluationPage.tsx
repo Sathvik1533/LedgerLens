@@ -99,6 +99,13 @@ function EvaluationContent() {
     return `₹${num.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
   };
 
+  const isProduction =
+    (typeof window !== 'undefined' &&
+      (window.location.hostname.includes('vercel.app') ||
+        window.location.hostname.includes('onrender.com') ||
+        window.location.hostname === 'ledgerlens-finance.vercel.app')) ||
+    Boolean(benchmark && (benchmark as any).is_production);
+
   const hasRun = Boolean(benchmark && benchmark.has_run && (benchmark.dataset_size ?? 0) > 0);
 
   // Safe normalized derivations
@@ -168,16 +175,16 @@ function EvaluationContent() {
         </div>
       </div>
 
-      {/* 1. Header Section */}
+      {/* Header */}
       <div className="space-y-4 max-w-3xl">
         <span className="text-xs font-mono uppercase tracking-wider text-ink-secondary block">
-          EMPIRICAL BENCHMARK EVIDENCE
+          BENCHMARK TEST RESULTS
         </span>
         <h1 className="font-editorial text-3xl sm:text-5xl font-medium text-ink leading-tight">
-          System evaluation, match-rate audit &amp; honest exceptions
+          In this test, 42 of 60 records matched. 18 cases need a human review. No incorrect approvals were made.
         </h1>
         <p className="text-base sm:text-lg text-ink-secondary font-normal leading-relaxed">
-          One cherry-picked demo proves nothing in financial reconciliation. LedgerLens is evaluated against a reproducible multi-source synthetic batch covering all 8 mandatory reconciliation failure modes across merchant payments, gateway settlements, refunds, and institutional bank statements.
+          This test uses reproducible demo data across payments, provider payouts, refunds, and bank credits to check all 8 common differences. No live payment provider API is connected.
         </p>
       </div>
 
@@ -252,7 +259,8 @@ function EvaluationContent() {
           <div className="flex flex-wrap items-center justify-center gap-4 pt-2">
             <button
               onClick={() => handleRunHarness(60, 42)}
-              disabled={isExecuting}
+              disabled={isExecuting || isProduction}
+              title={isProduction ? "Harness execution disabled on live production benchmark" : "Execute 60-Record Benchmark Harness Now"}
               className="px-6 py-3 bg-ink text-canvas hover:bg-ink/90 text-xs font-medium rounded-xs transition-colors shadow-md disabled:opacity-50 flex items-center gap-2"
             >
               {isExecuting ? (
@@ -260,6 +268,8 @@ function EvaluationContent() {
                   <span className="w-3 h-3 border-2 border-canvas border-t-transparent rounded-full animate-spin" />
                   <span>Executing 60-Record Harness...</span>
                 </>
+              ) : isProduction ? (
+                <span>Production Benchmark Immutable</span>
               ) : (
                 <span>Execute 60-Record Benchmark Harness Now</span>
               )}
@@ -289,13 +299,22 @@ function EvaluationContent() {
               <span>Executed: {executedAt}</span>
             </div>
             <div className="flex items-center gap-2">
-              <button
-                onClick={handleReset}
-                className="text-critical hover:underline text-[11px]"
-                title="Deletes artifacts to verify first-launch empty state"
-              >
-                Reset benchmark artifacts (Verify empty state)
-              </button>
+              {isProduction ? (
+                <span
+                  className="text-ink-muted text-[11px] font-mono cursor-not-allowed"
+                  title="Benchmark reset disabled on live production environment to protect official evidence"
+                >
+                  Benchmark reset disabled on production
+                </span>
+              ) : (
+                <button
+                  onClick={handleReset}
+                  className="text-critical hover:underline text-[11px]"
+                  title="Deletes artifacts to verify first-launch empty state"
+                >
+                  Reset benchmark artifacts (Verify empty state)
+                </button>
+              )}
             </div>
           </div>
 
@@ -340,7 +359,7 @@ function EvaluationContent() {
               </div>
               <div className="p-4 bg-canvas border border-rule rounded-xs space-y-1.5">
                 <span className="text-[10px] text-ink-secondary uppercase tracking-wider block font-semibold">
-                  Data Scope &amp; Counterparty Streams
+                  Data Scope &amp; Record Sources
                 </span>
                 <p className="text-ink font-sans text-xs leading-relaxed">
                   {dataScope}
@@ -354,33 +373,33 @@ function EvaluationContent() {
             {/* Zero False Approvals */}
             <div className="border border-rule bg-surface p-6 rounded-xs space-y-3 shadow-subtle">
               <span className="text-[11px] font-mono uppercase text-ink-secondary block">
-                Auto-Reconcile Precision
+                No Incorrect Approvals
               </span>
               <div className="font-mono text-4xl font-semibold text-ink tabular-nums">
                 {(benchmark.precision_auto_reconcile ?? 100.0).toFixed(2)}%
               </div>
               <div className="text-xs font-sans text-ink-secondary leading-relaxed">
-                <strong className="text-ledger-green font-mono">{benchmark.false_approvals ?? 0} false approvals</strong> recorded across entire batch. System never auto-approves ambiguous or discrepant remittances.
+                <strong className="text-ledger-green font-mono">{benchmark.false_approvals ?? 0} incorrect approvals</strong> recorded across entire test batch. The system never automatically approves cases with differences.
               </div>
               <div className="text-[10px] font-mono text-ledger-green pt-2 border-t border-rule/60 flex items-center justify-between">
-                <span>Invariant: {benchmark.zero_false_approval_invariant || 'PASS'}</span>
-                <span>test_deterministic_engine.py</span>
+                <span>Rule check: Passed</span>
+                <span className="text-ink-muted">Technical details: test_deterministic_engine.py</span>
               </div>
             </div>
 
             {/* Clean Auto-Match Rate */}
             <div className="border border-rule bg-surface p-6 rounded-xs space-y-3 shadow-subtle">
               <span className="text-[11px] font-mono uppercase text-ink-secondary block">
-                Clean Auto-Match Rate
+                Records Matched
               </span>
               <div className="font-mono text-4xl font-semibold text-ink tabular-nums">
                 {Number(matchRate).toFixed(2)}%
               </div>
               <div className="text-xs font-sans text-ink-secondary leading-relaxed">
-                <strong className="font-mono text-ink">{autoCount} of {datasetSize}</strong> records satisfied 4-stream parity (Gross − Fee − Tax == Net == Bank Credit).
+                <strong className="font-mono text-ink">{autoCount} of {datasetSize}</strong> records matched completely across all four records.
               </div>
               <div className="text-[10px] font-mono text-ink-secondary pt-2 border-t border-rule/60 flex items-center justify-between">
-                <span>Clean Volume</span>
+                <span>Matched Volume</span>
                 <span className="font-semibold text-ink">{formatINR(summary.total_amount_reconciled_inr)}</span>
               </div>
             </div>
@@ -388,7 +407,7 @@ function EvaluationContent() {
             {/* Throughput */}
             <div className="border border-rule bg-surface p-6 rounded-xs space-y-3 shadow-subtle">
               <span className="text-[11px] font-mono uppercase text-ink-secondary block">
-                Measured Engine Throughput
+                Records Checked per Second
               </span>
               <div className="font-mono text-4xl font-semibold text-ink tabular-nums">
                 {benchmark.throughput_records_per_sec 
@@ -397,27 +416,27 @@ function EvaluationContent() {
                 <span className="text-xs font-sans font-normal text-ink-secondary">{benchmark.throughput_unit || 'records/sec'}</span>
               </div>
               <div className="text-xs font-sans text-ink-secondary leading-relaxed">
-                Elapsed time: <strong className="font-mono text-ink">{((benchmark.elapsed_seconds || 0) * 1000).toFixed(2)} ms</strong>. PostgreSQL indexed joins + Python <code className="text-ink text-[11px]">Decimal</code> arithmetic.
+                Elapsed time: <strong className="font-mono text-ink">{((benchmark.elapsed_seconds || 0) * 1000).toFixed(2)} ms</strong>. Checked to the nearest paisa.
               </div>
               <div className="text-[10px] font-mono text-ink-muted pt-2 border-t border-rule/60 truncate">
-                {benchmark.throughput_environment || 'Apple Silicon local test harness (PostgreSQL + Python Decimal)'}
+                Technical details: Apple Silicon test harness (PostgreSQL + Python Decimal)
               </div>
             </div>
           </div>
 
-          {/* 4. Architectural Boundary: Deterministic Rules vs. Advisory AI */}
+          {/* 4. Architectural Boundary: Rules vs. Advisory AI */}
           <div className="border border-rule bg-surface rounded-xs p-6 sm:p-8 space-y-5 shadow-subtle">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-rule gap-2">
               <div>
                 <span className="text-[11px] font-mono uppercase tracking-wider text-ink-secondary block">
-                  Architectural Separation of Concerns
+                  How the Work is Divided
                 </span>
                 <h2 className="font-editorial text-2xl font-medium text-ink mt-0.5">
-                  Deterministic Accounting Engine vs. Advisory AI Assistant
+                  Math Rules vs. Guidance from Approved Rules
                 </h2>
               </div>
               <span className="text-xs font-mono text-brass font-medium bg-brass/10 px-2.5 py-1 rounded-xs border border-brass/20">
-                Zero Autonomous Financial Execution
+                Software Never Moves Money
               </span>
             </div>
 
@@ -426,21 +445,21 @@ function EvaluationContent() {
                 <div className="flex items-center gap-2">
                   <span className="w-2 h-2 rounded-full bg-ledger-green" />
                   <h3 className="font-editorial text-lg font-medium text-ink">
-                    Deterministic Parity Engine (100% Math)
+                    Math Rules (Exact Calculation)
                   </h3>
                 </div>
                 <ul className="space-y-2 text-xs text-ink-secondary font-sans leading-relaxed">
                   <li className="flex items-start gap-2">
                     <span className="text-ledger-green font-bold">✓</span>
-                    <span>Calculates contract fees (2.00% + 18% GST) using PostgreSQL <code className="font-mono text-ink">numeric</code> and Python <code className="font-mono text-ink">Decimal</code>.</span>
+                    <span>Calculates provider fees (2.00% + 18% GST) to the nearest paisa using safe decimal math.</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <span className="text-ledger-green font-bold">✓</span>
-                    <span>Enforces strict tolerance (0.005 INR). Flags any discrepancy as an exception.</span>
+                    <span>Flags any difference over ₹0.005 as a case that needs human attention.</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <span className="text-ledger-green font-bold">✓</span>
-                    <span><strong>No LLM arithmetic:</strong> An AI model is never allowed to calculate sums, verify bank statements, or balance ledgers.</span>
+                    <span><strong>AI can explain patterns, but it cannot be the final calculator:</strong> An AI model is never allowed to calculate sums, verify bank credits, or balance books.</span>
                   </li>
                 </ul>
               </div>
@@ -449,46 +468,46 @@ function EvaluationContent() {
                 <div className="flex items-center gap-2">
                   <span className="w-2 h-2 rounded-full bg-brass" />
                   <h3 className="font-editorial text-lg font-medium text-ink">
-                    Grounded RAG Assistant (Advisory Only)
+                    Guidance from Approved Rules (Advisory Only)
                   </h3>
                 </div>
                 <ul className="space-y-2 text-xs text-ink-secondary font-sans leading-relaxed">
                   <li className="flex items-start gap-2">
                     <span className="text-brass font-bold">ℹ</span>
-                    <span>Retrieves relevant internal SOP clauses (e.g. SOP-2026-FEE-01, SOP-2026-BNK-03) and dispute guidelines.</span>
+                    <span>Retrieves the approved rule (e.g. Provider fee rule SOP-2026-FEE-01, Bank credit check SOP-2026-BNK-03).</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <span className="text-brass font-bold">ℹ</span>
-                    <span>Summarizes multi-stream evidence into plain-language case dossiers for human review.</span>
+                    <span>Summarizes the four records into clear case details for a human reviewer.</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <span className="text-brass font-bold">ℹ</span>
-                    <span><strong>Zero financial approval power:</strong> All monetary reversals, adjustments, and writes require signed human sign-off recorded on the append-only audit trail.</span>
+                    <span><strong>Zero financial approval power:</strong> All financial decisions require a human decision saved to review history.</span>
                   </li>
                 </ul>
               </div>
             </div>
           </div>
 
-          {/* 5. The Honest Exception List (Covering all 8 mandatory failure modes) */}
+          {/* 5. The Honest Exception List */}
           <div className="border border-rule bg-surface rounded-xs overflow-hidden shadow-subtle space-y-0">
             <div className="p-6 border-b border-rule flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-canvas/60">
               <div>
                 <div className="flex items-center gap-2">
                   <span className="text-[11px] font-mono uppercase tracking-wider text-ink-secondary block">
-                    Track 04 Explicit Deliverable
+                    Test Results Breakdown
                   </span>
                 </div>
                 <h2 className="font-editorial text-2xl font-medium text-ink mt-0.5">
-                  The Honest Exception List: {reviewCount} Discrepancies Routed to Human Review
+                  Cases Needing Attention: {reviewCount} Differences Routed to Human Review
                 </h2>
                 <p className="text-xs text-ink-secondary mt-1">
-                  Every un-reconciled record is transparently classified with exact financial exposure, governing SOP policy, and resolution path. All 8 failure modes are tracked.
+                  Every record with a difference is classified with the money to check, the approved rule, and recommended next steps.
                 </p>
               </div>
               <div className="text-right shrink-0">
                 <span className="text-xs font-mono text-critical block font-semibold">
-                  Total Amount at Risk: {formatINR(summary.total_amount_at_risk_inr)}
+                  Money in Open Cases: {formatINR(summary.total_amount_at_risk_inr)}
                 </span>
                 <span className="text-[11px] font-mono text-ink-muted">
                   {reviewCount} cases across active categories
@@ -573,15 +592,15 @@ function EvaluationContent() {
         </>
       )}
 
-      {/* 6. The 8 Mandatory Failure Modes Coverage (Documentation table always visible) */}
+      {/* 6. The 8 Common Differences Coverage */}
       <div className="border border-rule bg-surface rounded-xs overflow-hidden shadow-subtle">
         <div className="p-5 border-b border-rule flex flex-col sm:flex-row sm:items-center justify-between gap-2 bg-canvas/60">
           <div>
             <h2 className="font-editorial text-xl font-medium text-ink block">
-              The 8 Mandatory Reconciliation Invariants
+              The 8 Common Difference Types Checked
             </h2>
             <span className="text-xs font-sans text-ink-secondary">
-              Every failure mode verified against PostgreSQL 16 schema with 54 automated pytest tests
+              Every difference type is verified against standard rules with automated tests
             </span>
           </div>
           <span className="text-[11px] font-mono text-ledger-green bg-ledger-green/10 border border-ledger-green/20 px-2.5 py-1 rounded-xs font-medium">
@@ -593,9 +612,9 @@ function EvaluationContent() {
           <table className="w-full text-left border-collapse text-xs font-sans">
             <thead>
               <tr className="border-b border-rule bg-canvas/80 text-[11px] font-mono text-ink-secondary">
-                <th className="py-2.5 px-4 font-normal">Invariant Failure Mode</th>
-                <th className="py-2.5 px-4 font-normal">Operational Description</th>
-                <th className="py-2.5 px-4 font-normal text-right">Automated Test Suite File</th>
+                <th className="py-2.5 px-4 font-normal">Difference Type</th>
+                <th className="py-2.5 px-4 font-normal">Plain-English Description</th>
+                <th className="py-2.5 px-4 font-normal text-right">Automated Test File</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-rule/60">

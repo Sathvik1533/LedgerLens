@@ -27,6 +27,7 @@ if not test_db_url.rstrip('/').endswith("_test"):
 # Force the application to use the test database
 os.environ["DATABASE_URL"] = test_db_url
 os.environ["_TEST_DB_OVERRIDDEN"] = "1"
+os.environ.setdefault("SECRET_KEY", "test-secret-key-for-local-testing")
 
 from backend.app.main import app
 from backend.app.db.session import get_db

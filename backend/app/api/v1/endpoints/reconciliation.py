@@ -1,6 +1,6 @@
 from typing import Optional, List
 from uuid import UUID
-from fastapi import APIRouter, Depends, Query, status
+from fastapi import APIRouter, Depends, Query, status, HTTPException
 from sqlalchemy.orm import Session
 
 from backend.app.db.session import get_db
@@ -116,6 +116,7 @@ def get_reconciliation_stats(
         "total_amount_reconciled": str(total_reconciled),
         "total_amount_at_risk": str(total_at_risk),
         "exception_breakdown": exception_counts,
+        "has_run": total_cases > 0,
     }
 
 
@@ -209,6 +210,7 @@ def _normalize_benchmark_payload(data: dict) -> dict:
             "total_amount_at_risk_inr": str(raw_summary.get("total_amount_at_risk_inr", "0.00")),
         },
         "exception_categories": categories,
+        "is_production": data.get("is_production", False),
     }
 
 
@@ -222,11 +224,17 @@ def _normalize_benchmark_payload(data: dict) -> dict:
 def get_reconciliation_benchmark():
     import json
     import os
+    from backend.app.core.config import settings
+    is_prod = (
+        settings.APP_ENV == "production"
+        or "supabase.co" in (settings.DATABASE_URL or "").lower()
+        or "onrender.com" in os.getenv("RENDER_EXTERNAL_URL", "")
+    )
     project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../../.."))
     report_path = os.path.join(project_root, "artifacts/evaluation/reconciliation_benchmark_report.json")
     
     if not os.path.exists(report_path):
-        return _normalize_benchmark_payload({
+        payload = _normalize_benchmark_payload({
             "has_run": False,
             "status": "no_run_recorded",
             "message": "No evaluation run recorded. Execute `python evaluation/run_benchmark.py` to generate verifiable benchmark metrics.",
@@ -240,13 +248,19 @@ def get_reconciliation_benchmark():
                 "total_amount_at_risk_inr": "0.00",
             },
             "exception_categories": [],
+            "is_production": is_prod,
         })
+        payload["is_production"] = is_prod
+        return payload
 
     with open(report_path, "r", encoding="utf-8") as f:
         data = json.load(f)
 
     data["has_run"] = True
-    return _normalize_benchmark_payload(data)
+    data["is_production"] = is_prod
+    payload = _normalize_benchmark_payload(data)
+    payload["is_production"] = is_prod
+    return payload
 
 
 @router.post(
@@ -259,6 +273,18 @@ def reset_reconciliation_benchmark(
     current_user: UserModel = Depends(get_current_admin),
 ):
     import os
+    from backend.app.core.config import settings
+    is_prod = (
+        settings.APP_ENV == "production"
+        or "supabase.co" in (settings.DATABASE_URL or "").lower()
+        or "onrender.com" in os.getenv("RENDER_EXTERNAL_URL", "")
+    )
+    if is_prod:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Reset and benchmark mutation controls are permanently disabled against the live production environment.",
+        )
+
     project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../../.."))
     artifact_files = [
         "artifacts/evaluation/reconciliation_benchmark_report.json",
@@ -304,6 +330,19 @@ def trigger_reconciliation_benchmark_run(
     db: Session = Depends(get_db),
     current_user: UserModel = Depends(get_current_admin),
 ):
+    import os
+    from backend.app.core.config import settings
+    is_prod = (
+        settings.APP_ENV == "production"
+        or "supabase.co" in (settings.DATABASE_URL or "").lower()
+        or "onrender.com" in os.getenv("RENDER_EXTERNAL_URL", "")
+    )
+    if is_prod:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Benchmark run execution is permanently disabled against the live production environment.",
+        )
+
     from evaluation.run_benchmark import run_reconciliation_benchmark
     report = run_reconciliation_benchmark(total_records=size, seed=seed)
     report["has_run"] = True

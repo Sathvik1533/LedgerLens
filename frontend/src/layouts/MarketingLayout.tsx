@@ -121,14 +121,14 @@ export default function MarketingLayout() {
               </p>
             </div>
             <div className="flex flex-col md:items-end gap-1 font-mono text-[11px] text-ink-secondary">
-              <span>Canonical 4-Source Reconciliation Architecture</span>
-              <span className="text-ink">Payments &bull; Settlements &bull; Refunds &bull; Bank Credits</span>
-              <span>Reconciled with penny-exact mathematical parity</span>
+              <span>Four records checked &bull; Differences explained &bull; Human decisions saved</span>
+              <span className="text-ink">Payments &bull; Provider payouts &bull; Refunds &bull; Bank credits</span>
+              <span>Checked to the nearest paisa</span>
             </div>
           </div>
           <div className="mt-8 pt-6 border-t border-rule/60 flex justify-between items-center text-[11px] font-mono text-ink-muted">
             <span>&copy; {new Date().getFullYear()} LedgerLens Financial Operations</span>
-            <span>Operating under strict double-entry invariants</span>
+            <span>Rule checks for accuracy &bull; Human decisions for final action</span>
           </div>
         </div>
       </footer>

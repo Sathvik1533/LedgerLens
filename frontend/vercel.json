@@ -2,7 +2,7 @@
   "rewrites": [
     {
       "source": "/api/:path*",
-      "destination": "https://creature-thru-since-montana.trycloudflare.com/api/:path*"
+      "destination": "https://razorpay-ai-finance-controller-xm77.onrender.com/api/:path*"
     },
     {
       "source": "/(.*)",

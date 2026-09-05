@@ -3,35 +3,35 @@ import { ExceptionType } from '../types/api';
 
 export const EXCEPTION_CONFIG: Record<string, { label: string; severity: 'critical' | 'high' | 'resolved' }> = {
   missing_settlement: {
-    label: 'Missing settlement',
+    label: 'Missing provider payout',
     severity: 'high',
   },
   missing_bank_credit: {
-    label: 'Missing bank credit',
+    label: 'Bank payment not received',
     severity: 'critical',
   },
   amount_mismatch: {
-    label: 'Amount mismatch',
+    label: 'Amounts do not match',
     severity: 'critical',
   },
   fee_mismatch: {
-    label: 'Fee / tax mismatch',
+    label: 'Provider fee or tax is different',
     severity: 'high',
   },
   duplicate_payment: {
-    label: 'Duplicate payment',
+    label: 'Customer may have paid twice',
     severity: 'critical',
   },
   duplicate_bank_credit: {
-    label: 'Duplicate bank credit',
+    label: 'Bank payment may appear twice',
     severity: 'high',
   },
   partial_refund_not_reflected: {
-    label: 'Partial refund unadjusted',
+    label: 'Refund is missing from the payout',
     severity: 'high',
   },
   ambiguous_match: {
-    label: 'Ambiguous match',
+    label: 'More than one possible match',
     severity: 'high',
   },
 };
@@ -44,7 +44,7 @@ export const ExceptionBadge: React.FC<{ type: ExceptionType | string | null; siz
     return (
       <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-xs text-[11px] font-mono font-medium bg-ledger-green/10 text-ledger-green border border-ledger-green/30">
         <span>✓</span>
-        <span>Reconciled</span>
+        <span>Matched automatically</span>
       </span>
     );
   }

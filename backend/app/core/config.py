@@ -20,7 +20,7 @@ class Settings(BaseSettings):
     APP_ENV: str = "development"
     LOG_LEVEL: str = "INFO"
     DATABASE_URL: Optional[str] = "postgresql://postgres:postgres@localhost:5432/finance_controller"
-    SECRET_KEY: str = os.getenv("SECRET_KEY", "dev-local-session-key-only")
+    SECRET_KEY: str = os.environ.get("SECRET_KEY", "")
     BACKEND_PROVIDER: str = "Render Cloud Infrastructure"
     DEPLOYMENT_VERSION: str = os.getenv("DEPLOYMENT_VERSION") or _resolve_source_commit()
     SOURCE_COMMIT: str = _resolve_source_commit()

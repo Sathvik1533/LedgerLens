@@ -32,10 +32,10 @@ export default function AppLayout() {
     try {
       await triggerReconciliationRun();
       await updateQueueCount();
-      setReconMessage('Reconciliation cycle executed');
+      setReconMessage('Records compared');
       setTimeout(() => setReconMessage(null), 3000);
     } catch {
-      setReconMessage('Reconciliation run interrupted');
+      setReconMessage('Record check interrupted');
       setTimeout(() => setReconMessage(null), 3000);
     } finally {
       setIsRunningRecon(false);
@@ -44,11 +44,11 @@ export default function AppLayout() {
 
   const navItems = [
     { path: '/app/dashboard', label: 'Overview' },
-    { path: '/app/queue', label: 'Review queue', badge: queueCount },
-    { path: '/app/ingestion', label: 'Ingestion feeds' },
-    { path: '/app/audit', label: 'Audit ledger' },
-    { path: '/app/policies', label: 'Policy library' },
-    { path: '/app/settings', label: 'Contract settings' },
+    { path: '/app/queue', label: 'Cases to review', badge: queueCount },
+    { path: '/app/ingestion', label: 'Source files' },
+    { path: '/app/audit', label: 'Saved review history' },
+    { path: '/app/policies', label: 'Approved rules' },
+    { path: '/app/settings', label: 'Settings' },
   ];
 
   return (
@@ -95,7 +95,7 @@ export default function AppLayout() {
               })}
             </nav>
 
-          <div className="flex items-center space-x-3 shrink-0">
+          <div className="flex items-center gap-3 shrink-0">
             {reconMessage && (
               <span className="text-[11px] font-mono text-ink-secondary hidden md:inline-block">
                 {reconMessage}
@@ -107,19 +107,21 @@ export default function AppLayout() {
               className="px-3 py-1.5 border border-rule-strong bg-surface hover:bg-canvas text-ink text-xs font-medium rounded-xs transition-colors flex items-center gap-2 disabled:opacity-50"
             >
               <span className={`w-1.5 h-1.5 rounded-full ${isRunningRecon ? 'bg-brass animate-ping' : 'bg-ledger-green'}`} />
-              <span>{isRunningRecon ? 'Reconciling...' : 'Run reconciliation'}</span>
+              <span>{isRunningRecon ? 'Comparing...' : 'Compare records'}</span>
             </button>
 
             {user && (
-              <div className="flex items-center gap-2 pl-2 border-l border-rule">
-                <div className="flex flex-col text-right hidden lg:block">
-                  <span className="text-xs font-medium text-ink leading-tight">{user.full_name}</span>
-                  <span className="text-[10px] font-mono text-ink-secondary uppercase tracking-wider">{user.role === 'admin' ? 'Administrator' : 'Reviewer'}</span>
+              <div className="flex items-center gap-3 pl-3 border-l border-rule">
+                <div className="hidden sm:flex items-center gap-2">
+                  <span className="text-xs font-medium text-ink">{user.full_name}</span>
+                  <span className="px-1.5 py-0.5 font-mono text-[10px] uppercase tracking-wider text-ink-secondary bg-surface border border-rule rounded-xs">
+                    {user.role === 'admin' ? 'Admin' : 'Reviewer'}
+                  </span>
                 </div>
                 <button
                   data-testid="nav-logout"
                   onClick={() => logout()}
-                  className="px-2 py-1 text-[11px] font-mono border border-rule hover:bg-canvas rounded-xs text-ink-secondary hover:text-ink transition-colors cursor-pointer"
+                  className="px-2.5 py-1.5 text-xs font-mono border border-rule hover:bg-canvas rounded-xs text-ink-secondary hover:text-ink transition-colors cursor-pointer"
                   title="Sign out of LedgerLens"
                 >
                   Sign out
@@ -140,7 +142,7 @@ export default function AppLayout() {
                 <span className="font-medium text-ink">Welcome to LedgerLens. Here is how to investigate:</span>
               </div>
               <p className="text-ink-secondary text-[11px] leading-relaxed">
-                1. Start with the batch &bull; 2. Open highest-risk exception &bull; 3. Compare the four sources &bull; 4. Read the policy &bull; 5. Record a human decision &bull; 6. Check the audit receipt
+                1. Choose records &bull; 2. Open a case needing attention &bull; 3. Compare the four records &bull; 4. Read the approved rule &bull; 5. Record a human decision &bull; 6. Check the saved history
               </p>
             </div>
             <button
@@ -163,9 +165,9 @@ export default function AppLayout() {
         <div className="max-w-7xl mx-auto px-6 flex justify-between items-center">
           <div className="flex items-center gap-2">
             <span className="w-1.5 h-1.5 rounded-full bg-ledger-green" />
-            <span>Deterministic 4-Source Parity System</span>
+            <span>Four records checked &bull; Differences explained</span>
           </div>
-          <span>Append-Only Ledger Engine</span>
+          <span>Human decisions saved</span>
         </div>
       </footer>
     </div>

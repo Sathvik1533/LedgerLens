@@ -18,65 +18,94 @@ export default function DocsPage() {
 
       {/* Grid of Actionable Documentation Sections */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* Section 1: Invariants */}
-        <div className="border border-rule bg-surface p-6 rounded-xs space-y-4 shadow-subtle">
-          <span className="text-xs font-mono uppercase text-ink-secondary block">Specification 01</span>
-          <h3 className="font-editorial text-2xl font-medium text-ink">
-            Financial &amp; Math Invariants
-          </h3>
-          <p className="text-xs text-ink-secondary leading-relaxed">
-            All monetary math uses Python <code className="text-ink font-mono">Decimal</code> and PostgreSQL <code className="text-ink font-mono">numeric(18,2)</code>. Floating-point types are strictly forbidden across the pipeline.
-          </p>
-          <div className="p-3 bg-canvas border border-rule rounded-xs font-mono text-[11px] text-ink space-y-1">
-            <div>Expected Net = Gross - [Fee (2%) + GST (18%)] - Refunds</div>
-            <div className="text-ink-secondary">&Delta; Tolerable variance &le; ₹0.01</div>
+        {/* Section 1: Math rules */}
+        <div className="border border-rule bg-surface p-6 rounded-xs space-y-4 shadow-subtle flex flex-col justify-between">
+          <div className="space-y-3">
+            <h3 className="font-editorial text-2xl font-medium text-ink">
+              Math rules
+            </h3>
+            <p className="text-xs text-ink-secondary leading-relaxed font-sans">
+              Numbers are checked to the nearest paisa so rounding errors never become missing money. If the expected payout differs from what reached the bank by even ₹0.01, the case pauses for a human reviewer.
+            </p>
+          </div>
+          
+          <div className="pt-3 border-t border-rule/60 space-y-2 text-xs">
+            <span className="text-[10px] uppercase font-mono tracking-wider text-ink-secondary block font-semibold">Technical details</span>
+            <p className="text-[11px] font-sans text-ink-secondary leading-relaxed">
+              All monetary math uses Python <code className="text-ink font-mono">Decimal</code> and PostgreSQL <code className="text-ink font-mono">numeric(18,2)</code>. Floating-point types are strictly forbidden.
+            </p>
+            <div className="p-2.5 bg-canvas border border-rule rounded-xs font-mono text-[10px] text-ink space-y-0.5">
+              <div>Expected Net = Gross - [Fee (2%) + GST (18%)] - Refunds</div>
+              <div className="text-ink-secondary">&Delta; Tolerable difference &le; ₹0.01</div>
+            </div>
           </div>
         </div>
 
-        {/* Section 2: Four-Source Architecture */}
-        <div className="border border-rule bg-surface p-6 rounded-xs space-y-4 shadow-subtle">
-          <span className="text-xs font-mono uppercase text-ink-secondary block">Specification 02</span>
-          <h3 className="font-editorial text-2xl font-medium text-ink">
-            Four-Source Evidence Contracts
-          </h3>
-          <p className="text-xs text-ink-secondary leading-relaxed">
-            Every transaction is evaluated across four distinct counterparty streams before auto-resolution or exception routing.
-          </p>
-          <ul className="text-xs font-mono text-ink-secondary space-y-1.5 list-disc pl-4">
-            <li><strong className="text-ink">Payments:</strong> captured merchant order references</li>
-            <li><strong className="text-ink">Settlements:</strong> reported net payout line items</li>
-            <li><strong className="text-ink">Refunds:</strong> customer returns and reversals</li>
-            <li><strong className="text-ink">Bank Credits:</strong> verified institutional statement UTRs</li>
-          </ul>
-        </div>
-
-        {/* Section 3: Idempotent Ingestion */}
-        <div className="border border-rule bg-surface p-6 rounded-xs space-y-4 shadow-subtle">
-          <span className="text-xs font-mono uppercase text-ink-secondary block">Specification 03</span>
-          <h3 className="font-editorial text-2xl font-medium text-ink">
-            ACID Ingestion &amp; Idempotency
-          </h3>
-          <p className="text-xs text-ink-secondary leading-relaxed">
-            Upload endpoints support optional <code className="text-ink font-mono">X-Idempotency-Key</code> headers. Replaying an identical batch returns the original receipt without duplicating records.
-          </p>
-          <div className="p-3 bg-canvas border border-rule rounded-xs font-mono text-[11px] text-ink space-y-1">
-            <div>POST /api/v1/ingestion/upload/:source_type</div>
-            <div className="text-ink-secondary">Enforces atomic multi-row commits &amp; hash deduplication</div>
+        {/* Section 2: Four records checked */}
+        <div className="border border-rule bg-surface p-6 rounded-xs space-y-4 shadow-subtle flex flex-col justify-between">
+          <div className="space-y-3">
+            <h3 className="font-editorial text-2xl font-medium text-ink">
+              Four records checked
+            </h3>
+            <p className="text-xs text-ink-secondary leading-relaxed font-sans">
+              Every transaction is verified across four independent records before any case is closed: what the customer paid, what the provider sent, what was refunded, and what arrived in the bank.
+            </p>
+          </div>
+          
+          <div className="pt-3 border-t border-rule/60 space-y-2 text-xs">
+            <span className="text-[10px] uppercase font-mono tracking-wider text-ink-secondary block font-semibold">Technical details</span>
+            <ul className="text-[11px] font-mono text-ink-secondary space-y-1 list-disc pl-4">
+              <li><strong className="text-ink">Payments:</strong> captured customer order references</li>
+              <li><strong className="text-ink">Provider payouts:</strong> reported net payout line items</li>
+              <li><strong className="text-ink">Refunds:</strong> customer returns and reversals</li>
+              <li><strong className="text-ink">Bank credits:</strong> verified bank reference numbers (UTR)</li>
+            </ul>
           </div>
         </div>
 
-        {/* Section 4: Audit Trail Permanence */}
-        <div className="border border-rule bg-surface p-6 rounded-xs space-y-4 shadow-subtle">
-          <span className="text-xs font-mono uppercase text-ink-secondary block">Specification 04</span>
-          <h3 className="font-editorial text-2xl font-medium text-ink">
-            Audit Trail &amp; Safe Concurrency
-          </h3>
-          <p className="text-xs text-ink-secondary leading-relaxed">
-            Operator actions enforce optimistic concurrency (version checks). Colliding reviews return HTTP 409 to prevent accidental overwrites. All changes write to an append-only event ledger.
-          </p>
-          <div className="p-3 bg-canvas border border-rule rounded-xs font-mono text-[11px] text-ink space-y-1">
-            <div>Signer &bull; Action &bull; Version &bull; Timestamp &bull; Rationale</div>
-            <div className="text-ink-secondary">Shared persisted event store between case &amp; global views</div>
+        {/* Section 3: Safe upload without duplicates */}
+        <div className="border border-rule bg-surface p-6 rounded-xs space-y-4 shadow-subtle flex flex-col justify-between">
+          <div className="space-y-3">
+            <h3 className="font-editorial text-2xl font-medium text-ink">
+              Safe upload without duplicates
+            </h3>
+            <p className="text-xs text-ink-secondary leading-relaxed font-sans">
+              Uploading a file twice never creates duplicate records. Either all records in a batch save together safely, or none do.
+            </p>
+          </div>
+          
+          <div className="pt-3 border-t border-rule/60 space-y-2 text-xs">
+            <span className="text-[10px] uppercase font-mono tracking-wider text-ink-secondary block font-semibold">Technical details</span>
+            <p className="text-[11px] font-sans text-ink-secondary leading-relaxed">
+              Upload endpoints support optional <code className="text-ink font-mono">X-Idempotency-Key</code> headers. Replaying an identical batch returns the original receipt without duplicating rows.
+            </p>
+            <div className="p-2.5 bg-canvas border border-rule rounded-xs font-mono text-[10px] text-ink space-y-0.5">
+              <div>POST /api/v1/ingestion/:source_type</div>
+              <div className="text-ink-secondary">Enforces atomic multi-row commits and duplicate-file checks</div>
+            </div>
+          </div>
+        </div>
+
+        {/* Section 4: Saved review history */}
+        <div className="border border-rule bg-surface p-6 rounded-xs space-y-4 shadow-subtle flex flex-col justify-between">
+          <div className="space-y-3">
+            <h3 className="font-editorial text-2xl font-medium text-ink">
+              Saved review history
+            </h3>
+            <p className="text-xs text-ink-secondary leading-relaxed font-sans">
+              See what was decided, by whom, when, and why. Protection against two people changing the same case stops accidental overwrites.
+            </p>
+          </div>
+          
+          <div className="pt-3 border-t border-rule/60 space-y-2 text-xs">
+            <span className="text-[10px] uppercase font-mono tracking-wider text-ink-secondary block font-semibold">Technical details</span>
+            <p className="text-[11px] font-sans text-ink-secondary leading-relaxed">
+              Operator actions enforce optimistic concurrency (version checks). Colliding reviews return HTTP 409 to prevent accidental overwrites. All changes write to an append-only event ledger.
+            </p>
+            <div className="p-2.5 bg-canvas border border-rule rounded-xs font-mono text-[10px] text-ink space-y-0.5">
+              <div>Signer &bull; Action &bull; Version &bull; Timestamp &bull; Reason</div>
+              <div className="text-ink-secondary">Shared persisted event store between case and global views</div>
+            </div>
           </div>
         </div>
       </div>

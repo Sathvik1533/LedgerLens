@@ -270,6 +270,121 @@ async def test_local_reviewer_logout():
         await context.close()
         await browser.close()
 
+@pytest.mark.browser
+@pytest.mark.asyncio
+async def test_local_zero_state_rendering():
+    """Asserts truthful zero-state banners and messaging across Dashboard, Queue, and Audit when DB is empty."""
+    from tests.conftest import truncate_all_tables
+    truncate_all_tables()
+
+    async with async_playwright() as p:
+        browser = await p.chromium.launch(headless=True)
+        context = await browser.new_context(viewport={"width": 1440, "height": 900})
+        page = await context.new_page()
+
+        # Login as demo reviewer
+        await page.goto(f"{LOCAL_BASE_URL}/login", wait_until="networkidle")
+        await page.locator("[data-testid='login-demo-reviewer']").click()
+        await page.wait_for_url("**/app/queue", timeout=15000)
+
+        # 1. Queue Page Zero State
+        queue_empty = page.locator("[data-testid='queue-empty-state']")
+        await page.wait_for_selector("[data-testid='queue-empty-state']", timeout=10000)
+        assert await queue_empty.is_visible()
+        queue_text = await queue_empty.inner_text()
+        assert "No reconciliation run active" in queue_text or "clear" in queue_text
+
+        # 2. Dashboard Page Zero State
+        await page.goto(f"{LOCAL_BASE_URL}/app/dashboard", wait_until="networkidle")
+        banner = page.locator("[data-testid='no-run-banner']")
+        await page.wait_for_selector("[data-testid='no-run-banner']", timeout=10000)
+        assert await banner.is_visible()
+        banner_text = await banner.inner_text()
+        assert "No reconciliation run active" in banner_text
+
+        # 3. Audit Ledger Zero State
+        await page.goto(f"{LOCAL_BASE_URL}/app/audit", wait_until="networkidle")
+        audit_empty = page.locator("[data-testid='audit-empty-state']")
+        await page.wait_for_selector("[data-testid='audit-empty-state']", timeout=10000)
+        assert await audit_empty.is_visible()
+        audit_text = await audit_empty.inner_text()
+        assert "No reconciliation run active" in audit_text or "no events" in audit_text
+
+        await context.close()
+        await browser.close()
+
+
+@pytest.mark.browser
+@pytest.mark.asyncio
+async def test_local_state_transition_refetch():
+    """Asserts transition from zero-state to populated state after fixture load and reconciliation."""
+    from tests.conftest import truncate_all_tables
+    truncate_all_tables()
+
+    async with async_playwright() as p:
+        browser = await p.chromium.launch(headless=True)
+        context = await browser.new_context(viewport={"width": 1440, "height": 900})
+        page = await context.new_page()
+
+        # Login
+        await page.goto(f"{LOCAL_BASE_URL}/login", wait_until="networkidle")
+        await page.locator("[data-testid='login-demo-reviewer']").click()
+        await page.wait_for_url("**/app/queue", timeout=15000)
+
+        # Confirm zero banner on dashboard
+        await page.goto(f"{LOCAL_BASE_URL}/app/dashboard", wait_until="networkidle")
+        banner = page.locator("[data-testid='no-run-banner']")
+        await page.wait_for_selector("[data-testid='no-run-banner']", timeout=10000)
+        assert await banner.is_visible()
+
+        # Ingest 4-source fixture via API
+        from tests.evaluation.generator_fixture import generate_evaluation_dataset
+        csv_streams, _ = generate_evaluation_dataset(total_records=60, seed=42)
+        async with httpx.AsyncClient(base_url=LOCAL_API_URL) as client:
+            auth = await client.post("/api/v1/auth/demo", json={"role": "reviewer"})
+            cookies = auth.cookies
+            headers = {"x-ledgerlens-csrf": "1"}
+
+            for ep, key in [
+                ("payments", "payments"),
+                ("settlements", "settlements"),
+                ("refunds", "refunds"),
+                ("bank-credits", "bank_credits"),
+            ]:
+                res = await client.post(
+                    f"/api/v1/ingestion/{ep}",
+                    files={"file": (f"{key}.csv", csv_streams[key].encode("utf-8"), "text/csv")},
+                    cookies=cookies,
+                    headers=headers,
+                )
+                assert res.status_code == 201
+
+        # Click 'Run reconciliation cycle' on the Dashboard banner
+        recon_btn = page.locator("[data-testid='no-run-banner'] button:has-text('Run reconciliation')")
+        assert await recon_btn.count() > 0
+        await recon_btn.click()
+
+        # Wait for the zero banner to disappear
+        await page.wait_for_selector("[data-testid='no-run-banner']", state="detached", timeout=15000)
+
+        # Confirm live computed metrics rendered on dashboard
+        await page.wait_for_selector("text=Parity Rate", timeout=10000)
+        content = await page.content()
+        assert "70.0%" in content or "70%" in content
+
+        # Check queue has 18 rows
+        await page.goto(f"{LOCAL_BASE_URL}/app/queue", wait_until="networkidle")
+        await page.wait_for_selector("[data-testid='queue-row']", timeout=15000)
+        rows = page.locator("[data-testid='queue-row']")
+        assert await rows.count() == 18
+
+        # Clean up database after test
+        truncate_all_tables()
+
+        await context.close()
+        await browser.close()
+
+
 if __name__ == "__main__":
     print(f"Executing standalone local CI browser E2E run against {LOCAL_BASE_URL}...")
     async def run_all():
@@ -300,6 +415,14 @@ if __name__ == "__main__":
         print("7. Testing reviewer logout...")
         await test_local_reviewer_logout()
         print("✓ Passed logout")
+
+        print("8. Testing zero-state UI rendering across Dashboard, Queue, and Audit...")
+        await test_local_zero_state_rendering()
+        print("✓ Passed zero-state UI rendering")
+
+        print("9. Testing truthful state transition and refetch in browser...")
+        await test_local_state_transition_refetch()
+        print("✓ Passed state transition refetch")
 
         print("\nAll Local/CI Browser E2E tests passed successfully!")
 

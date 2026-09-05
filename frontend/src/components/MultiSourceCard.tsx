@@ -31,10 +31,10 @@ export const MultiSourceCard: React.FC<{ evidence: CaseEvidenceResponse }> = ({ 
         <div className="flex flex-col sm:flex-row sm:items-baseline justify-between border-b border-rule pb-3 gap-2">
           <div>
             <span className="text-[11px] font-mono text-ink-secondary uppercase tracking-wider block">
-              RECONCILIATION SUMMARY &bull; AT A GLANCE
+              RECORDS COMPARISON
             </span>
             <h2 className="font-editorial text-2xl font-medium text-ink mt-0.5">
-              What was expected vs. what arrived
+              What is different?
             </h2>
           </div>
           <ExceptionBadge type={exception_type} size="sm" />
@@ -85,18 +85,18 @@ export const MultiSourceCard: React.FC<{ evidence: CaseEvidenceResponse }> = ({ 
         <div className="flex flex-wrap items-center justify-between gap-3 border-b border-rule pb-3">
           <div>
             <span className="text-[11px] font-mono text-ink-secondary uppercase tracking-wider block">
-              Flagged Exception Detail &bull; Divergence at {summary.divergenceStreamName}
+              What needs attention &bull; {summary.divergenceStreamName}
             </span>
             <span className="font-editorial text-xl font-medium text-ink mt-0.5 block">
-              {exception_type === 'amount_mismatch' && 'Settlement amount mismatch'}
-              {exception_type === 'missing_settlement' && 'Payment captured without settlement'}
-              {exception_type === 'missing_bank_credit' && 'Settlement confirmed without bank credit'}
-              {exception_type === 'fee_mismatch' && 'Contractual fee calculation mismatch'}
-              {exception_type === 'duplicate_payment' && 'Duplicate payment record detected'}
-              {exception_type === 'duplicate_bank_credit' && 'Duplicate bank statement credit'}
-              {exception_type === 'partial_refund_not_reflected' && 'Partial refund not adjusted in settlement'}
-              {exception_type === 'ambiguous_match' && 'Ambiguous candidate settlement match'}
-              {!exception_type && 'Deterministic reconciliation match'}
+              {exception_type === 'amount_mismatch' && 'Payout amount does not match expected net'}
+              {exception_type === 'missing_settlement' && 'Provider payout has not arrived'}
+              {exception_type === 'missing_bank_credit' && 'Bank payment not received'}
+              {exception_type === 'fee_mismatch' && 'Provider fee or tax does not match approved rule'}
+              {exception_type === 'duplicate_payment' && 'Customer appears to have paid twice'}
+              {exception_type === 'duplicate_bank_credit' && 'Bank payment appears more than once'}
+              {exception_type === 'partial_refund_not_reflected' && 'Refund was not deducted from provider payout'}
+              {exception_type === 'ambiguous_match' && 'More than one possible match found'}
+              {!exception_type && 'Records matched automatically'}
             </span>
           </div>
           <ExceptionBadge type={exception_type} size="sm" />
@@ -108,12 +108,12 @@ export const MultiSourceCard: React.FC<{ evidence: CaseEvidenceResponse }> = ({ 
 
         {summary.hasDiscrepancy && (
           <div className="mt-3 pt-3 border-t border-rule/60 flex items-baseline justify-between text-xs">
-            <span className="text-ink-secondary">Unreconciled Variance:</span>
+            <span className="text-ink-secondary">Exact difference:</span>
             <div className="flex items-baseline gap-2">
               <span className="font-mono font-semibold text-critical text-sm tabular-nums">
                 {summary.varianceFormatted}
               </span>
-              <span className="text-[10px] font-mono text-ink-muted uppercase">isolated discrepancy</span>
+              <span className="text-[10px] font-mono text-ink-muted uppercase">difference</span>
             </div>
           </div>
         )}
@@ -122,7 +122,7 @@ export const MultiSourceCard: React.FC<{ evidence: CaseEvidenceResponse }> = ({ 
       {/* 2. Four-Source Evidence Slips Grid */}
       <div className="space-y-4">
         <div className="flex items-center justify-between text-xs font-mono text-ink-secondary border-b border-rule pb-1.5">
-          <span>SOURCE EVIDENCE SLIPS (4-SOURCE RECONCILIATION)</span>
+          <span>FOUR FINANCIAL RECORDS</span>
           <span>CURRENCY: {evidence.currency}</span>
         </div>
 
@@ -131,10 +131,10 @@ export const MultiSourceCard: React.FC<{ evidence: CaseEvidenceResponse }> = ({ 
           <div data-testid="evidence-payment" className={`evidence-slip p-4 space-y-3 rounded-xs border ${summary.divergenceStreamIndex === 1 ? 'border-critical/60 bg-critical/5' : ''}`}>
             <div className="flex items-center justify-between border-b border-rule pb-2">
               <div className="flex items-center gap-2">
-                <span className="text-xs font-semibold text-ink">1. Merchant Payment Record</span>
+                <span className="text-xs font-semibold text-ink">1. Customer Payment</span>
                 {summary.divergenceStreamIndex === 1 && (
                   <span className="text-[9px] font-mono text-critical font-semibold uppercase px-1 border border-critical/30 rounded-xs">
-                    Discrepancy Source
+                    Difference Here
                   </span>
                 )}
               </div>
@@ -146,7 +146,7 @@ export const MultiSourceCard: React.FC<{ evidence: CaseEvidenceResponse }> = ({ 
             {payment ? (
               <div className="space-y-2 text-xs">
                 <div className="flex justify-between items-center text-ink-secondary">
-                  <span>Captured Gross</span>
+                  <span>Amount customer paid</span>
                   <AmountDisplay amount={payment.amount} className="font-mono font-medium text-ink" />
                 </div>
                 <div className="flex justify-between items-center text-ink-secondary">
@@ -154,7 +154,7 @@ export const MultiSourceCard: React.FC<{ evidence: CaseEvidenceResponse }> = ({ 
                   <span className="font-mono text-ink text-[11px]">{payment.order_id}</span>
                 </div>
                 <div className="flex justify-between items-center text-ink-secondary pt-1.5 border-t border-rule/60">
-                  <span>Payment Identifier</span>
+                  <span>Payment reference</span>
                   <button
                     onClick={() => copyText(payment.payment_id, 'pay_id')}
                     className="font-mono text-[11px] text-link hover:underline flex items-center gap-1"
@@ -165,14 +165,14 @@ export const MultiSourceCard: React.FC<{ evidence: CaseEvidenceResponse }> = ({ 
                 </div>
                 {payment.payment_timestamp && (
                   <div className="flex justify-between items-center text-ink-muted text-[11px] font-mono">
-                    <span>Captured At</span>
+                    <span>Payment date</span>
                     <span>{new Date(payment.payment_timestamp).toLocaleString('en-IN')}</span>
                   </div>
                 )}
               </div>
             ) : (
               <div className="py-4 text-center text-xs text-critical font-mono">
-                No merchant payment record linked to this case.
+                No customer payment record found.
               </div>
             )}
           </div>
@@ -181,10 +181,10 @@ export const MultiSourceCard: React.FC<{ evidence: CaseEvidenceResponse }> = ({ 
           <div data-testid="evidence-settlement" className={`evidence-slip p-4 space-y-3 rounded-xs border ${summary.divergenceStreamIndex === 2 ? 'border-critical/60 bg-critical/5' : ''}`}>
             <div className="flex items-center justify-between border-b border-rule pb-2">
               <div className="flex items-center gap-2">
-                <span className="text-xs font-semibold text-ink">2. Gateway Settlement Slip</span>
+                <span className="text-xs font-semibold text-ink">2. Provider Payout</span>
                 {summary.divergenceStreamIndex === 2 && (
                   <span className="text-[9px] font-mono text-critical font-semibold uppercase px-1 border border-critical/30 rounded-xs">
-                    Discrepancy Source
+                    Difference Here
                   </span>
                 )}
               </div>
@@ -196,19 +196,19 @@ export const MultiSourceCard: React.FC<{ evidence: CaseEvidenceResponse }> = ({ 
             {settlement ? (
               <div className="space-y-2 text-xs">
                 <div className="flex justify-between items-center text-ink-secondary">
-                  <span>Reported Net Payout</span>
+                  <span>Reported provider payout</span>
                   <AmountDisplay amount={settlement.net_settlement_amount} className="font-mono font-medium text-ink" />
                 </div>
                 <div className="flex justify-between items-center text-ink-secondary">
-                  <span>Processing Fee (2%)</span>
+                  <span>Provider fee (2%)</span>
                   <AmountDisplay amount={settlement.fee_amount} className="font-mono text-ink-secondary" />
                 </div>
                 <div className="flex justify-between items-center text-ink-secondary">
-                  <span>GST on Fee (18%)</span>
+                  <span>Tax on fee (18%)</span>
                   <AmountDisplay amount={settlement.tax_amount} className="font-mono text-ink-secondary" />
                 </div>
                 <div className="flex justify-between items-center text-ink-secondary pt-1.5 border-t border-rule/60">
-                  <span>Settlement Batch ID</span>
+                  <span>Provider payout reference</span>
                   <button
                     onClick={() => copyText(settlement.settlement_id, 'set_id')}
                     className="font-mono text-[11px] text-link hover:underline flex items-center gap-1"
@@ -220,7 +220,7 @@ export const MultiSourceCard: React.FC<{ evidence: CaseEvidenceResponse }> = ({ 
               </div>
             ) : (
               <div className="py-4 text-center text-xs text-critical font-mono">
-                No settlement row reported by gateway (T+2 SLA breached).
+                No payout record received from provider.
               </div>
             )}
           </div>
@@ -229,10 +229,10 @@ export const MultiSourceCard: React.FC<{ evidence: CaseEvidenceResponse }> = ({ 
           <div data-testid="evidence-refund" className={`evidence-slip p-4 space-y-3 rounded-xs border ${summary.divergenceStreamIndex === 3 ? 'border-critical/60 bg-critical/5' : ''}`}>
             <div className="flex items-center justify-between border-b border-rule pb-2">
               <div className="flex items-center gap-2">
-                <span className="text-xs font-semibold text-ink">3. Customer Refund Slip</span>
+                <span className="text-xs font-semibold text-ink">3. Customer Refund</span>
                 {summary.divergenceStreamIndex === 3 && (
                   <span className="text-[9px] font-mono text-critical font-semibold uppercase px-1 border border-critical/30 rounded-xs">
-                    Discrepancy Source
+                    Difference Here
                   </span>
                 )}
               </div>
@@ -246,7 +246,7 @@ export const MultiSourceCard: React.FC<{ evidence: CaseEvidenceResponse }> = ({ 
                 {refunds.map((ref) => (
                   <div key={ref.refund_id} className="space-y-1.5 text-xs">
                     <div className="flex justify-between items-center text-ink-secondary">
-                      <span>Refund Amount</span>
+                      <span>Refund amount</span>
                       <AmountDisplay amount={ref.refund_amount} className="font-mono font-medium text-ink" />
                     </div>
                     <div className="flex justify-between items-center text-ink-secondary text-[11px] font-mono">
@@ -254,7 +254,7 @@ export const MultiSourceCard: React.FC<{ evidence: CaseEvidenceResponse }> = ({ 
                       <span className="capitalize">{ref.refund_type}</span>
                     </div>
                     <div className="flex justify-between items-center text-ink-secondary text-[11px] font-mono">
-                      <span>Refund Identifier</span>
+                      <span>Refund reference</span>
                       <button
                         onClick={() => copyText(ref.refund_id, 'ref_id')}
                         className="text-link hover:underline flex items-center gap-1"
@@ -265,7 +265,7 @@ export const MultiSourceCard: React.FC<{ evidence: CaseEvidenceResponse }> = ({ 
                     </div>
                     {ref.refund_timestamp && (
                       <div className="flex justify-between items-center text-ink-muted text-[11px] font-mono">
-                        <span>Initiated</span>
+                        <span>Refund date</span>
                         <span>{new Date(ref.refund_timestamp).toLocaleString('en-IN')}</span>
                       </div>
                     )}
@@ -274,7 +274,7 @@ export const MultiSourceCard: React.FC<{ evidence: CaseEvidenceResponse }> = ({ 
               </div>
             ) : (
               <div className="py-3 text-center text-xs text-ink-secondary font-mono">
-                No customer refund active for this transaction.
+                No refund was issued for this payment.
               </div>
             )}
           </div>
@@ -283,10 +283,10 @@ export const MultiSourceCard: React.FC<{ evidence: CaseEvidenceResponse }> = ({ 
           <div data-testid="evidence-bank-credit" className={`evidence-slip p-4 space-y-3 rounded-xs border ${summary.divergenceStreamIndex === 4 ? 'border-critical/60 bg-critical/5' : ''}`}>
             <div className="flex items-center justify-between border-b border-rule pb-2">
               <div className="flex items-center gap-2">
-                <span className="text-xs font-semibold text-ink">4. Bank Credit Statement</span>
+                <span className="text-xs font-semibold text-ink">4. Bank Statement Credit</span>
                 {summary.divergenceStreamIndex === 4 && (
                   <span className="text-[9px] font-mono text-critical font-semibold uppercase px-1 border border-critical/30 rounded-xs">
-                    {bank_credits.length > 1 ? 'Duplicate Credit Source' : 'Discrepancy Source'}
+                    {bank_credits.length > 1 ? 'Duplicate Credit Source' : 'Difference Here'}
                   </span>
                 )}
               </div>
@@ -306,14 +306,14 @@ export const MultiSourceCard: React.FC<{ evidence: CaseEvidenceResponse }> = ({ 
                 {bank_credits.map((bc, idx) => (
                   <div key={bc.bank_credit_id} className={`space-y-1.5 text-xs p-2 rounded-xs ${bank_credits.length > 1 ? (idx === 1 ? 'bg-critical/10 border border-critical/30' : 'bg-canvas') : ''}`}>
                     <div className="flex justify-between items-center text-ink-secondary">
-                      <span>{bank_credits.length > 1 ? `Credit Entry 0${idx + 1}` : 'Bank Amount Credited'}</span>
+                      <span>{bank_credits.length > 1 ? `Credit Entry 0${idx + 1}` : 'Amount received in bank'}</span>
                       <AmountDisplay 
                         amount={bc.credited_amount} 
                         className={`font-mono font-semibold ${idx === 1 && bank_credits.length > 1 ? 'text-critical' : 'text-ledger-green'}`} 
                       />
                     </div>
                     <div className="flex justify-between items-center text-ink-secondary text-[11px] font-mono">
-                      <span>UTR / Reference</span>
+                      <span>Bank reference (UTR)</span>
                       <button
                         onClick={() => copyText(bc.bank_reference, `utr_${idx}`)}
                         className="text-link hover:underline flex items-center gap-1"
@@ -324,7 +324,7 @@ export const MultiSourceCard: React.FC<{ evidence: CaseEvidenceResponse }> = ({ 
                     </div>
                     {bc.bank_credit_timestamp && (
                       <div className="flex justify-between items-center text-ink-muted text-[11px] font-mono">
-                        <span>Cleared At</span>
+                        <span>Credit date</span>
                         <span>{new Date(bc.bank_credit_timestamp).toLocaleString('en-IN')}</span>
                       </div>
                     )}
@@ -333,7 +333,7 @@ export const MultiSourceCard: React.FC<{ evidence: CaseEvidenceResponse }> = ({ 
               </div>
             ) : (
               <div className="py-4 text-center text-xs text-critical font-mono">
-                No bank statement credit recorded in clearing feed (UTR missing).
+                No matching credit found in bank statement.
               </div>
             )}
           </div>
@@ -343,7 +343,7 @@ export const MultiSourceCard: React.FC<{ evidence: CaseEvidenceResponse }> = ({ 
       {/* 3. Raw Data Inspection Disclosure */}
       <details className="text-xs font-mono text-ink-secondary border border-rule rounded-xs p-3.5 bg-surface/50">
         <summary className="cursor-pointer hover:text-ink select-none font-medium">
-          Inspect raw counterparty telemetry (JSON)
+          Inspect raw record details (JSON)
         </summary>
         <pre className="mt-3 p-3 bg-ink text-[#EAE4D8] overflow-x-auto text-[11px] leading-relaxed rounded-xs">
           {JSON.stringify(evidence, null, 2)}

@@ -5,17 +5,18 @@ import { fetchReviewQueue } from '../../api/client';
 import { ExceptionBadge } from '../../components/ExceptionBadge';
 import { QueueTableSkeleton } from '../../components/SkeletonLoaders';
 import { RollingNumberTicker } from '../../components/ui/RollingNumberTicker';
+import { CustomSelect } from '../../components/CustomSelect';
 
 const EXCEPTION_CATEGORIES: { label: string; value: string }[] = [
-  { label: 'All exception categories', value: 'all' },
-  { label: 'Amount mismatch', value: 'amount_mismatch' },
-  { label: 'Fee / tax mismatch', value: 'fee_mismatch' },
-  { label: 'Missing settlement', value: 'missing_settlement' },
-  { label: 'Missing bank credit', value: 'missing_bank_credit' },
-  { label: 'Duplicate payment', value: 'duplicate_payment' },
-  { label: 'Duplicate bank credit', value: 'duplicate_bank_credit' },
-  { label: 'Partial refund unreflected', value: 'partial_refund_not_reflected' },
-  { label: 'Ambiguous match', value: 'ambiguous_match' },
+  { label: 'All categories', value: 'all' },
+  { label: 'Amounts do not match', value: 'amount_mismatch' },
+  { label: 'Provider fee or tax is different', value: 'fee_mismatch' },
+  { label: 'Missing provider payout', value: 'missing_settlement' },
+  { label: 'Bank payment not received', value: 'missing_bank_credit' },
+  { label: 'Customer may have paid twice', value: 'duplicate_payment' },
+  { label: 'Bank payment may appear twice', value: 'duplicate_bank_credit' },
+  { label: 'Refund is missing from the payout', value: 'partial_refund_not_reflected' },
+  { label: 'More than one possible match', value: 'ambiguous_match' },
 ];
 
 export const QueuePage: React.FC = () => {
@@ -156,34 +157,34 @@ export const QueuePage: React.FC = () => {
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-rule pb-6">
         <div className="space-y-1">
           <div className="flex items-center gap-2 text-xs font-mono text-ink-secondary">
-            <span>OPERATIONAL REVIEW QUEUE</span>
+            <span>REVIEW QUEUE</span>
             <span>&bull;</span>
             <span className="text-ink font-semibold">
-              <RollingNumberTicker value={processedCases.length} /> exception records
+              <RollingNumberTicker value={processedCases.length} /> cases waiting
             </span>
             <span>&bull;</span>
             <span className="text-[10px] text-ink-muted">
-              {viewMode === 'unique' ? 'Unique Transactions Mode' : 'All Historical Runs'}
+              {viewMode === 'unique' ? 'Unique payments' : 'All cases'}
             </span>
           </div>
           <h1 data-testid="queue-heading" className="font-editorial text-3xl sm:text-4xl font-medium text-ink">
-            Exceptions requiring operator sign-off
+            Cases waiting for a human decision
           </h1>
           <p className="text-xs sm:text-sm text-ink-secondary max-w-2xl font-sans leading-relaxed">
-            Every transaction flagged here broke a deterministic invariant. Review four-source evidence, inspect cited operating rules, and record the resolution decision.
+            A rule found a difference in these records. Open a case to compare the evidence, read the approved rule, and decide what should happen next.
           </p>
         </div>
 
         {/* Exposure summary */}
         <div className="p-4 bg-surface border border-rule rounded-xs space-y-1 min-w-[220px]">
           <span className="text-[11px] font-mono uppercase text-ink-secondary block">
-            Total Exposure Under Review
+            Total money to check
           </span>
           <div className="text-2xl font-medium text-critical">
             <RollingNumberTicker value={totalExposure} currency="₹" decimals={2} />
           </div>
           <span className="text-[10px] font-mono text-ink-muted block">
-            Across <RollingNumberTicker value={processedCases.length} /> active records
+            Across <RollingNumberTicker value={processedCases.length} /> open cases
           </span>
         </div>
       </div>
@@ -193,7 +194,7 @@ export const QueuePage: React.FC = () => {
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 text-xs font-mono">
           {/* Search */}
           <div>
-            <label className="text-[10px] uppercase text-ink-secondary block mb-1">Search Identifier</label>
+            <label className="text-[10px] uppercase text-ink-secondary block mb-1">Search payment or case</label>
             <input
               type="text"
               value={searchQuery}
@@ -205,46 +206,40 @@ export const QueuePage: React.FC = () => {
 
           {/* Category */}
           <div>
-            <label className="text-[10px] uppercase text-ink-secondary block mb-1">Exception Category</label>
-            <select
+            <label className="text-[10px] uppercase text-ink-secondary block mb-1">Category</label>
+            <CustomSelect
               value={selectedCategory}
-              onChange={(e) => updateParam('category', e.target.value)}
-              className="w-full px-3 py-1.5 border border-rule bg-surface text-ink text-xs rounded-xs focus:outline-none focus:border-ink font-sans"
-            >
-              {EXCEPTION_CATEGORIES.map((c) => (
-                <option key={c.value} value={c.value}>
-                  {c.label}
-                </option>
-              ))}
-            </select>
+              onChange={(val) => updateParam('category', val)}
+              options={EXCEPTION_CATEGORIES.map((c) => ({ value: c.value, label: c.label }))}
+            />
           </div>
 
           {/* Severity */}
           <div>
-            <label className="text-[10px] uppercase text-ink-secondary block mb-1">Severity Level</label>
-            <select
+            <label className="text-[10px] uppercase text-ink-secondary block mb-1">Severity</label>
+            <CustomSelect
               value={selectedSeverity}
-              onChange={(e) => updateParam('severity', e.target.value)}
-              className="w-full px-3 py-1.5 border border-rule bg-surface text-ink text-xs rounded-xs focus:outline-none focus:border-ink font-sans"
-            >
-              <option value="all">All severities</option>
-              <option value="critical">Critical (Direct cash / UTR risk)</option>
-              <option value="high">High (Missing record / variance)</option>
-            </select>
+              onChange={(val) => updateParam('severity', val)}
+              options={[
+                { value: 'all', label: 'All severities' },
+                { value: 'critical', label: 'Critical (Money missing)' },
+                { value: 'high', label: 'High (Difference found)' },
+              ]}
+            />
           </div>
 
           {/* Sort */}
           <div>
-            <label className="text-[10px] uppercase text-ink-secondary block mb-1">Sort Priority</label>
-            <select
+            <label className="text-[10px] uppercase text-ink-secondary block mb-1">Sort by</label>
+            <CustomSelect
               value={sortBy}
-              onChange={(e) => updateParam('sort', e.target.value)}
-              className="w-full px-3 py-1.5 border border-rule bg-surface text-ink text-xs rounded-xs focus:outline-none focus:border-ink font-sans"
-            >
-              <option value="discrepancy">Highest exposure variance</option>
-              <option value="amount">Largest gross volume</option>
-              <option value="age">Earliest opened timestamp</option>
-            </select>
+              onChange={(val) => updateParam('sort', val)}
+              options={[
+                { value: 'discrepancy', label: 'Highest difference' },
+                { value: 'amount', label: 'Largest payment amount' },
+                { value: 'age', label: 'Oldest first' },
+              ]}
+            />
           </div>
         </div>
 
@@ -255,18 +250,18 @@ export const QueuePage: React.FC = () => {
             <button
               type="button"
               onClick={() => updateParam('view', 'unique')}
-              title="Shows one row per payment transaction, deduplicating multiple runs"
+              title="Shows one row per payment transaction"
               className={`px-2 py-0.5 rounded-xs border text-[11px] transition-colors ${viewMode === 'unique' ? 'bg-ink text-canvas border-ink font-medium' : 'bg-surface text-ink-secondary border-rule hover:text-ink'}`}
             >
-              Unique Transactions ({Array.from(new Set(cases.map(c => c.payment_id))).length})
+              Unique payments ({Array.from(new Set(cases.map(c => c.payment_id))).length})
             </button>
             <button
               type="button"
               onClick={() => updateParam('view', 'all')}
-              title="Shows every raw flagged exception case across all batch runs"
+              title="Shows every raw case"
               className={`px-2 py-0.5 rounded-xs border text-[11px] transition-colors ${viewMode === 'all' ? 'bg-ink text-canvas border-ink font-medium' : 'bg-surface text-ink-secondary border-rule hover:text-ink'}`}
             >
-              All Case Instances ({cases.length})
+              All cases ({cases.length})
             </button>
           </div>
           {(searchQuery || selectedCategory !== 'all' || selectedSeverity !== 'all') && (
@@ -293,6 +288,28 @@ export const QueuePage: React.FC = () => {
             Retry queue load
           </button>
         </div>
+      ) : cases.length === 0 ? (
+        <div data-testid="queue-empty-state" className="p-12 text-center border border-dashed border-rule bg-surface/50 rounded-xs space-y-3">
+          <div className="w-2.5 h-2.5 rounded-full bg-brass mx-auto" />
+          <span className="font-editorial text-2xl text-ink block">No reconciliation run active</span>
+          <p className="text-xs text-ink-secondary max-w-md mx-auto leading-relaxed">
+            The review queue is clear. No exception cases have been flagged or no reconciliation run is active.
+          </p>
+          <div className="pt-2 flex items-center justify-center gap-3">
+            <button
+              onClick={loadQueue}
+              className="px-3.5 py-2 border border-rule bg-surface text-xs font-mono text-ink rounded-xs hover:bg-canvas transition-colors"
+            >
+              Refresh queue
+            </button>
+            <button
+              onClick={() => navigate('/app/dashboard')}
+              className="px-4 py-2 bg-ink text-canvas text-xs font-medium rounded-xs hover:bg-ink/90 transition-colors"
+            >
+              Go to overview &rarr;
+            </button>
+          </div>
+        </div>
       ) : processedCases.length === 0 ? (
         <div className="p-12 text-center border border-dashed border-rule bg-surface/50 rounded-xs space-y-3">
           <span className="font-editorial text-xl text-ink block">No exceptions match the active filter</span>
@@ -315,7 +332,7 @@ export const QueuePage: React.FC = () => {
                   <th className="py-2.5 px-4 font-normal">Severity</th>
                   <th className="py-2.5 px-4 font-normal">What Happened</th>
                   <th className="py-2.5 px-4 font-normal">Payment Reference</th>
-                  <th className="py-2.5 px-4 font-normal text-right">Amount at Risk</th>
+                  <th className="py-2.5 px-4 font-normal text-right">Money to Check</th>
                   <th className="py-2.5 px-4 font-normal text-center">Action</th>
                 </tr>
               </thead>
@@ -341,7 +358,7 @@ export const QueuePage: React.FC = () => {
                             className={`w-1.5 h-6 rounded-full ${
                               isCritical ? 'bg-critical' : 'bg-brass'
                             }`}
-                            title={isCritical ? 'Critical Severity' : 'High Priority'}
+                            title={isCritical ? 'Critical' : 'High'}
                           />
                           <span
                             className={`font-mono text-[10px] uppercase font-semibold px-1.5 py-0.5 rounded-xs ${
@@ -350,7 +367,7 @@ export const QueuePage: React.FC = () => {
                                 : 'bg-brass/10 text-brass border border-brass/20'
                             }`}
                           >
-                            {isCritical ? 'Critical' : 'High Risk'}
+                            {isCritical ? 'Critical' : 'High'}
                           </span>
                         </div>
                       </td>
@@ -359,15 +376,15 @@ export const QueuePage: React.FC = () => {
                       <td className="py-3 px-4">
                         <div className="space-y-0.5">
                           <span className="font-editorial text-sm font-medium text-ink block group-hover:text-link">
-                            {c.exception_type === 'amount_mismatch' && 'Settlement payout shortfall'}
-                            {c.exception_type === 'missing_settlement' && 'Captured gross unremitted by gateway'}
-                            {c.exception_type === 'missing_bank_credit' && 'Missing bank credit verification'}
-                            {c.exception_type === 'fee_mismatch' && 'Commercial fee tier deviation'}
-                            {c.exception_type === 'duplicate_payment' && 'Duplicate customer charge detected'}
-                            {c.exception_type === 'duplicate_bank_credit' && 'Duplicate bank statement credit'}
-                            {c.exception_type === 'partial_refund_not_reflected' && 'Customer refund not adjusted in net'}
-                            {c.exception_type === 'ambiguous_match' && 'Ambiguous candidate settlement lines'}
-                            {!c.exception_type && 'Unreconciled invariant violation'}
+                            {c.exception_type === 'amount_mismatch' && 'Payout amount does not match expected net'}
+                            {c.exception_type === 'missing_settlement' && 'Provider payout has not arrived'}
+                            {c.exception_type === 'missing_bank_credit' && 'Bank payment not received'}
+                            {c.exception_type === 'fee_mismatch' && 'Provider fee or tax does not match approved rule'}
+                            {c.exception_type === 'duplicate_payment' && 'Customer appears to have paid twice'}
+                            {c.exception_type === 'duplicate_bank_credit' && 'Bank payment appears more than once'}
+                            {c.exception_type === 'partial_refund_not_reflected' && 'Refund was not deducted from provider payout'}
+                            {c.exception_type === 'ambiguous_match' && 'More than one possible match found'}
+                            {!c.exception_type && 'Difference needs review'}
                           </span>
                           <ExceptionBadge type={c.exception_type as ExceptionType} size="sm" />
                         </div>
@@ -387,7 +404,7 @@ export const QueuePage: React.FC = () => {
                           <span className="font-mono font-semibold text-critical text-sm tabular-nums block">
                             ₹{exposure.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
                           </span>
-                          <span className="text-[10px] font-mono text-ink-muted">Amount at risk</span>
+                          <span className="text-[10px] font-mono text-ink-muted">Money to check</span>
                         </div>
                       </td>
 
@@ -400,7 +417,7 @@ export const QueuePage: React.FC = () => {
                           }}
                           className="px-2.5 py-1 text-xs font-mono font-medium border border-rule bg-canvas hover:bg-ink hover:text-canvas text-ink rounded-xs transition-colors"
                         >
-                          Review dossier &rarr;
+                          Review case &rarr;
                         </button>
                       </td>
                     </tr>

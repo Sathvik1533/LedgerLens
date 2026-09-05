@@ -20,25 +20,25 @@ export default function AboutPage() {
       <div className="space-y-8 text-sm text-ink leading-relaxed">
         <div className="border border-rule bg-surface p-8 rounded-xs space-y-4 shadow-subtle">
           <h3 className="font-editorial text-2xl font-medium text-ink">
-            The Fundamental Tenet: Software calculates, humans decide.
+            The software checks the numbers. A person decides what to do.
           </h3>
-          <p className="text-ink-secondary leading-relaxed">
-            In modern financial engineering, there is a dangerous temptation to surrender ledger arithmetic to non-deterministic artificial intelligence. We reject this premise entirely. Large language models should never perform final accounting math. They are probabilistic reasoning layers, not calculators.
+          <p className="text-ink-secondary leading-relaxed font-sans">
+            In modern financial software, there is a dangerous temptation to let artificial intelligence make financial decisions. We reject this premise entirely. AI can summarize evidence and approved rules, but cannot approve money, close a case, or replace the reviewer. AI can explain patterns, but it cannot be the final calculator.
           </p>
-          <p className="text-ink-secondary leading-relaxed">
-            LedgerLens is designed on a bedrock separation of concerns:
+          <p className="text-ink-secondary leading-relaxed font-sans">
+            LedgerLens is built around a clear division of work:
           </p>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2 font-mono text-xs">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2 text-xs">
             <div className="p-4 bg-canvas border border-rule rounded-xs space-y-1">
-              <strong className="text-ink block font-sans text-sm">Deterministic Machine Core</strong>
-              <p className="text-ink-secondary text-[11px] leading-normal font-mono">
-                Pure PostgreSQL and Python Decimal logic evaluates four-source counterparty parity down to the exact paisa. Zero room for hallucination.
+              <strong className="text-ink block font-sans text-sm">Rules for the math</strong>
+              <p className="text-ink-secondary text-[11px] leading-relaxed font-sans">
+                Exact math checks four records—payments, provider payouts, refunds, and bank credits—down to the nearest paisa. Math rules never guess.
               </p>
             </div>
             <div className="p-4 bg-canvas border border-rule rounded-xs space-y-1">
-              <strong className="text-ink block font-sans text-sm">Human Governance Layer</strong>
-              <p className="text-ink-secondary text-[11px] leading-normal font-mono">
-                When contractual invariants break, grounded policy guidance explains the commercial context—empowering an accountable human operator to record the final sign-off.
+              <strong className="text-ink block font-sans text-sm">Human decisions for action</strong>
+              <p className="text-ink-secondary text-[11px] leading-relaxed font-sans">
+                When records do not agree, approved rules explain what to check. An accountable human reviewer decides what happens next, and the decision is saved.
               </p>
             </div>
           </div>
@@ -52,19 +52,19 @@ export default function AboutPage() {
             <li className="flex items-start gap-3">
               <span className="font-mono text-ledger-green font-semibold">01</span>
               <span>
-                <strong className="text-ink">No Black Boxes:</strong> Every discrepancy surfaced by the engine cites the exact records, timestamps, and line numbers that triggered the exception.
+                <strong className="text-ink">Clear evidence:</strong> Every difference surfaced cites the exact four source records and reference numbers so nothing is hidden.
               </span>
             </li>
             <li className="flex items-start gap-3">
               <span className="font-mono text-ledger-green font-semibold">02</span>
               <span>
-                <strong className="text-ink">Immutable Audit Trail:</strong> No financial decision is final until it is recorded with the signer’s identity, timestamp, and version hash in an append-only ledger.
+                <strong className="text-ink">Saved review history:</strong> Saved history that cannot be silently changed. Every decision records who decided, when, why, and the exact version of the case.
               </span>
             </li>
             <li className="flex items-start gap-3">
               <span className="font-mono text-ledger-green font-semibold">03</span>
               <span>
-                <strong className="text-ink">Strict Float-Free Mathematics:</strong> Every amount is stored and calculated as an exact fixed-point decimal to protect against floating-point rounding bleed.
+                <strong className="text-ink">Checked to the nearest paisa:</strong> Every amount is calculated using exact decimal arithmetic so rounding errors never become missing money.
               </span>
             </li>
           </ul>

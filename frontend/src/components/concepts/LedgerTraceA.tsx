@@ -34,9 +34,9 @@ export const LedgerTraceA: React.FC<LedgerTraceAProps> = ({
 
   const caseTag = evidence?.case_id 
     ? `CAS-${evidence.case_id.slice(0, 8).toUpperCase()}` 
-    : (isDiscrepant ? 'SPECIMEN-0921-MM' : 'SPECIMEN-PARITY');
+    : (isDiscrepant ? 'CASE-0921' : 'CASE-MATCHED');
   
-  const statusLabel = isDiscrepant ? 'EXCEPTION' : 'RECONCILED';
+  const statusLabel = isDiscrepant ? 'NEEDS REVIEW' : 'MATCHED';
   const offsetBadgeText = summary?.traceOffsetLabel || 'Δ -₹150.00 OFFSET';
   const divergenceStream = summary?.divergenceStreamIndex || (isDiscrepant ? 2 : 0);
 
@@ -55,11 +55,11 @@ export const LedgerTraceA: React.FC<LedgerTraceAProps> = ({
         <div className="flex items-center gap-2">
           <span className={`w-1.5 h-1.5 rounded-full ${isDiscrepant ? 'bg-critical animate-pulse' : 'bg-ledger-green'}`} />
           <span className="text-[#EAE4D8]">
-            {evidence ? 'LEDGER TRACE • LIVE RECONCILIATION' : 'LEDGER TRACE • ILLUSTRATIVE SPECIMEN'}
+            {evidence ? 'RECORD TRACE • LIVE CASE' : 'RECORD TRACE • EXAMPLE'}
           </span>
         </div>
         <span className="text-[10px] text-[#A87931]">
-          {summary ? summary.divergenceStreamName.toUpperCase() : 'PARITY MATRIX 4-STREAM (SPECIMEN)'}
+          {summary ? summary.divergenceStreamName.toUpperCase() : 'FOUR RECORDS COMPARED'}
         </span>
       </div>
 
@@ -206,15 +206,15 @@ export const LedgerTraceA: React.FC<LedgerTraceAProps> = ({
           )}
 
           {/* Alignment Column Labels */}
-          <text x="25" y="42" fill="#EAE4D8" fontFamily="sans-serif" fontSize="11" fontWeight="500">1. Merchant Payment</text>
-          <text x="25" y="102" fill="#EAE4D8" fontFamily="sans-serif" fontSize="11" fontWeight="500">2. Gateway Settlement</text>
+          <text x="25" y="42" fill="#EAE4D8" fontFamily="sans-serif" fontSize="11" fontWeight="500">1. Customer Payment</text>
+          <text x="25" y="102" fill="#EAE4D8" fontFamily="sans-serif" fontSize="11" fontWeight="500">2. Provider Payout</text>
           <text x="25" y="162" fill="#EAE4D8" fontFamily="sans-serif" fontSize="11" fontWeight="500">3. Customer Refund</text>
           <text x="25" y="222" fill="#EAE4D8" fontFamily="sans-serif" fontSize="11" fontWeight="500">4. Bank Statement Credit</text>
 
           {/* Terminal Parity Mark */}
           <line x1="680" y1="40" x2="680" y2="200" stroke="#D8D2C8" strokeWidth="1" />
           <rect x="690" y="75" width="95" height="75" rx="3" fill="#17212B" stroke={isDiscrepant ? "#B94E3D" : "#3D6B55"} strokeWidth="1.5" />
-          <text x="700" y="95" fill="#716E68" fontFamily="monospace" fontSize="9">VERDICT</text>
+          <text x="700" y="95" fill="#716E68" fontFamily="monospace" fontSize="9">STATUS</text>
           <text x="700" y="115" fill={isDiscrepant ? "#B94E3D" : "#3D6B55"} fontFamily="sans-serif" fontSize="12" fontWeight="bold">
             {statusLabel}
           </text>
@@ -227,25 +227,25 @@ export const LedgerTraceA: React.FC<LedgerTraceAProps> = ({
       {/* Narrative Legend */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-4 border-t border-white/10 text-xs font-mono">
         <div className="space-y-0.5">
-          <span className="text-[10px] text-[#716E68] block">STREAM 01: CAPTURE</span>
+          <span className="text-[10px] text-[#716E68] block">RECORD 1: PAYMENT</span>
           <span className="text-[#3D6B55] font-semibold">
             ₹{gross.toLocaleString('en-IN', { minimumFractionDigits: 2 })} Gross
           </span>
         </div>
         <div className="space-y-0.5">
-          <span className="text-[10px] text-[#716E68] block">STREAM 02: REPORTED</span>
+          <span className="text-[10px] text-[#716E68] block">RECORD 2: PROVIDER PAYOUT</span>
           <span className={`${divergenceStream === 2 ? 'text-[#B94E3D]' : 'text-[#EAE4D8]'} font-semibold`}>
             {evidence && !evidence.settlement ? 'Missing Payout' : `₹${net.toLocaleString('en-IN', { minimumFractionDigits: 2 })} Net`}
           </span>
         </div>
         <div className="space-y-0.5">
-          <span className="text-[10px] text-[#716E68] block">STREAM 03: REFUND</span>
+          <span className="text-[10px] text-[#716E68] block">RECORD 3: REFUND</span>
           <span className="text-[#A87931] font-semibold">
             {refundTotal > 0 ? `₹${refundTotal.toLocaleString('en-IN', { minimumFractionDigits: 2 })} Refund` : '₹0.00 Nil'}
           </span>
         </div>
         <div className="space-y-0.5">
-          <span className="text-[10px] text-[#716E68] block">STREAM 04: DEPOSIT</span>
+          <span className="text-[10px] text-[#716E68] block">RECORD 4: BANK CREDIT</span>
           <span className={`${divergenceStream === 4 ? 'text-[#B94E3D]' : 'text-[#385D82]'} font-semibold`}>
             {bankCredits.length > 1 
               ? `₹${bankTotal.toLocaleString('en-IN', { minimumFractionDigits: 2 })} (${bankCredits.length} Credits)`

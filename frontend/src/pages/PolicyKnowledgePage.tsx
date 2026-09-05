@@ -3,6 +3,13 @@ import { fetchPolicyCorpus, queryPolicyCorpus } from '../api/client';
 import { PolicyCorpusResponse, PolicySearchResult, PolicyDocument } from '../types/api';
 import { CalibratedAccordion } from '../components/ui/CalibratedAccordion';
 
+const getHumanDocTitle = (filename: string, fallback: string) => {
+  if (filename.includes('fee')) return 'Provider fee and tax rule';
+  if (filename.includes('exception')) return 'Missing payout time limit';
+  if (filename.includes('settlement')) return 'Bank credit check';
+  return fallback;
+};
+
 export const PolicyKnowledgePage: React.FC = () => {
   const [corpusData, setCorpusData] = useState<PolicyCorpusResponse | null>(null);
   const [selectedDoc, setSelectedDoc] = useState<PolicyDocument | null>(null);
@@ -51,15 +58,13 @@ export const PolicyKnowledgePage: React.FC = () => {
       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6 border-b border-rule pb-6">
         <div className="space-y-1">
           <div className="flex items-center gap-2 text-xs font-mono text-ink-secondary">
-            <span>GOVERNANCE &amp; PRECEDENT</span>
-            <span>&bull;</span>
-            <span className="text-ink font-semibold">Standard Operating Procedures</span>
+            <span className="text-ink font-semibold">Standard Operating Rules</span>
           </div>
           <h1 className="font-editorial text-3xl sm:text-4xl font-medium text-ink">
-            Approved policy library
+            Approved rules
           </h1>
           <p className="text-xs sm:text-sm text-ink-secondary font-sans max-w-2xl leading-relaxed">
-            Verified operating rules, commercial fee agreements, SLA standards, and manual override conditions. Policy guidance operates on read-only authority to inform human review decisions.
+            These rules explain why a case needs attention and what a reviewer should check. The guidance explains the rule. A person still makes the final decision.
           </p>
         </div>
 
@@ -69,7 +74,7 @@ export const PolicyKnowledgePage: React.FC = () => {
             disabled={isLoading}
             className="px-3.5 py-2 border border-rule bg-surface hover:bg-canvas text-ink text-xs font-medium rounded-xs transition-colors"
           >
-            {isLoading ? 'Reloading...' : 'Reload library corpus'}
+            {isLoading ? 'Reloading...' : 'Reload rules'}
           </button>
         </div>
       </div>
@@ -78,10 +83,10 @@ export const PolicyKnowledgePage: React.FC = () => {
       <div className="border border-rule bg-surface p-6 rounded-xs space-y-4 shadow-subtle">
         <div className="border-b border-rule pb-3 space-y-0.5">
           <span className="font-editorial text-xl font-medium text-ink block">
-            Search approved operating rules
+            Search approved rules
           </span>
           <p className="text-xs text-ink-secondary">
-            Enter a scenario or question to retrieve verified contractual passages and resolution steps.
+            Enter a scenario or question to see what the rule says and what to check next.
           </p>
         </div>
 
@@ -91,7 +96,7 @@ export const PolicyKnowledgePage: React.FC = () => {
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="e.g. fee calculation, missing settlement SLA, refund clawback rules..."
+              placeholder="e.g. fee calculation, missing provider payout, refund deduction..."
               className="flex-1 px-3.5 py-2 border border-rule bg-canvas text-ink text-xs font-sans rounded-xs focus:outline-none focus:border-ink"
             />
             <button
@@ -99,7 +104,7 @@ export const PolicyKnowledgePage: React.FC = () => {
               disabled={isSearching || !searchQuery.trim()}
               className="px-5 py-2 bg-ink hover:bg-ink/90 text-canvas text-xs font-medium rounded-xs transition-colors disabled:opacity-50 flex items-center justify-center gap-2 whitespace-nowrap"
             >
-              {isSearching ? 'Searching rules...' : 'Search approved operating rules'}
+              {isSearching ? 'Searching rules...' : 'Search approved rules'}
             </button>
           </div>
         </form>
@@ -109,14 +114,14 @@ export const PolicyKnowledgePage: React.FC = () => {
           <div className="space-y-4 pt-3 border-t border-rule">
             <div className="flex items-center justify-between text-xs font-mono text-ink-secondary">
               <span>Matched passages ({searchResult.matched_chunks.length})</span>
-              {searchTimestamp && <span>Query executed at {searchTimestamp}</span>}
+              {searchTimestamp && <span>Searched at {searchTimestamp}</span>}
             </div>
 
             {searchResult.matched_chunks.length === 0 ? (
               <div className="p-4 bg-brass/10 border border-brass/30 rounded-xs text-xs text-ink space-y-1">
-                <strong className="block text-brass">No verified passages matched with sufficient confidence</strong>
+                <strong className="block text-brass">No matching rule found</strong>
                 <p className="text-ink-secondary text-[11px]">
-                  The policy engine suppressed low-confidence results to prevent ungrounded interpretation. Consult the full policy documents below.
+                  No approved rule matched your query closely enough. Consult the full rule documents below.
                 </p>
               </div>
             ) : (
@@ -127,14 +132,14 @@ export const PolicyKnowledgePage: React.FC = () => {
                     className="border border-rule bg-surface p-4 rounded-xs space-y-3 text-xs shadow-subtle"
                   >
                     <div className="flex items-center justify-between border-b border-rule/60 pb-2 font-mono text-[11px]">
-                      <span className="font-semibold text-ink">Citation: {chunk.source_file} (Lines {chunk.line_start}&ndash;{chunk.line_end})</span>
-                      <span className="text-ledger-green font-medium px-1.5 py-0.5 bg-ledger-green/10 rounded-xs">Verified Rule</span>
+                      <span className="font-semibold text-ink">Rule file: {chunk.source_file}</span>
+                      <span className="text-ledger-green font-medium px-1.5 py-0.5 bg-ledger-green/10 rounded-xs">Approved rule</span>
                     </div>
 
                     {/* Exact Policy Rule */}
                     <div className="space-y-1">
                       <span className="text-[10px] font-mono uppercase text-ink-secondary block">
-                        Exact Contractual Clause
+                        Rule text
                       </span>
                       <p className="font-sans text-xs text-ink leading-relaxed bg-canvas p-3 border border-rule/60 rounded-xs italic">
                         &ldquo;{chunk.text}&rdquo;
@@ -144,19 +149,19 @@ export const PolicyKnowledgePage: React.FC = () => {
                     {/* What it means for the operator */}
                     <div className="space-y-1 pt-1">
                       <span className="text-[10px] font-mono uppercase text-ink-secondary block">
-                        Operator Guidance &amp; Recommended Action
+                        Guidance for reviewer
                       </span>
                       <p className="font-sans text-xs text-ink-secondary leading-relaxed">
-                        {chunk.source_file.includes('fee') && 'Apply contractual 2.0% fee + 18% GST formula. If gateway deduction exceeds contracted net by > ₹0.01, raise a dispute or approve an authorized commercial waiver.'}
-                        {chunk.source_file.includes('exception') && 'Review counterparty documentation against T+2 aging limits. Missing records require acquirer trace before manual sign-off.'}
-                        {chunk.source_file.includes('settlement') && 'Verify institutional bank statement credit UTR before marking transaction as fully reconciled.'}
-                        {!chunk.source_file.includes('fee') && !chunk.source_file.includes('exception') && !chunk.source_file.includes('settlement') && 'Consult governing contract terms before manual reconciliation override.'}
+                        {chunk.source_file.includes('fee') && 'Apply the standard 2.0% fee + 18% tax formula. If the provider deduction differs from the expected payout by more than ₹0.01, verify the difference or escalate.'}
+                        {chunk.source_file.includes('exception') && 'Check provider records against the 2-day waiting period. If a record is still missing, trace it with the provider before signing off.'}
+                        {chunk.source_file.includes('settlement') && 'Verify the bank reference number in the bank statement before marking the transaction as fully resolved.'}
+                        {!chunk.source_file.includes('fee') && !chunk.source_file.includes('exception') && !chunk.source_file.includes('settlement') && 'Consult the approved rule before making a decision.'}
                       </p>
                     </div>
 
                     <div className="flex justify-between items-center text-[10px] font-mono text-ink-muted border-t border-rule/40 pt-2">
-                      <span>Authority: Read-only governance</span>
-                      <span>Immutable policy precedent</span>
+                      <span>Read-only guidance</span>
+                      <span>A human reviewer makes the final decision</span>
                     </div>
                   </div>
                 ))}
@@ -184,12 +189,13 @@ export const PolicyKnowledgePage: React.FC = () => {
           {/* File index */}
           <div className="border border-rule bg-surface p-4 rounded-xs space-y-3">
             <span className="text-xs font-mono uppercase text-ink-secondary block">
-              Policy Documents ({corpusData.documents.length})
+              Approved rules ({corpusData.documents.length})
             </span>
 
             <div className="space-y-1.5">
               {corpusData.documents.map((doc) => {
                 const isSelected = selectedDoc?.filename === doc.filename;
+                const humanTitle = getHumanDocTitle(doc.filename, doc.title);
                 return (
                   <button
                     key={doc.filename}
@@ -200,8 +206,7 @@ export const PolicyKnowledgePage: React.FC = () => {
                         : 'border-transparent hover:border-rule text-ink-secondary hover:text-ink'
                     }`}
                   >
-                    <span className="truncate pr-2">{doc.title}</span>
-                    <span className="font-mono text-[10px] text-ink-muted">{doc.line_count}L</span>
+                    <span className="truncate pr-2">{humanTitle}</span>
                   </button>
                 );
               })}
@@ -214,10 +219,10 @@ export const PolicyKnowledgePage: React.FC = () => {
               <>
                 <div className="flex flex-wrap items-center justify-between gap-2 border-b border-rule pb-3">
                   <span className="font-editorial text-xl font-medium text-ink">
-                    {selectedDoc.title}
+                    {getHumanDocTitle(selectedDoc.filename, selectedDoc.title)}
                   </span>
                   <span className="font-mono text-xs text-ink-secondary">
-                    File: {selectedDoc.filename} &bull; {selectedDoc.line_count} lines
+                    Rule file: {selectedDoc.filename}
                   </span>
                 </div>
 
@@ -229,21 +234,21 @@ export const PolicyKnowledgePage: React.FC = () => {
               </>
             ) : (
               <div className="py-12 text-center text-xs font-mono text-ink-secondary">
-                Select a policy document on the left to inspect full text.
+                Select an approved rule on the left to read the full text.
               </div>
             )}
           </div>
         </div>
       )}
 
-      {/* 4. Authoritative SOP Key Provisions (Calibrated Accordion) */}
+      {/* 4. Common Approved Rules (Calibrated Accordion) */}
       <section className="space-y-4 pt-6 border-t border-rule">
         <div className="space-y-1">
           <span className="text-xs font-mono uppercase tracking-wider text-ink-secondary block">
-            STANDARD OPERATING PROCEDURES &bull; ACTIVE RECONCILIATION CODES
+            OPERATING RULES &bull; REFERENCE
           </span>
           <h2 className="font-editorial text-2xl font-medium text-ink">
-            Core contract invariants &amp; escalation thresholds
+            Common approved rules
           </h2>
         </div>
 
@@ -252,46 +257,46 @@ export const PolicyKnowledgePage: React.FC = () => {
           items={[
             {
               id: 'sop-fee-01',
-              title: 'SOP-2026-FEE-01: Commercial Gateway Fee & Tax Computation',
-              subtitle: 'Mandatory contractual fee deductions on gross captured settlement',
+              title: 'Provider fee and tax rule',
+              subtitle: 'SOP-2026-FEE-01 • Standard fee and tax calculation',
               defaultOpen: true,
               content: (
                 <div className="space-y-3">
                   <p>
-                    Standard commercial agreements dictate a Merchant Discount Rate (MDR) of exactly 2.00% levied on gross captured payment amounts, plus an 18.00% Goods & Services Tax (GST) applied strictly to the fee sum:
+                    The provider fee is exactly 2.00% of the customer payment amount, plus 18.00% tax on the fee:
                   </p>
                   <div className="p-3 bg-canvas border border-rule rounded-xs font-mono text-xs">
-                    Fee = Gross &times; 0.02 | Tax = Fee &times; 0.18 | Expected Net = Gross - Fee - Tax - Refunds
+                    Fee = Payment &times; 2% | Tax = Fee &times; 18% | Expected Payout = Payment - Fee - Tax - Refunds
                   </div>
                   <p>
-                    Any variance exceeding ₹0.01 between reported net payout and contracted expected net constitutes a material breach requiring gateway dispute issuance.
+                    If the provider's reported payout differs from the expected amount by even ₹0.01, LedgerLens flags it for human review.
                   </p>
                 </div>
               ),
             },
             {
               id: 'sop-esc-02',
-              title: 'SOP-2026-ESC-02: Unmatched Settlement Payout SLA Escalation',
-              subtitle: 'Aging limits and inter-bank nodal verification timelines',
+              title: 'Missing payout time limit',
+              subtitle: 'SOP-2026-ESC-02 • Waiting period and escalation',
               content: (
                 <div className="space-y-3">
                   <p>
-                    Where a payment is marked as captured in the merchant register but lacks a corresponding gateway settlement line item after T+2 business days, the transaction must be flagged as <code>missing_settlement</code>.
+                    When a customer payment is received, the provider payout should arrive within 2 business days. If no payout record arrives in that time, the case is flagged as <strong>Missing provider payout</strong>.
                   </p>
                   <p>
-                    Controllers must verify payment capture status with the primary acquirer prior to manual waiver approval. Unverified settlements older than 5 business days trigger automated nodal alert escalations.
+                    The reviewer checks whether the payment was captured with the provider before making a decision. Cases open longer than 5 business days are escalated.
                   </p>
                 </div>
               ),
             },
             {
               id: 'sop-bank-03',
-              title: 'SOP-2026-BNK-03: Bank Credit Statement & UTR Verification Protocol',
-              subtitle: 'Single source of truth for institutional cash receipt',
+              title: 'Bank credit check',
+              subtitle: 'SOP-2026-BNK-03 • Checking bank statement credits',
               content: (
                 <div className="space-y-3">
                   <p>
-                    A settlement cannot be marked as fully reconciled without a verified Unique Transaction Reference (UTR) logged in the institutional banking feed. Duplicate bank credit entries sharing an identical settlement batch reference require nodal reconciliation reversing the shadow credit.
+                    A payout is only complete when the money actually arrives in the bank account and has a bank reference number. If the bank record is missing or appears twice, a reviewer must verify what happened before closing the case.
                   </p>
                 </div>
               ),

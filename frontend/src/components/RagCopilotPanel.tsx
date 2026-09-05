@@ -42,11 +42,11 @@ export const RagCopilotPanel: React.FC<PolicyNoteProps> = ({ caseId, autoRun = t
               Policy Note
             </span>
             <span className="text-[10px] font-mono px-1.5 py-0.2 bg-canvas border border-rule text-ink-secondary rounded-xs">
-              Read-Only Guidance
+              Approved operating rule
             </span>
           </div>
           <span className="font-editorial text-lg font-medium text-ink block">
-            Approved operating rule & precedent
+            What the approved rule says
           </span>
         </div>
 
@@ -55,7 +55,7 @@ export const RagCopilotPanel: React.FC<PolicyNoteProps> = ({ caseId, autoRun = t
           disabled={isLoading}
           className="text-[11px] font-mono text-ink-secondary hover:text-ink underline disabled:opacity-50"
         >
-          {isLoading ? 'Checking...' : 'Re-verify'}
+          {isLoading ? 'Checking...' : 'Check again'}
         </button>
       </div>
 
@@ -63,7 +63,7 @@ export const RagCopilotPanel: React.FC<PolicyNoteProps> = ({ caseId, autoRun = t
       {isLoading && (
         <div className="py-4 text-xs font-mono text-ink-secondary flex items-center gap-2">
           <span className="w-2 h-2 rounded-full bg-brass animate-ping" />
-          <span>Consulting approved policy library...</span>
+          <span>Checking approved rules...</span>
         </div>
       )}
 
@@ -80,7 +80,7 @@ export const RagCopilotPanel: React.FC<PolicyNoteProps> = ({ caseId, autoRun = t
           {/* Summary / Root Cause */}
           <div className="space-y-1">
             <span className="text-[11px] font-mono uppercase text-ink-secondary block">
-              Rule Interpretation
+              What the rule explains
             </span>
             <p className="text-ink font-normal">{result.summary}</p>
           </div>
@@ -88,7 +88,7 @@ export const RagCopilotPanel: React.FC<PolicyNoteProps> = ({ caseId, autoRun = t
           {result.recommended_action && (
             <div className="space-y-1 pt-2 border-t border-rule/50">
               <span className="text-[11px] font-mono uppercase text-ink-secondary block">
-                Standard Recommended Action
+                Recommended next step
               </span>
               <p className="text-ink font-medium">{result.recommended_action}</p>
             </div>
@@ -98,14 +98,14 @@ export const RagCopilotPanel: React.FC<PolicyNoteProps> = ({ caseId, autoRun = t
           {result.citations && result.citations.length > 0 && (
             <div className="space-y-2 pt-2 border-t border-rule/50">
               <span className="text-[11px] font-mono uppercase text-ink-secondary block">
-                Policy Grounding Citations ({result.citations.length})
+                Approved rule passages ({result.citations.length})
               </span>
               <div className="space-y-2">
                 {result.citations.map((cite, idx) => (
-                  <div key={idx} className="p-2.5 bg-canvas/60 border border-rule rounded-xs space-y-1 text-[11px]">
+                  <div key={idx} data-testid="policy-citation" className="p-2.5 bg-canvas/60 border border-rule rounded-xs space-y-1 text-[11px]">
                     <div className="flex justify-between font-mono text-ink-secondary">
                       <span className="font-semibold text-ink">{cite.source_file}</span>
-                      <span>Verified Document</span>
+                      <span>Approved rule</span>
                     </div>
                     <p className="italic text-ink-secondary font-serif leading-normal">&ldquo;{cite.quote}&rdquo;</p>
                   </div>
@@ -117,12 +117,12 @@ export const RagCopilotPanel: React.FC<PolicyNoteProps> = ({ caseId, autoRun = t
           {/* Secondary Disclosure for Technical Retrieval Metadata */}
           <details className="pt-2 text-[11px] font-mono text-ink-muted border-t border-rule/40">
             <summary className="cursor-pointer hover:text-ink">
-              Technical retrieval metadata
+              How this rule was found
             </summary>
             <div className="mt-2 p-2 bg-canvas/40 border border-rule/60 rounded-xs space-y-1">
-              <div>Grounding confidence: {result.is_confident ? 'Pass (>= 0.35 cosine floor)' : 'Sub-threshold review required'}</div>
-              <div>Retrieval boundary: Local immutable markdown corpus only</div>
-              <div>Decision model: Pure advisory; cannot approve or mutate financial records</div>
+              <div>Rule match confidence: {result.is_confident ? 'Matched approved library' : 'Low confidence match'}</div>
+              <div>Rule library: Read-only local operating policies</div>
+              <div>Reviewer guidance: A person makes the final decision</div>
             </div>
           </details>
         </div>

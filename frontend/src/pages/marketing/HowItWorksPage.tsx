@@ -6,66 +6,66 @@ export default function HowItWorksPage() {
   const stages = [
     {
       number: '01',
-      title: 'Bring the records together',
-      summary: 'Every customer purchase creates four separate records: checkout payment, payment gateway payout, customer refund, and bank deposit.',
-      detail: 'LedgerLens gathers all four records in one place so nothing is hidden or assumed.',
+      title: 'Bring in the records',
+      summary: 'Every transaction creates four separate records: checkout payment, provider payout, refund, and bank credit.',
+      detail: 'LedgerLens brings all four records into one view so finance teams do not have to copy and paste between files.',
       icon: Layers,
-      indicator: 'Record Intake',
-      visualBadge: 'Four Financial Records',
+      indicator: 'Records received',
+      visualBadge: 'Four financial records',
     },
     {
       number: '02',
-      title: 'Check whether they agree',
-      summary: 'LedgerLens calculates the exact expected payout by subtracting agreed gateway fees and taxes down to the single paisa.',
-      detail: 'When what was captured matches what reached the bank, the transaction is verified and marked complete.',
+      title: 'Check the amounts',
+      summary: 'LedgerLens calculates the expected provider payout by subtracting the agreed fee and tax down to the nearest paisa.',
+      detail: 'When the payment minus fees equals the bank deposit, the case matches and can close without manual review.',
       icon: CheckCircle2,
-      indicator: 'Automatic Verification',
-      visualBadge: 'Exact Math',
+      indicator: 'Exact calculation',
+      visualBadge: 'Checked to the nearest paisa',
     },
     {
       number: '03',
-      title: 'Find what does not match',
-      summary: 'If a bank credit is short, a fee is higher than agreed, or a refund is missing, LedgerLens flags the exact difference immediately.',
-      detail: 'The transaction is paused and sent to the review queue before discrepancies can compound.',
+      title: 'Find the difference',
+      summary: 'If a bank credit is short, a fee is higher than agreed, or a refund is missing, LedgerLens highlights the exact difference.',
+      detail: 'The case pauses and goes into the review queue so errors do not compound.',
       icon: AlertTriangle,
-      indicator: 'Discrepancy Flagged',
-      visualBadge: 'Variance Isolated',
+      indicator: 'Needs attention',
+      visualBadge: 'Difference highlighted',
     },
     {
       number: '04',
       title: 'Compare the evidence',
-      summary: 'A human reviewer opens the case dossier to see the four original source records side by side.',
-      detail: 'Every number, identifier, and bank reference is displayed clearly so you can see exactly where the money stopped matching.',
+      summary: 'A reviewer opens the case to see all four source records side by side with their original reference numbers.',
+      detail: 'You can see exactly what the customer paid, what the provider sent, any refunds, and what arrived in the bank.',
       icon: FileSearch,
-      indicator: 'Evidence Review',
-      visualBadge: 'Side-by-Side Proof',
+      indicator: 'Evidence side by side',
+      visualBadge: 'Four sources compared',
     },
     {
       number: '05',
       title: 'Read the approved rule',
-      summary: 'LedgerLens displays the exact company policy or gateway operating standard that applies to this specific situation.',
-      detail: 'Advisory guidance shows previous precedent and standard resolution steps without guessing.',
+      summary: 'LedgerLens shows the approved policy that explains the difference and what steps to check next.',
+      detail: 'Reviewers get clear guidance based on company policy rather than guessing what to do.',
       icon: BookOpen,
-      indicator: 'Company Policy',
-      visualBadge: 'Approved Guidance',
+      indicator: 'Approved rule',
+      visualBadge: 'Policy guidance',
     },
     {
       number: '06',
-      title: 'A human chooses what happens next',
-      summary: 'The software never moves money or closes cases on its own. An authorized person reviews the evidence and records a decision.',
-      detail: 'The reviewer can approve a valid fee adjustment, request a missing bank credit, or dispute an overcharge.',
+      title: 'Make a human decision',
+      summary: 'The software never moves money or approves exceptions on its own. A person decides what should happen next.',
+      detail: 'The reviewer can approve a valid adjustment, reject a discrepancy, or escalate for further review.',
       icon: UserCheck,
-      indicator: 'Human Authority',
-      visualBadge: 'Reviewer Decision',
+      indicator: 'Human decision',
+      visualBadge: 'Reviewer choice',
     },
     {
       number: '07',
-      title: 'Save the result in the record',
-      summary: 'The reviewer’s choice, written reason, and exact timestamp are permanently saved to the ledger.',
-      detail: 'This creates a tamper-evident audit receipt that cannot be altered or silently deleted.',
+      title: 'Save what happened',
+      summary: 'The reviewer’s decision, written explanation, and timestamp are saved permanently into review history.',
+      detail: 'This saved history cannot be silently changed or deleted, providing complete traceability for audits.',
       icon: ShieldCheck,
-      indicator: 'Permanent Receipt',
-      visualBadge: 'Audit Trail',
+      indicator: 'Saved review history',
+      visualBadge: 'Permanent record',
     },
   ];
 
@@ -80,7 +80,7 @@ export default function HowItWorksPage() {
           How LedgerLens works in seven simple steps
         </h1>
         <p className="text-base sm:text-lg text-ink-secondary font-normal leading-relaxed">
-          LedgerLens brings four financial records together, highlights the break, shows the approved rule, and lets a human decide.
+          Four financial records arrive. LedgerLens compares them. If they do not agree, it shows where the difference is. An approved rule explains what to check. A human reviewer decides what happens next. The decision is saved.
         </p>
       </div>
 
@@ -142,7 +142,7 @@ export default function HowItWorksPage() {
           See the evidence in action
         </h3>
         <p className="text-xs sm:text-sm text-ink-secondary max-w-md mx-auto leading-relaxed">
-          Compare a clean transaction that matched perfectly against a broken transaction where money stopped matching.
+          Compare a case where all four amounts agree against a case where ₹150 is missing and needs a human decision.
         </p>
         <div className="pt-2">
           <Link

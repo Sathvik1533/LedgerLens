@@ -6,7 +6,7 @@ export const AuditTimeline: React.FC<{ events: AuditEventItem[] }> = ({ events }
     <div data-testid="audit-ledger" className="border border-rule bg-surface p-4 rounded-xs space-y-3 font-sans shadow-subtle">
       <div className="flex items-center justify-between border-b border-rule pb-2">
         <span className="font-editorial text-base font-medium text-ink">
-          Case audit ledger
+          Case audit history
         </span>
         <span className="text-[11px] font-mono text-ink-secondary bg-canvas px-1.5 py-0.5 rounded-xs border border-rule">
           {events.length} {events.length === 1 ? 'record' : 'records'}
@@ -15,12 +15,23 @@ export const AuditTimeline: React.FC<{ events: AuditEventItem[] }> = ({ events }
 
       {events.length === 0 ? (
         <div className="py-4 text-center text-xs text-ink-secondary font-mono italic">
-          No audit records appended yet.
+          No review history yet.
         </div>
       ) : (
         <div className="divide-y divide-rule/60 text-xs">
           {events.map((evt) => {
             const isHuman = evt.event_type.startsWith('human_') || evt.actor !== 'system';
+            const humanAction =
+              evt.event_type === 'human_review_submitted'
+                ? 'Review decision saved'
+                : evt.event_type === 'case_opened'
+                ? 'Case opened'
+                : evt.event_type === 'reconciliation_run'
+                ? 'Records compared'
+                : evt.event_type === 'batch_ingested'
+                ? 'File uploaded'
+                : evt.event_type.split('_').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+
             let dateStr = evt.occurred_at;
             try {
               dateStr = new Date(evt.occurred_at).toLocaleString('en-IN', {
@@ -36,13 +47,13 @@ export const AuditTimeline: React.FC<{ events: AuditEventItem[] }> = ({ events }
                 <div className="flex items-center justify-between font-mono text-[11px]">
                   <div className="flex items-center gap-1.5">
                     <span className={`w-1.5 h-1.5 rounded-full ${isHuman ? 'bg-ink' : 'bg-rule-strong'}`} />
-                    <span className="font-semibold text-ink">{evt.event_type}</span>
+                    <span className="font-semibold text-ink">{humanAction}</span>
                   </div>
                   <span className="text-ink-secondary">{dateStr}</span>
                 </div>
 
                 <div className="flex flex-wrap items-center justify-between text-[11px] font-mono text-ink-secondary">
-                  <span>Signer: <strong className="text-ink font-normal">{evt.actor}</strong></span>
+                  <span>Reviewer: <strong className="text-ink font-normal">{evt.actor}</strong></span>
                   {evt.previous_status && evt.new_status && (
                     <span className="flex items-center gap-1">
                       <span>{evt.previous_status}</span>

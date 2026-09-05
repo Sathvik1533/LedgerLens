@@ -14,7 +14,7 @@ export default function EvidencePage() {
           How LedgerLens compares the evidence
         </h1>
         <p className="text-base sm:text-lg text-ink-secondary font-normal leading-relaxed">
-          Reconciliation breaks when companies rely on internal reports without checking the bank. Here is how LedgerLens compares payment, settlement, refund, and bank records.
+          Comparing records breaks down when companies rely on internal reports without checking the bank. Here is how LedgerLens compares payments, provider payouts, refunds, and bank credits.
         </p>
       </div>
 
@@ -29,12 +29,12 @@ export default function EvidencePage() {
                 EXAMPLE A &bull; MATCHED RECORDS
               </span>
               <h2 className="font-editorial text-2xl font-medium text-ink mt-0.5">
-                Clean transaction: all four records agree
+                All four amounts agree
               </h2>
             </div>
             <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xs bg-ledger-green/10 border border-ledger-green/30 text-xs font-mono text-ledger-green font-medium">
               <CheckCircle2 className="w-3.5 h-3.5" />
-              All four records agree
+              All four amounts agree
             </span>
           </div>
 
@@ -43,36 +43,36 @@ export default function EvidencePage() {
             <div className="p-3.5 bg-canvas border border-rule rounded-xs space-y-1">
               <span className="text-[11px] uppercase tracking-wider text-ink-secondary block">1. Payment</span>
               <div className="text-sm font-semibold text-ink">₹10,000.00</div>
-              <p className="text-[11px] text-ink-muted font-sans">Customer checkout amount captured.</p>
+              <p className="text-[11px] text-ink-muted font-sans">Payment: what the customer paid.</p>
             </div>
 
-            {/* Settlement */}
+            {/* Provider Payout */}
             <div className="p-3.5 bg-canvas border border-rule rounded-xs space-y-1">
-              <span className="text-[11px] uppercase tracking-wider text-ink-secondary block">2. Settlement</span>
+              <span className="text-[11px] uppercase tracking-wider text-ink-secondary block">2. Provider Payout</span>
               <div className="text-sm font-semibold text-ink">₹9,764.00</div>
-              <p className="text-[11px] text-ink-muted font-sans">Agreed fee (₹200) + tax (₹36) deducted.</p>
+              <p className="text-[11px] text-ink-muted font-sans">Provider payout: what the payment provider sent (after fee and tax).</p>
             </div>
 
             {/* Refund */}
             <div className="p-3.5 bg-canvas border border-rule rounded-xs space-y-1">
               <span className="text-[11px] uppercase tracking-wider text-ink-secondary block">3. Refund</span>
               <div className="text-sm font-semibold text-ink">₹0.00</div>
-              <p className="text-[11px] text-ink-muted font-sans">No customer refund requested.</p>
+              <p className="text-[11px] text-ink-muted font-sans">Refund: money returned to the customer.</p>
             </div>
 
             {/* Bank Credit */}
             <div className="p-3.5 bg-ledger-green/10 border border-ledger-green/30 rounded-xs space-y-1 text-ink">
               <span className="text-[11px] uppercase tracking-wider text-ledger-green font-medium block">4. Bank Credit</span>
               <div className="text-sm font-semibold text-ledger-green">₹9,764.00</div>
-              <p className="text-[11px] text-ink-secondary font-sans">Exact deposit confirmed on bank statement.</p>
+              <p className="text-[11px] text-ink-secondary font-sans">Bank credit: money received by the bank.</p>
             </div>
           </div>
 
           <div className="p-3.5 bg-canvas border border-rule rounded-xs flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs font-mono">
-            <span className="text-ink-secondary">Difference: ₹0.00 (Zero variance)</span>
+            <span className="text-ink-secondary">Difference: ₹0.00 (No difference)</span>
             <span className="text-ledger-green font-medium flex items-center gap-1.5">
               <CheckCircle2 className="w-3.5 h-3.5" />
-              Automatically verified and closed
+              All four amounts agree. The case can close automatically.
             </span>
           </div>
         </div>
@@ -82,15 +82,15 @@ export default function EvidencePage() {
           <div className="border-b border-rule pb-3 flex flex-col sm:flex-row sm:items-baseline justify-between gap-2">
             <div>
               <span className="text-xs font-mono text-critical uppercase tracking-wider block">
-                EXAMPLE B &bull; DISCREPANCY DETECTED
+                EXAMPLE B &bull; DIFFERENCE FOUND
               </span>
               <h2 className="font-editorial text-2xl font-medium text-ink mt-0.5">
-                Broken transaction: ₹150 is missing from the settlement
+                ₹150 is missing: case goes to a reviewer
               </h2>
             </div>
             <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xs bg-critical/10 border border-critical/30 text-xs font-mono text-critical font-medium">
               <AlertTriangle className="w-3.5 h-3.5" />
-              Sent to human review
+              Case goes to human review
             </span>
           </div>
 
@@ -99,30 +99,30 @@ export default function EvidencePage() {
             <div className="p-3.5 bg-canvas border border-rule rounded-xs space-y-1">
               <span className="text-[11px] uppercase tracking-wider text-ink-secondary block">1. Payment</span>
               <div className="text-sm font-semibold text-ink">₹10,000.00</div>
-              <p className="text-[11px] text-ink-muted font-sans">Gross customer payment received.</p>
+              <p className="text-[11px] text-ink-muted font-sans">Payment: what the customer paid.</p>
             </div>
 
-            {/* Expected vs Actual Settlement */}
+            {/* Provider Payout */}
             <div className="p-3.5 bg-critical/5 border border-critical/30 rounded-xs space-y-1">
-              <span className="text-[11px] uppercase tracking-wider text-critical font-medium block">2. Settlement</span>
+              <span className="text-[11px] uppercase tracking-wider text-critical font-medium block">2. Provider Payout</span>
               <div className="text-sm font-bold text-critical">₹9,614.00</div>
               <p className="text-[11px] text-critical font-sans">
-                Expected ₹9,764.00. <strong>₹150 is missing from the settlement.</strong>
+                Expected ₹9,764.00. <strong>₹150 is missing from the payout.</strong>
               </p>
             </div>
 
             {/* Refund */}
             <div className="p-3.5 bg-canvas border border-rule rounded-xs space-y-1">
               <span className="text-[11px] uppercase tracking-wider text-ink-secondary block">3. Refund</span>
-              <div className="text-sm font-medium text-ink-secondary">No refund applies</div>
-              <p className="text-[11px] text-ink-muted font-sans">Pure settlement shortfall with zero refund.</p>
+              <div className="text-sm font-medium text-ink-secondary">₹0.00</div>
+              <p className="text-[11px] text-ink-muted font-sans">Refund: money returned to the customer.</p>
             </div>
 
             {/* Bank Credit */}
             <div className="p-3.5 bg-canvas border border-rule rounded-xs space-y-1 text-ink">
               <span className="text-[11px] uppercase tracking-wider text-ink-secondary block">4. Bank Credit</span>
               <div className="text-sm font-semibold text-ink">₹9,614.00</div>
-              <p className="text-[11px] text-ink-muted font-sans">Bank received the short gateway remittance.</p>
+              <p className="text-[11px] text-ink-muted font-sans">Bank credit: money received by the bank.</p>
             </div>
           </div>
 
@@ -130,7 +130,7 @@ export default function EvidencePage() {
             <span>Difference: -₹150.00 missing from payout</span>
             <span className="font-medium flex items-center gap-1.5">
               <AlertTriangle className="w-3.5 h-3.5" />
-              Flagged for human reviewer decision
+              ₹150 is missing. The case goes to a human reviewer.
             </span>
           </div>
         </div>
@@ -139,7 +139,7 @@ export default function EvidencePage() {
       {/* 3. Simple Summary of Financial Breakpoints */}
       <div className="border border-rule bg-surface p-6 sm:p-8 rounded-xs space-y-4 shadow-subtle">
         <div className="border-b border-rule pb-3">
-          <span className="text-xs font-mono uppercase text-ink-secondary block">COMMON DISCREPANCIES</span>
+          <span className="text-xs font-mono uppercase text-ink-secondary block">COMMON DIFFERENCES</span>
           <h3 className="font-editorial text-2xl font-medium text-ink mt-0.5">
             Why financial records disagree
           </h3>
@@ -150,27 +150,27 @@ export default function EvidencePage() {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs font-sans">
           <div className="p-3.5 bg-canvas border border-rule rounded-xs space-y-1">
-            <span className="font-semibold text-ink block">Settlement payout shortfall</span>
+            <span className="font-semibold text-ink block">Provider payout shortfall</span>
             <p className="text-ink-secondary leading-relaxed">
-              The gateway took higher processing fees than agreed in the contract, leaving less money than expected.
+              The payment provider subtracted higher fees than agreed, leaving less money than expected.
             </p>
           </div>
           <div className="p-3.5 bg-canvas border border-rule rounded-xs space-y-1">
             <span className="font-semibold text-ink block">Missing bank credit</span>
             <p className="text-ink-secondary leading-relaxed">
-              The payment gateway reported that funds were remitted, but no matching credit appeared on the bank statement.
+              The payment provider reported money sent, but no matching credit appeared on the bank statement.
             </p>
           </div>
           <div className="p-3.5 bg-canvas border border-rule rounded-xs space-y-1">
-            <span className="font-semibold text-ink block">Customer refund not adjusted</span>
+            <span className="font-semibold text-ink block">Customer refund not reflected</span>
             <p className="text-ink-secondary leading-relaxed">
-              A customer return was processed, but the gateway settled the full payout without adjusting for the refund.
+              A refund was returned to the customer, but the provider payout did not reflect the adjustment.
             </p>
           </div>
           <div className="p-3.5 bg-canvas border border-rule rounded-xs space-y-1">
-            <span className="font-semibold text-ink block">Duplicate payment or bank credit</span>
+            <span className="font-semibold text-ink block">Customer paid twice or bank credit appears twice</span>
             <p className="text-ink-secondary leading-relaxed">
-              A customer was charged twice due to a browser retry, or the bank credited the same payout batch twice.
+              A customer may have paid twice due to a retry, or the bank credited the same payout twice.
             </p>
           </div>
         </div>
@@ -182,17 +182,17 @@ export default function EvidencePage() {
           NEXT STEP IN THE JOURNEY
         </span>
         <h3 className="font-editorial text-2xl sm:text-3xl font-medium text-ink">
-          Inspect the benchmark evaluation
+          Inspect the benchmark test
         </h3>
         <p className="text-xs sm:text-sm text-ink-secondary max-w-md mx-auto leading-relaxed">
-          See how LedgerLens performs across standardized test batches with honest reporting of matched cases, exceptions, and amount at risk.
+          In this test, 42 of 60 records matched. 18 cases need a human review. No incorrect approvals were made.
         </p>
         <div className="pt-2">
           <Link
             to="/evaluation"
             className="px-6 py-2.5 bg-ink text-canvas hover:bg-ink/90 text-xs font-medium rounded-xs transition-colors inline-flex items-center gap-2 shadow-subtle"
           >
-            <span>View benchmark evaluation</span>
+            <span>View test results</span>
             <ArrowRight className="w-3.5 h-3.5" />
           </Link>
         </div>

@@ -42,11 +42,11 @@ export default function LandingPage() {
                 Financial operations
               </span>
               <h1 className="font-editorial text-4xl sm:text-6xl md:text-7xl font-medium tracking-tight text-[#FCFBF8] leading-[1.08]">
-                When the numbers disagree, <br />
-                <span className="italic text-[#EAE4D8]">LedgerLens</span> shows you where.
+                When four financial records do not agree, <br />
+                <span className="italic text-[#EAE4D8]">LedgerLens</span> shows where the difference started.
               </h1>
               <p className="text-base sm:text-lg text-[#D8D2C8] leading-relaxed max-w-2xl font-light">
-                LedgerLens compares payment, settlement, refund, and bank records to show exactly where money stopped matching.
+                LedgerLens compares payments, provider payouts, refunds, and bank credits. If they do not agree, it shows the difference and the approved rule so a reviewer can decide what happens next.
               </p>
             </div>
 
@@ -63,11 +63,11 @@ export default function LandingPage() {
                   to="/login"
                   className="px-5 py-3 border border-white/20 hover:border-white/40 text-[#D8D2C8] hover:text-white text-xs rounded-xs transition-colors text-center font-mono"
                 >
-                  Enter the control room &rarr;
+                  Review a case &rarr;
                 </Link>
               </div>
               <div className="text-[11px] font-mono text-[#A8A49C] text-center lg:text-left">
-                Synthetic demonstration data &bull; A human reviewer makes the decision
+                Demo data only &bull; A human reviewer makes the final decision
               </div>
             </div>
           </div>
@@ -75,8 +75,8 @@ export default function LandingPage() {
           {/* Visual Proof Element: Four Records Converging */}
           <div className="space-y-3 pt-4">
             <div className="flex flex-col sm:flex-row sm:items-baseline justify-between text-xs font-mono text-[#A8A49C] gap-1">
-              <span>FOUR RECORDS CONVERGING &mdash; EXACT DIFFERENCE HIGHLIGHTED</span>
-              <span className="text-[#B94E3D] font-medium">DISCREPANCY DETECTED AT GATEWAY SETTLEMENT</span>
+              <span>FOUR RECORDS ARRIVE &mdash; EXACT DIFFERENCE HIGHLIGHTED</span>
+              <span className="text-[#B94E3D] font-medium">DIFFERENCE FOUND IN PROVIDER PAYOUT</span>
             </div>
             <LedgerTraceA hasDiscrepancy={true} />
           </div>
@@ -90,10 +90,10 @@ export default function LandingPage() {
             A CONCRETE COMPARISON
           </span>
           <h2 className="font-editorial text-3xl sm:text-4xl font-medium text-ink">
-            What matching looks like vs. where money breaks
+            What matching looks like vs. where money is missing
           </h2>
           <p className="text-sm text-ink-secondary leading-relaxed">
-            See the difference between a clean transaction that clears automatically and a broken transaction where funds go missing.
+            See the difference between records that agree and clear automatically, and a case where ₹150 is missing and needs a human decision.
           </p>
         </div>
 
@@ -107,7 +107,7 @@ export default function LandingPage() {
                 </span>
                 <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-xs bg-ledger-green/10 text-ledger-green text-xs font-mono font-medium">
                   <CheckCircle2 className="w-3.5 h-3.5" />
-                  All 4 records agree
+                  All four amounts agree
                 </span>
               </div>
 
@@ -117,19 +117,19 @@ export default function LandingPage() {
 
               <div className="space-y-2.5 font-mono text-xs">
                 <div className="flex justify-between p-2.5 bg-canvas border border-rule rounded-xs">
-                  <span className="text-ink-secondary">1. Payment:</span>
+                  <span className="text-ink-secondary">1. Payment (what customer paid):</span>
                   <span className="font-semibold text-ink">₹10,000.00</span>
                 </div>
                 <div className="flex justify-between p-2.5 bg-canvas border border-rule rounded-xs">
-                  <span className="text-ink-secondary">2. Settlement (Fee & Tax):</span>
+                  <span className="text-ink-secondary">2. Provider payout (what provider sent):</span>
                   <span className="font-semibold text-ink">₹9,764.00</span>
                 </div>
                 <div className="flex justify-between p-2.5 bg-canvas border border-rule rounded-xs">
-                  <span className="text-ink-secondary">3. Refund:</span>
+                  <span className="text-ink-secondary">3. Refund (money returned):</span>
                   <span className="font-semibold text-ink">₹0.00</span>
                 </div>
                 <div className="flex justify-between p-2.5 bg-ledger-green/10 border border-ledger-green/30 rounded-xs text-ledger-green font-medium">
-                  <span>4. Bank Credit:</span>
+                  <span>4. Bank credit (money received):</span>
                   <span className="font-semibold">₹9,764.00</span>
                 </div>
               </div>
@@ -137,7 +137,7 @@ export default function LandingPage() {
 
             <div className="p-3 bg-canvas border border-rule rounded-xs text-xs font-sans text-ink-secondary flex items-center gap-2">
               <CheckCircle2 className="w-4 h-4 text-ledger-green shrink-0" />
-              <span>Exact penny-level match satisfied. Automatically closed without human intervention.</span>
+              <span>All four amounts agree. The case can close automatically.</span>
             </div>
           </div>
 
@@ -146,33 +146,33 @@ export default function LandingPage() {
             <div className="space-y-4">
               <div className="flex items-center justify-between border-b border-rule pb-3">
                 <span className="text-xs font-mono text-critical uppercase tracking-wider">
-                  EXAMPLE 2 &bull; DISCREPANCY
+                  EXAMPLE 2 &bull; DIFFERENCE
                 </span>
                 <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-xs bg-critical/10 text-critical text-xs font-mono font-medium">
                   <AlertTriangle className="w-3.5 h-3.5" />
-                  Sent to human review
+                  Sent to human reviewer
                 </span>
               </div>
 
               <h3 className="font-editorial text-2xl font-medium text-ink">
-                Broken transaction: ₹150 is missing
+                ₹150 is missing: case needs attention
               </h3>
 
               <div className="space-y-2.5 font-mono text-xs">
                 <div className="flex justify-between p-2.5 bg-canvas border border-rule rounded-xs">
-                  <span className="text-ink-secondary">1. Payment:</span>
+                  <span className="text-ink-secondary">1. Payment (what customer paid):</span>
                   <span className="font-semibold text-ink">₹10,000.00</span>
                 </div>
                 <div className="flex justify-between p-2.5 bg-critical/5 border border-critical/30 rounded-xs text-critical">
-                  <span>2. Settlement (Shortfall):</span>
+                  <span>2. Provider payout (shortfall):</span>
                   <span className="font-semibold">₹9,614.00 (Expected ₹9,764.00)</span>
                 </div>
                 <div className="flex justify-between p-2.5 bg-canvas border border-rule rounded-xs">
-                  <span className="text-ink-secondary">3. Refund:</span>
-                  <span className="text-ink-secondary">No refund applies</span>
+                  <span className="text-ink-secondary">3. Refund (money returned):</span>
+                  <span className="text-ink-secondary">₹0.00</span>
                 </div>
                 <div className="flex justify-between p-2.5 bg-canvas border border-rule rounded-xs">
-                  <span className="text-ink-secondary">4. Bank Credit:</span>
+                  <span className="text-ink-secondary">4. Bank credit (money received):</span>
                   <span className="font-semibold text-ink">₹9,614.00</span>
                 </div>
               </div>
@@ -180,7 +180,7 @@ export default function LandingPage() {
 
             <div className="p-3 bg-critical/10 border border-critical/30 rounded-xs text-xs font-sans text-critical flex items-center gap-2">
               <AlertTriangle className="w-4 h-4 shrink-0" />
-              <span><strong>₹150 is missing from the settlement.</strong> Sent immediately to the review queue for a human decision.</span>
+              <span><strong>₹150 is missing.</strong> The case goes to a human reviewer to decide what happens next.</span>
             </div>
           </div>
         </div>
@@ -204,10 +204,10 @@ export default function LandingPage() {
               THE WORKFLOW
             </span>
             <h2 className="font-editorial text-3xl sm:text-4xl font-medium text-ink">
-              One clear story from break to decision
+              One clear story from difference to decision
             </h2>
             <p className="text-sm text-ink-secondary leading-relaxed">
-              Bring records together. Find the break. Read the rule. Record the decision.
+              Four financial records arrive. LedgerLens compares them. If they do not agree, it shows where the difference is. An approved rule explains what to check. A human reviewer decides what happens next. The decision is saved.
             </p>
           </div>
 
@@ -217,10 +217,10 @@ export default function LandingPage() {
                 01
               </div>
               <h3 className="font-editorial text-xl font-medium text-ink">
-                Bring records together
+                Bring in the records
               </h3>
               <p className="text-xs text-ink-secondary leading-relaxed">
-                Payments, gateway settlements, customer refunds, and bank statements are unified without guessing.
+                Payments, provider payouts, customer refunds, and bank credits arrive from source files.
               </p>
             </div>
 
@@ -229,10 +229,10 @@ export default function LandingPage() {
                 02
               </div>
               <h3 className="font-editorial text-xl font-medium text-ink">
-                Find the break
+                Find the difference
               </h3>
               <p className="text-xs text-ink-secondary leading-relaxed">
-                LedgerLens checks whether the four records agree exactly down to the single paisa. Any difference is redlined.
+                LedgerLens checks the four records down to the nearest paisa. Any difference is shown clearly.
               </p>
             </div>
 
@@ -244,7 +244,7 @@ export default function LandingPage() {
                 Read the approved rule
               </h3>
               <p className="text-xs text-ink-secondary leading-relaxed">
-                Advisory policy notes show the approved rule and standard resolution steps that apply to the case.
+                Approved rules explain why a case needs attention and what a reviewer should check next.
               </p>
             </div>
 
@@ -253,10 +253,10 @@ export default function LandingPage() {
                 04
               </div>
               <h3 className="font-editorial text-xl font-medium text-ink">
-                Record the decision
+                Make a human decision
               </h3>
               <p className="text-xs text-ink-secondary leading-relaxed">
-                A human reviewer makes the final call. The decision is permanently saved with an immutable audit receipt.
+                A human reviewer makes the final decision. The decision is saved to history.
               </p>
             </div>
           </div>
@@ -272,12 +272,12 @@ export default function LandingPage() {
           </div>
 
           <h2 className="font-editorial text-3xl sm:text-4xl font-medium text-ink leading-snug">
-            &ldquo;LedgerLens explains the difference. <br className="hidden sm:inline" />
-            A human reviewer makes the decision.&rdquo;
+            The software checks the numbers. <br className="hidden sm:inline" />
+            A person decides what to do.
           </h2>
 
           <p className="text-sm text-ink-secondary max-w-xl mx-auto leading-relaxed">
-            The software never moves money or closes exceptions silently. Every decision requires a verified reviewer, a written reason, and produces a permanent receipt.
+            AI can explain evidence and approved policy, but it never makes the final financial decision or moves money. Every decision requires a human reviewer and is saved to review history.
           </p>
 
           <div className="pt-4 flex flex-col sm:flex-row items-center justify-center gap-3">
@@ -285,7 +285,7 @@ export default function LandingPage() {
               to="/login"
               className="px-8 py-3.5 bg-ink text-canvas hover:bg-ink/90 text-xs font-medium rounded-xs transition-colors shadow-subtle inline-flex items-center gap-2"
             >
-              <span>Open the financial control room</span>
+              <span>Review a case</span>
               <ArrowRight className="w-3.5 h-3.5" />
             </Link>
             <Link

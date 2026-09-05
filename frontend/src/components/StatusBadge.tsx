@@ -9,12 +9,12 @@ interface StatusMeta {
 
 const STATUS_CONFIG: Record<string, StatusMeta> = {
   needs_review: {
-    label: 'Needs Review',
+    label: 'Needs a human decision',
     dotColor: 'bg-amber-400',
     textColor: 'text-high',
   },
   auto_reconciled: {
-    label: 'Auto Reconciled',
+    label: 'Matched automatically',
     dotColor: 'bg-emerald-400',
     textColor: 'text-resolved',
   },
@@ -24,12 +24,12 @@ const STATUS_CONFIG: Record<string, StatusMeta> = {
     textColor: 'text-resolved',
   },
   rejected: {
-    label: 'Rejected',
+    label: 'Reviewer did not approve',
     dotColor: 'bg-rose-400',
     textColor: 'text-text-primary',
   },
   unresolved: {
-    label: 'Unresolved',
+    label: 'Still not explained',
     dotColor: 'bg-slate-400',
     textColor: 'text-text-secondary',
   },

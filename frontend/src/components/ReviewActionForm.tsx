@@ -70,14 +70,14 @@ export const ReviewActionForm: React.FC<ReviewActionFormProps> = ({
       <div className="border-b border-rule pb-3 space-y-1">
         <div className="flex items-center justify-between">
           <span className="font-editorial text-lg font-medium text-ink">
-            Record a review decision
+            What should happen next?
           </span>
           <span className="text-[11px] font-mono px-1.5 py-0.5 border border-rule text-ink-secondary bg-canvas rounded-xs">
-            Ledger v{evidence.version}
+            Review v{evidence.version}
           </span>
         </div>
         <p className="text-xs text-ink-secondary leading-relaxed">
-          Sign this financial review note. Your decision, rationale, and timestamp will be permanently appended to the immutable audit ledger.
+          Make a decision on this case. Your decision, reason, and identity will be saved to the review history.
         </p>
       </div>
 
@@ -106,13 +106,13 @@ export const ReviewActionForm: React.FC<ReviewActionFormProps> = ({
       {lastReceipt && (
         <div data-testid="review-receipt-banner" className="p-4 bg-ledger-green/10 border border-ledger-green/30 rounded-xs space-y-2 font-mono text-xs text-ink">
           <div className="flex items-center justify-between text-ledger-green font-semibold">
-            <span>✓ Decision recorded to ledger</span>
+            <span>✓ Decision saved to review history</span>
             <span>v{lastReceipt.current_version}</span>
           </div>
           <div className="text-[11px] text-ink-secondary space-y-1 pt-1 border-t border-ledger-green/20">
             <div>Receipt ID: {lastReceipt.review_action_id}</div>
-            <div>Signer: {lastReceipt.actor} ({lastReceipt.action})</div>
-            <div>Recorded: {new Date(lastReceipt.actioned_at).toLocaleString('en-IN')}</div>
+            <div>Reviewer: {lastReceipt.actor} ({lastReceipt.action})</div>
+            <div>Saved: {new Date(lastReceipt.actioned_at).toLocaleString('en-IN')}</div>
             <div>Audit Event: {lastReceipt.audit_event_id}</div>
           </div>
           <div className="text-[11px] text-ledger-green/90 pt-1.5 border-t border-ledger-green/20 font-sans font-medium">
@@ -141,7 +141,7 @@ export const ReviewActionForm: React.FC<ReviewActionFormProps> = ({
         {/* Action Choice */}
         <div className="space-y-1.5">
           <label className="text-[11px] font-mono uppercase text-ink-secondary block">
-            Resolution Action
+            Your decision
           </label>
           <div className="grid grid-cols-3 gap-2">
             <button
@@ -154,7 +154,7 @@ export const ReviewActionForm: React.FC<ReviewActionFormProps> = ({
                   : 'border-rule bg-canvas text-ink-secondary hover:border-ink hover:text-ink'
               }`}
             >
-              Approve match
+              Approve
             </button>
             <button
               type="button"
@@ -166,7 +166,7 @@ export const ReviewActionForm: React.FC<ReviewActionFormProps> = ({
                   : 'border-rule bg-canvas text-ink-secondary hover:border-ink hover:text-ink'
               }`}
             >
-              Reject record
+              Reject
             </button>
             <button
               type="button"
@@ -187,7 +187,7 @@ export const ReviewActionForm: React.FC<ReviewActionFormProps> = ({
         <div className="space-y-1">
           <div className="flex items-center justify-between">
             <label className="text-[11px] font-mono uppercase text-ink-secondary block">
-              Audit Rationale & Reference Notes
+              Why are you making this decision?
             </label>
             <span className={`text-[10px] font-mono ${comment.trim().length >= 10 ? 'text-ledger-green' : 'text-ink-secondary'}`}>
               {comment.trim().length}/10 min chars
@@ -201,7 +201,7 @@ export const ReviewActionForm: React.FC<ReviewActionFormProps> = ({
             required
             minLength={10}
             className="w-full px-3 py-2 border border-rule bg-canvas text-ink font-sans text-xs rounded-xs focus:outline-none focus:border-ink"
-            placeholder="Explain the commercial or operational justification for this decision (minimum 10 characters)..."
+            placeholder="Why are you making this decision? (minimum 10 characters)"
           />
         </div>
 
@@ -213,9 +213,9 @@ export const ReviewActionForm: React.FC<ReviewActionFormProps> = ({
           className="w-full py-2.5 bg-ink hover:bg-ink/90 text-canvas font-medium text-xs rounded-xs transition-colors disabled:opacity-50 flex items-center justify-center gap-2 cursor-pointer"
         >
           {isSubmitting ? (
-            <span>Recording to ledger...</span>
+            <span>Saving decision...</span>
           ) : (
-            <span>Record review decision</span>
+            <span>Save decision</span>
           )}
         </button>
       </form>

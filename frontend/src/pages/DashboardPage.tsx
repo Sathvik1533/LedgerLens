@@ -5,14 +5,14 @@ import { ReconciliationStats } from '../types/api';
 import { RollingNumberTicker } from '../components/ui/RollingNumberTicker';
 
 const EXCEPTION_LABELS: Record<string, string> = {
-  amount_mismatch: 'Amount mismatch',
-  fee_mismatch: 'Fee / tax mismatch',
-  missing_settlement: 'Missing settlement',
-  missing_bank_credit: 'Missing bank credit',
-  duplicate_payment: 'Duplicate payment',
-  duplicate_bank_credit: 'Duplicate bank credit',
-  partial_refund_not_reflected: 'Partial refund not reflected',
-  ambiguous_match: 'Ambiguous candidate match',
+  amount_mismatch: 'Amounts do not match',
+  fee_mismatch: 'Provider fee or tax is different',
+  missing_settlement: 'Missing provider payout',
+  missing_bank_credit: 'Bank payment not received',
+  duplicate_payment: 'Customer may have paid twice',
+  duplicate_bank_credit: 'Bank payment may appear twice',
+  partial_refund_not_reflected: 'Refund is missing from the payout',
+  ambiguous_match: 'More than one possible match',
 };
 
 export const DashboardPage: React.FC = () => {
@@ -45,7 +45,7 @@ export const DashboardPage: React.FC = () => {
       await triggerReconciliationRun();
       await loadStats();
     } catch (err: any) {
-      alert(`Reconciliation run failed: ${err.message || 'Error executing cycle'}`);
+      alert(`Record comparison failed: ${err.message || 'Error executing cycle'}`);
     } finally {
       setIsRunning(false);
     }
@@ -59,13 +59,13 @@ export const DashboardPage: React.FC = () => {
           <div className="flex items-center gap-2 text-xs font-mono text-ink-secondary">
             <span>FINANCIAL OPERATIONS OVERVIEW</span>
             <span>&bull;</span>
-            <span className="text-ledger-green font-medium">Four-Source Active Parity</span>
+            <span className="text-ledger-green font-medium">Four Records Compared</span>
           </div>
           <h1 className="font-editorial text-3xl sm:text-4xl font-medium text-ink">
-            Reconciliation status & ledger health
+            Records compared &amp; open cases
           </h1>
           <p className="text-xs sm:text-sm text-ink-secondary font-sans leading-relaxed max-w-2xl">
-            Live overview of transactions processed through the deterministic reconciliation engine. Inspect matched volumes and surfaced variances.
+            Live overview of records checked across payments, provider payouts, refunds, and bank credits.
           </p>
         </div>
 
@@ -83,7 +83,7 @@ export const DashboardPage: React.FC = () => {
             className="px-4 py-2 bg-ink hover:bg-ink/90 text-canvas text-xs font-medium rounded-xs transition-colors disabled:opacity-50 flex items-center gap-2"
           >
             <span className={`w-1.5 h-1.5 rounded-full ${isRunning ? 'bg-brass animate-ping' : 'bg-ledger-green'}`} />
-            <span>{isRunning ? 'Reconciling...' : 'Reconcile new records'}</span>
+            <span>{isRunning ? 'Comparing...' : 'Compare the records'}</span>
           </button>
         </div>
       </div>
@@ -105,7 +105,7 @@ export const DashboardPage: React.FC = () => {
             onClick={loadStats}
             className="px-3 py-1.5 bg-ink text-canvas text-xs font-medium rounded-xs hover:bg-ink/90"
           >
-            Retry metrics query
+            Retry query
           </button>
         </div>
       )}
@@ -120,62 +120,62 @@ export const DashboardPage: React.FC = () => {
                 <div className="flex items-center gap-2">
                   <span className="w-2 h-2 rounded-full bg-critical animate-pulse" />
                   <span className="text-[11px] font-mono uppercase tracking-wider text-critical font-semibold">
-                    Action Required &bull; Review Queue
+                    Action Required &bull; Cases Waiting for Decision
                   </span>
                 </div>
                 <p className="text-xs sm:text-sm font-sans text-ink">
-                  <strong className="font-semibold">{stats.needs_review_count} exception{stats.needs_review_count === 1 ? '' : 's'}</strong> awaiting human sign-off ({stats.total_amount_at_risk ? `₹${parseFloat(stats.total_amount_at_risk).toLocaleString('en-IN', { minimumFractionDigits: 2 })}` : '₹0.00'} total exposure).
+                  <strong className="font-semibold">{stats.needs_review_count} case{stats.needs_review_count === 1 ? '' : 's'}</strong> needing human attention ({stats.total_amount_at_risk ? `₹${parseFloat(stats.total_amount_at_risk).toLocaleString('en-IN', { minimumFractionDigits: 2 })}` : '₹0.00'} money in open cases).
                 </p>
               </div>
               <Link
                 to="/app/queue"
                 className="inline-flex items-center justify-center gap-1.5 px-4 py-2 bg-critical text-canvas text-xs font-medium rounded-xs hover:bg-critical/90 transition-colors shrink-0 shadow-subtle"
               >
-                <span>Open highest-risk exception</span>
+                <span>Review cases</span>
                 <span>&rarr;</span>
               </Link>
             </div>
           )}
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {/* Clean Match Parity */}
-            <div className="border border-rule bg-surface p-5 space-y-2 rounded-xs shadow-subtle">
-              <span className="text-[11px] font-mono uppercase text-ink-secondary block">
-                Deterministic Parity Rate
-              </span>
-              <div className="text-3xl font-semibold text-ink">
-                <RollingNumberTicker value={stats.match_rate_percentage} decimals={1} />%
-              </div>
-              <div className="text-xs text-ledger-green font-medium flex items-center gap-1.5">
-                <span>✓</span>
-                <span>
-                  <RollingNumberTicker value={stats.auto_reconciled_count} /> of{' '}
-                  <RollingNumberTicker value={stats.total_cases} /> transactions matched cleanly
+          {/* Zero State Notice Banner */}
+          {stats.total_cases === 0 && (
+            <div data-testid="no-run-banner" className="p-6 bg-canvas border border-dashed border-rule rounded-xs text-center space-y-3 shadow-subtle">
+              <div className="w-2.5 h-2.5 rounded-full bg-brass mx-auto" />
+              <div className="space-y-1">
+                <span className="text-[11px] font-mono uppercase tracking-wider text-ink-secondary block">
+                  Status &bull; Awaiting Record Check
                 </span>
+                <h2 className="font-editorial text-2xl font-medium text-ink">
+                  No reconciliation run active
+                </h2>
+                <p className="text-xs text-ink-secondary font-sans max-w-lg mx-auto leading-relaxed">
+                  No source files have been compared yet. Bring in source files or load demo data, then compare the records to see matched rates and cases needing attention.
+                </p>
+              </div>
+              <div className="pt-2 flex items-center justify-center gap-3">
+                <button
+                  onClick={handleRunRecon}
+                  disabled={isRunning}
+                  className="px-4 py-2 bg-ink hover:bg-ink/90 text-canvas text-xs font-medium rounded-xs transition-colors disabled:opacity-50 inline-flex items-center gap-2"
+                >
+                  <span className={`w-1.5 h-1.5 rounded-full ${isRunning ? 'bg-brass animate-ping' : 'bg-ledger-green'}`} />
+                  <span>{isRunning ? 'Comparing...' : 'Compare the records'}</span>
+                </button>
+                <Link
+                  to="/app/ingestion"
+                  className="px-3.5 py-2 border border-rule bg-surface hover:bg-canvas text-ink text-xs font-medium rounded-xs transition-colors"
+                >
+                  Bring in source files &rarr;
+                </Link>
               </div>
             </div>
+          )}
 
-            {/* Reconciled Volume */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {/* Money in open cases */}
             <div className="border border-rule bg-surface p-5 space-y-2 rounded-xs shadow-subtle">
               <span className="text-[11px] font-mono uppercase text-ink-secondary block">
-                Reconciled Value
-              </span>
-              <div className="text-3xl font-semibold text-ledger-green">
-                <RollingNumberTicker
-                  value={parseFloat(stats.total_amount_reconciled || '0')}
-                  currency="₹"
-                  decimals={2}
-                />
-              </div>
-              <span className="text-xs text-ink-secondary block font-mono text-[11px]">
-                Four-source parity verified
-              </span>
-            </div>
-
-            {/* Volume Under Review */}
-            <div className="border border-rule bg-surface p-5 space-y-2 rounded-xs shadow-subtle">
-              <span className="text-[11px] font-mono uppercase text-ink-secondary block">
-                Exposure Under Review
+                Money in open cases
               </span>
               <div className="text-3xl font-semibold text-critical">
                 <RollingNumberTicker
@@ -185,14 +185,14 @@ export const DashboardPage: React.FC = () => {
                 />
               </div>
               <Link to="/app/queue" className="text-xs text-link hover:underline block font-medium">
-                <RollingNumberTicker value={stats.needs_review_count} /> exception{stats.needs_review_count === 1 ? '' : 's'} awaiting sign-off &rarr;
+                <RollingNumberTicker value={stats.needs_review_count} /> case{stats.needs_review_count === 1 ? '' : 's'} waiting for decision &rarr;
               </Link>
             </div>
 
-            {/* Four-Source Intake Totals */}
+            {/* Records received */}
             <div className="border border-rule bg-surface p-5 space-y-2 rounded-xs shadow-subtle">
               <span className="text-[11px] font-mono uppercase text-ink-secondary block">
-                Ingested Record Intake
+                Records received
               </span>
               <div className="text-3xl font-semibold text-ink">
                 <RollingNumberTicker
@@ -205,7 +205,41 @@ export const DashboardPage: React.FC = () => {
                 />
               </div>
               <span className="text-xs text-ink-secondary block font-mono text-[11px]">
-                Across all 4 stream feeds
+                Across all 4 source files
+              </span>
+            </div>
+
+            {/* Records matched */}
+            <div className="border border-rule bg-surface p-5 space-y-2 rounded-xs shadow-subtle">
+              <span className="text-[11px] font-mono uppercase text-ink-secondary block">
+                Records matched
+              </span>
+              <div className="text-3xl font-semibold text-ledger-green">
+                <RollingNumberTicker
+                  value={parseFloat(stats.total_amount_reconciled || '0')}
+                  currency="₹"
+                  decimals={2}
+                />
+              </div>
+              <div className="text-xs text-ledger-green font-medium flex items-center gap-1.5">
+                <span>✓</span>
+                <span>
+                  <RollingNumberTicker value={stats.auto_reconciled_count} /> of{' '}
+                  <RollingNumberTicker value={stats.total_cases} /> matched correctly ({stats.match_rate_percentage}%)
+                </span>
+              </div>
+            </div>
+
+            {/* Cases needing attention */}
+            <div className="border border-rule bg-surface p-5 space-y-2 rounded-xs shadow-subtle">
+              <span className="text-[11px] font-mono uppercase text-ink-secondary block">
+                Cases needing attention
+              </span>
+              <div className="text-3xl font-semibold text-ink">
+                <RollingNumberTicker value={stats.needs_review_count} />
+              </div>
+              <span className="text-xs text-ink-secondary block font-mono text-[11px]">
+                Awaiting human decision
               </span>
             </div>
           </div>
@@ -213,39 +247,39 @@ export const DashboardPage: React.FC = () => {
           {/* 3. Four-Source Intake Stream Status */}
           <div className="border border-rule bg-surface p-6 rounded-xs space-y-4">
             <span className="font-editorial text-xl font-medium text-ink block">
-              Four-source stream ingestion summary
+              Source file breakdown
             </span>
 
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-2 text-xs font-mono">
               <div className="p-3 bg-canvas border border-rule rounded-xs space-y-1">
-                <span className="text-ink-secondary block uppercase text-[10px]">1. Captured Payments</span>
+                <span className="text-ink-secondary block uppercase text-[10px]">Payment records</span>
                 <span className="text-lg font-semibold text-ink tabular-nums">{stats.total_payments_count || 0}</span>
-                <span className="text-[10px] text-ink-muted block">Merchant captures</span>
+                <span className="text-[10px] text-ink-muted block">What customers paid</span>
               </div>
               <div className="p-3 bg-canvas border border-rule rounded-xs space-y-1">
-                <span className="text-ink-secondary block uppercase text-[10px]">2. Gateway Settlements</span>
+                <span className="text-ink-secondary block uppercase text-[10px]">Provider payout records</span>
                 <span className="text-lg font-semibold text-ink tabular-nums">{stats.total_settlements_count || 0}</span>
-                <span className="text-[10px] text-ink-muted block">Gateway net payouts</span>
+                <span className="text-[10px] text-ink-muted block">What provider sent</span>
               </div>
               <div className="p-3 bg-canvas border border-rule rounded-xs space-y-1">
-                <span className="text-ink-secondary block uppercase text-[10px]">3. Customer Refunds</span>
+                <span className="text-ink-secondary block uppercase text-[10px]">Refund records</span>
                 <span className="text-lg font-semibold text-ink tabular-nums">{stats.total_refunds_count || 0}</span>
-                <span className="text-[10px] text-ink-muted block">Reversals & chargebacks</span>
+                <span className="text-[10px] text-ink-muted block">Returned to customers</span>
               </div>
               <div className="p-3 bg-canvas border border-rule rounded-xs space-y-1">
-                <span className="text-ink-secondary block uppercase text-[10px]">4. Bank Statement Credits</span>
+                <span className="text-ink-secondary block uppercase text-[10px]">Bank credit records</span>
                 <span className="text-lg font-semibold text-ink tabular-nums">{stats.total_bank_credits_count || 0}</span>
-                <span className="text-[10px] text-ink-muted block">Direct bank transfers</span>
+                <span className="text-[10px] text-ink-muted block">Received by bank</span>
               </div>
             </div>
           </div>
 
           {/* 4. Exception Breakdown by Categorical Type */}
-          {stats.exception_breakdown && Object.keys(stats.exception_breakdown).length > 0 && (
+          {stats.exception_breakdown && Object.keys(stats.exception_breakdown).length > 0 ? (
             <div className="border border-rule bg-surface p-6 rounded-xs space-y-4">
               <div className="flex items-center justify-between border-b border-rule pb-3">
                 <span className="font-editorial text-xl font-medium text-ink">
-                  Exception distribution across active batches
+                  Differences found across active records
                 </span>
                 <Link to="/app/queue" className="text-xs font-mono text-link hover:underline">
                   Open full queue &rarr;
@@ -272,6 +306,21 @@ export const DashboardPage: React.FC = () => {
                     </div>
                   );
                 })}
+              </div>
+            </div>
+          ) : (
+            <div className="border border-rule bg-surface p-6 rounded-xs space-y-4">
+              <div className="flex items-center justify-between border-b border-rule pb-3">
+                <span className="font-editorial text-xl font-medium text-ink">
+                  Differences found across active records
+                </span>
+                <span className="text-xs font-mono text-ink-muted">0 differences found</span>
+              </div>
+              <div className="p-8 text-center border border-dashed border-rule/70 bg-canvas/40 rounded-xs space-y-1">
+                <span className="font-mono text-xs text-ink-secondary block font-medium">No record check active</span>
+                <p className="text-[11px] text-ink-muted max-w-sm mx-auto">
+                  Compare records after bringing in source files to see differences and open cases needing human attention.
+                </p>
               </div>
             </div>
           )}

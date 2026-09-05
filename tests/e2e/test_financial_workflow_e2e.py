@@ -278,3 +278,201 @@ def test_four_source_financial_workflow_e2e(client, db_session):
     assert db_session.get(ReconciliationCaseModel, c2.id).version == 2
     assert db_session.query(HumanReviewActionModel).filter_by(case_id=c2.id).count() == 1
     assert db_session.query(AuditEventModel).filter_by(case_id=c2.id).count() == 1
+
+
+@pytest.mark.e2e
+@pytest.mark.integration
+def test_truthful_state_transition_full_cycle(client, db_session):
+    """
+    Verifies the complete truthful state transition cycle:
+    1. Confirm real zero state (0 records, 0 metrics, has_run=False, empty queue, empty feeds).
+    2. Load known synthetic 4-source fixture (seed=42, 60 records).
+    3. Run deterministic reconciliation.
+    4. Confirm non-zero computed metrics (70% parity, reconciled value, exposure, 6 exception types).
+    5. Confirm review queue (18 cases), representative case evidence, and operator sign-off.
+    6. Confirm append-only audit event persistence.
+    7. Clean up test database and verify return to zero state.
+    """
+    from tests.conftest import create_test_user_session
+    from tests.evaluation.generator_fixture import generate_evaluation_dataset
+
+    token, user = create_test_user_session(db_session, role="reviewer", email="transition_lead@ledgerlens.internal")
+    client.cookies.set("ledgerlens_session", token)
+
+    # ── Phase 1: Confirm Real Zero Backend State ─────────────────────────────
+    # Overview / Stats
+    res_stats_zero = client.get("/api/v1/reconciliation/stats")
+    assert res_stats_zero.status_code == 200
+    stats_zero = res_stats_zero.json()
+    assert stats_zero["total_payments_count"] == 0
+    assert stats_zero["total_settlements_count"] == 0
+    assert stats_zero["total_refunds_count"] == 0
+    assert stats_zero["total_bank_credits_count"] == 0
+    assert stats_zero["total_cases"] == 0
+    assert stats_zero["auto_reconciled_count"] == 0
+    assert stats_zero["needs_review_count"] == 0
+    assert stats_zero["unresolved_count"] == 0
+    assert stats_zero["match_rate_percentage"] == 0.0
+    assert stats_zero["total_amount_reconciled"] == "0.00"
+    assert stats_zero["total_amount_at_risk"] == "0.00"
+    assert stats_zero["exception_breakdown"] == {}
+    assert stats_zero["has_run"] is False
+
+    # Review Queue
+    res_queue_zero = client.get("/api/v1/review/queue")
+    assert res_queue_zero.status_code == 200
+    queue_zero = res_queue_zero.json()
+    assert queue_zero["total_cases"] == 0
+    assert len(queue_zero["cases"]) == 0
+    assert queue_zero["total_amount_at_risk"] == "0.00"
+
+    # Ingestion Feeds Status
+    res_ingest_zero = client.get("/api/v1/ingestion/status")
+    assert res_ingest_zero.status_code == 200
+    ingest_zero = res_ingest_zero.json()
+    assert ingest_zero["feeds"]["payments"]["count"] == 0
+    assert ingest_zero["feeds"]["settlements"]["count"] == 0
+    assert ingest_zero["feeds"]["refunds"]["count"] == 0
+    assert ingest_zero["feeds"]["bank_credits"]["count"] == 0
+    assert len(ingest_zero["batches"]) == 0
+
+    # ── Phase 2: Load Known Synthetic Four-Source Fixture ────────────────────
+    csv_streams, meta = generate_evaluation_dataset(total_records=60, seed=42)
+
+    # Ingest Payments (60 valid, 1 malformed rejected)
+    res_p = client.post(
+        "/api/v1/ingestion/payments",
+        files={"file": ("payments.csv", io.BytesIO(csv_streams["payments"].encode("utf-8")), "text/csv")},
+    )
+    assert res_p.status_code == 201
+    assert res_p.json()["row_count_accepted"] == 60
+
+    # Ingest Settlements (58 valid)
+    res_s = client.post(
+        "/api/v1/ingestion/settlements",
+        files={"file": ("settlements.csv", io.BytesIO(csv_streams["settlements"].encode("utf-8")), "text/csv")},
+    )
+    assert res_s.status_code == 201
+    assert res_s.json()["row_count_accepted"] == 58
+
+    # Ingest Refunds (3 valid)
+    res_r = client.post(
+        "/api/v1/ingestion/refunds",
+        files={"file": ("refunds.csv", io.BytesIO(csv_streams["refunds"].encode("utf-8")), "text/csv")},
+    )
+    assert res_r.status_code == 201
+    assert res_r.json()["row_count_accepted"] == 3
+
+    # Ingest Bank Credits (54 valid)
+    res_b = client.post(
+        "/api/v1/ingestion/bank-credits",
+        files={"file": ("bank_credits.csv", io.BytesIO(csv_streams["bank_credits"].encode("utf-8")), "text/csv")},
+    )
+    assert res_b.status_code == 201
+    assert res_b.json()["row_count_accepted"] == 54
+
+    # Confirm feeds updated in ingestion status
+    res_ingest_updated = client.get("/api/v1/ingestion/status")
+    assert res_ingest_updated.status_code == 200
+    ingest_updated = res_ingest_updated.json()
+    assert ingest_updated["feeds"]["payments"]["count"] == 60
+    assert ingest_updated["feeds"]["settlements"]["count"] == 58
+    assert ingest_updated["feeds"]["refunds"]["count"] == 3
+    assert ingest_updated["feeds"]["bank_credits"]["count"] == 54
+    assert len(ingest_updated["batches"]) == 4
+
+    # ── Phase 3: Run Multi-Source Deterministic Reconciliation ────────────────
+    res_run = client.post("/api/v1/reconciliation/run", headers={"Content-Type": "application/json"})
+    assert res_run.status_code == 200
+    run_data = res_run.json()
+    assert run_data["total_payments_processed"] == 60
+    assert run_data["auto_reconciled_count"] == 42
+    assert run_data["needs_review_count"] == 18
+    assert run_data["match_rate_percentage"] == 70.0
+
+    # ── Phase 4: Confirm Non-Zero Computed Metrics (After) ───────────────────
+    res_stats_after = client.get("/api/v1/reconciliation/stats")
+    assert res_stats_after.status_code == 200
+    stats_after = res_stats_after.json()
+    assert stats_after["total_payments_count"] == 60
+    assert stats_after["total_cases"] == 60
+    assert stats_after["auto_reconciled_count"] == 42
+    assert stats_after["needs_review_count"] == 18
+    assert stats_after["unresolved_count"] == 0
+    assert stats_after["match_rate_percentage"] == 70.0
+    assert Decimal(stats_after["total_amount_reconciled"]) > Decimal("0.00")
+    assert Decimal(stats_after["total_amount_at_risk"]) > Decimal("0.00")
+    assert stats_after["has_run"] is True
+
+    # Confirm 6 active exception categories from fixture
+    exc_breakdown = stats_after["exception_breakdown"]
+    assert exc_breakdown.get("amount_mismatch") == 4
+    assert exc_breakdown.get("missing_bank_credit") == 4
+    assert exc_breakdown.get("partial_refund_not_reflected") == 3
+    assert exc_breakdown.get("fee_mismatch") == 3
+    assert exc_breakdown.get("duplicate_payment") == 2
+    assert exc_breakdown.get("missing_settlement") == 2
+
+    # ── Phase 5: Confirm Review Queue Cases & Evidence Dossier ───────────────
+    res_queue_after = client.get("/api/v1/review/queue")
+    assert res_queue_after.status_code == 200
+    queue_after = res_queue_after.json()
+    assert queue_after["total_cases"] == 18
+    assert len(queue_after["cases"]) == 18
+    assert Decimal(queue_after["total_amount_at_risk"]) > Decimal("0.00")
+
+    first_case = queue_after["cases"][0]
+    target_case_id = first_case["case_id"]
+
+    # Retrieve Case Evidence
+    res_evidence = client.get(f"/api/v1/review/cases/{target_case_id}")
+    assert res_evidence.status_code == 200
+    evidence = res_evidence.json()
+    assert evidence["case_id"] == target_case_id
+    assert evidence["payment_id"] is not None
+    assert evidence["payment"] is not None
+    assert evidence["version"] == 1
+
+    # ── Phase 6: Human Review Sign-Off & Append-Only Audit Trail ─────────────
+    review_res = client.post(
+        f"/api/v1/review/cases/{target_case_id}/review",
+        json={
+            "actor": "transition_lead@ledgerlens.internal",
+            "action": "approve",
+            "expected_version": 1,
+            "human_comment": "Verified multi-source trace. Cleared variance for state transition test.",
+        }
+    )
+    assert review_res.status_code == 200
+    review_receipt = review_res.json()
+    assert review_receipt["current_version"] == 2
+    assert review_receipt["new_decision_status"] == "auto_reconciled"
+    assert review_receipt["audit_event_id"] is not None
+
+    # Verify Audit Trail for Case
+    res_case_audit = client.get(f"/api/v1/review/cases/{target_case_id}/audit")
+    assert res_case_audit.status_code == 200
+    case_audit = res_case_audit.json()
+    assert len(case_audit) == 1
+    assert case_audit[0]["event_type"] == "human_approved"
+    assert case_audit[0]["actor"] == "transition_lead@ledgerlens.internal"
+
+    # Verify Global Audit Log
+    res_all_audit = client.get("/api/v1/review/audit/all")
+    assert res_all_audit.status_code == 200
+    assert len(res_all_audit.json()) >= 1
+
+    # ── Phase 7: Clean Up Test Database & Verify Return to Zero State ────────
+    db_session.rollback()
+    from tests.conftest import truncate_all_tables
+    truncate_all_tables()
+
+    # Re-create session since truncate removes user_sessions & users
+    token_clean, _ = create_test_user_session(db_session, role="reviewer", email="transition_lead@ledgerlens.internal")
+    client.cookies.set("ledgerlens_session", token_clean)
+
+    res_stats_cleaned = client.get("/api/v1/reconciliation/stats")
+    assert res_stats_cleaned.status_code == 200
+    assert res_stats_cleaned.json()["total_payments_count"] == 0
+    assert res_stats_cleaned.json()["total_cases"] == 0
+    assert res_stats_cleaned.json()["has_run"] is False

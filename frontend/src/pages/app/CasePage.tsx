@@ -118,7 +118,7 @@ export const CaseDetailPage: React.FC<CaseDetailPageProps> = ({ caseId: propCase
             <span>&larr; Review queue</span>
           </button>
           <span>/</span>
-          <span>Dossier</span>
+          <span>Case</span>
           <span>/</span>
           <span className="text-ink font-semibold">{evidence.case_id}</span>
         </div>
@@ -126,7 +126,7 @@ export const CaseDetailPage: React.FC<CaseDetailPageProps> = ({ caseId: propCase
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div>
             <span className="text-xs font-mono uppercase tracking-wider text-ink-secondary block">
-              Case Investigation Dossier
+              Case review
             </span>
             <h1 className="font-editorial text-3xl font-medium text-ink mt-0.5">
               Payment {evidence.payment_id}
@@ -137,11 +137,11 @@ export const CaseDetailPage: React.FC<CaseDetailPageProps> = ({ caseId: propCase
                 className="hover:text-ink flex items-center gap-1 underline decoration-dotted"
                 title="Click to copy case ID"
               >
-                <span>UUID: {evidence.case_id}</span>
+                <span>ID: {evidence.case_id}</span>
                 {copied && <span className="text-ledger-green">✓ copied</span>}
               </button>
               <span>&bull;</span>
-              <span>Ledger Version: v{evidence.version}</span>
+              <span>Version v{evidence.version}</span>
               {evidence.case_opened_at && (
                 <>
                   <span>&bull;</span>
@@ -156,7 +156,7 @@ export const CaseDetailPage: React.FC<CaseDetailPageProps> = ({ caseId: propCase
               onClick={loadCaseData}
               className="px-3 py-1.5 border border-rule bg-surface hover:bg-canvas text-xs font-mono text-ink rounded-xs transition-colors"
             >
-              Refresh case records
+              Refresh records
             </button>
           </div>
         </div>
@@ -166,16 +166,16 @@ export const CaseDetailPage: React.FC<CaseDetailPageProps> = ({ caseId: propCase
       <div className="p-4 border border-rule bg-surface rounded-xs shadow-subtle flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div className="space-y-0.5">
           <span className="text-[10px] font-mono uppercase tracking-wider text-ink-secondary block">
-            Plain-Language Finding
+            What is different?
           </span>
           <p className="text-xs sm:text-sm font-sans text-ink leading-relaxed">
             {evidence.settlement_discrepancy && parseFloat(evidence.settlement_discrepancy) !== 0
-              ? `₹${Math.abs(parseFloat(evidence.settlement_discrepancy)).toLocaleString('en-IN', { minimumFractionDigits: 2 })} difference surfaced between expected calculation and reported settlement payout.`
-              : `Discrepancy identified under invariant rule "${evidence.exception_type || 'unclassified'}". Review the four-source evidence below.`}
+              ? `₹${Math.abs(parseFloat(evidence.settlement_discrepancy)).toLocaleString('en-IN', { minimumFractionDigits: 2 })} difference found between expected payout and reported provider payout.`
+              : `A rule found a difference under "${evidence.exception_type || 'unclassified'}". Review the four financial records below.`}
           </p>
         </div>
         <span className="text-[11px] font-mono px-2 py-0.5 bg-canvas border border-rule text-ink-secondary rounded-xs shrink-0 self-start sm:self-auto">
-          Status: {evidence.decision_status || 'needs_review'}
+          Status: {evidence.decision_status === 'needs_review' ? 'Needs a human decision' : evidence.decision_status || 'Needs a human decision'}
         </span>
       </div>
 
@@ -184,10 +184,10 @@ export const CaseDetailPage: React.FC<CaseDetailPageProps> = ({ caseId: propCase
         <div data-testid="review-receipt-banner" className="p-4 bg-ledger-green/10 border border-ledger-green/30 rounded-xs flex items-center justify-between gap-4 text-xs font-mono text-ink">
           <div>
             <strong className="text-ledger-green block">
-              ✓ Decision permanently recorded to ledger
+              ✓ Decision saved to review history
             </strong>
             <span className="text-ink-secondary text-[11px]">
-              Receipt {receiptBanner.review_action_id} &bull; Signer: {receiptBanner.actor} &bull; Result: {receiptBanner.new_decision_status}
+              Receipt {receiptBanner.review_action_id} &bull; Reviewer: {receiptBanner.actor} &bull; Result: {receiptBanner.new_decision_status}
             </span>
           </div>
           <button
@@ -205,7 +205,7 @@ export const CaseDetailPage: React.FC<CaseDetailPageProps> = ({ caseId: propCase
         <div className="space-y-6">
           <div className="space-y-2">
             <span className="text-[11px] font-mono text-ink-secondary uppercase tracking-wider block">
-              Continuous Trace Alignment
+              Four records checked
             </span>
             <LedgerTraceA 
               evidence={evidence}

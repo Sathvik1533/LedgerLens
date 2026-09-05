@@ -33,29 +33,29 @@ export const SettingsPage: React.FC = () => {
       {/* 1. Masthead */}
       <div className="space-y-1 border-b border-rule pb-6">
         <div className="flex items-center gap-2 text-xs font-mono text-ink-secondary">
-          <span>OPERATIONAL GOVERNANCE</span>
+          <span>SETTINGS</span>
           <span>&bull;</span>
-          <span className="text-ink font-semibold">Contract Parameters</span>
+          <span className="text-ink font-semibold">Approved Rules &amp; Thresholds</span>
         </div>
         <h1 className="font-editorial text-3xl sm:text-4xl font-medium text-ink">
-          Contract settings & reconciliation invariants
+          Approved rules &amp; settings
         </h1>
         <p className="text-xs sm:text-sm text-ink-secondary font-sans max-w-2xl leading-relaxed">
-          Define commercial gateway fee structures, statutory tax rates, and mathematical parity thresholds applied during continuous batch reconciliation.
+          Define provider fee rates, tax rates, difference thresholds, and policy matching rules applied when comparing records.
         </p>
       </div>
 
       {/* 2. Typographic Formula Centerpiece */}
       <div className="border border-rule bg-surface p-8 rounded-xs space-y-4 shadow-subtle">
         <span className="text-[11px] font-mono uppercase text-ink-secondary block tracking-wider">
-          Contractual Settlement Invariant
+          How expected payout is calculated
         </span>
         <div className="font-editorial text-2xl sm:text-3xl text-ink leading-relaxed">
-          Net Settlement = Gross Payment &minus; [Fee ({feeRate}%) + GST ({gstRate}% of Fee)] &minus; Customer Refunds
+          Expected Payout = Customer Payment &minus; [Fee ({feeRate}%) + Tax ({gstRate}% of Fee)] &minus; Customer Refunds
         </div>
         <div className="text-xs font-mono text-ink-secondary border-t border-rule/60 pt-3 flex flex-wrap justify-between items-center gap-2">
-          <span>Discrepancy threshold: |Reported Net &minus; Expected Net| &gt; ₹{tolerance}</span>
-          <span className="text-ledger-green font-medium">Float-Free Decimal Arithmetic Enforced</span>
+          <span>Difference threshold: |Reported Payout &minus; Expected Payout| &gt; ₹{tolerance}</span>
+          <span className="text-ledger-green font-medium">Exact Decimal Arithmetic Enforced</span>
         </div>
       </div>
 
@@ -63,10 +63,10 @@ export const SettingsPage: React.FC = () => {
       <form onSubmit={handleSave} className="border border-rule bg-surface p-8 rounded-xs space-y-6 shadow-subtle">
         <div className="border-b border-rule pb-3 flex justify-between items-center">
           <span className="font-editorial text-xl font-medium text-ink">
-            Commercial agreement terms
+            Approved commercial terms
           </span>
           <span className="text-[11px] font-mono text-ink-secondary">
-            Contract Ref: SOP-2026-COMM-01
+            Rule Ref: SOP-2026-COMM-01
           </span>
         </div>
 
@@ -74,7 +74,7 @@ export const SettingsPage: React.FC = () => {
           {/* Fee Rate */}
           <div className="space-y-1.5">
             <label className="text-[11px] font-mono uppercase text-ink-secondary block">
-              Standard Gateway Fee Rate (%)
+              Provider Fee Rate (%)
             </label>
             <div className="relative">
               <input
@@ -90,14 +90,14 @@ export const SettingsPage: React.FC = () => {
               <span className="absolute right-3 top-1/2 -translate-y-1/2 font-mono text-ink-secondary text-xs">%</span>
             </div>
             <p className="text-[11px] text-ink-secondary">
-              Applied directly to merchant gross payment captured.
+              Applied directly to the customer payment amount.
             </p>
           </div>
 
           {/* GST Rate */}
           <div className="space-y-1.5">
             <label className="text-[11px] font-mono uppercase text-ink-secondary block">
-              GST on Gateway Processing Fee (%)
+              Tax on Provider Fee (%)
             </label>
             <div className="relative">
               <input
@@ -113,14 +113,14 @@ export const SettingsPage: React.FC = () => {
               <span className="absolute right-3 top-1/2 -translate-y-1/2 font-mono text-ink-secondary text-xs">%</span>
             </div>
             <p className="text-[11px] text-ink-secondary">
-              Statutory tax levied exclusively on the processing fee amount.
+              Tax applied to the provider fee.
             </p>
           </div>
 
           {/* Tolerance */}
           <div className="space-y-1.5">
             <label className="text-[11px] font-mono uppercase text-ink-secondary block">
-              Discrepancy Variance Tolerance (₹)
+              Allowed difference before flagging (₹)
             </label>
             <div className="relative">
               <input
@@ -136,14 +136,14 @@ export const SettingsPage: React.FC = () => {
               <span className="absolute right-3 top-1/2 -translate-y-1/2 font-mono text-ink-secondary text-xs">₹</span>
             </div>
             <p className="text-[11px] text-ink-secondary">
-              Any settlement variance exceeding this amount flags an exception case.
+              Any payout difference exceeding this amount flags a case for human review.
             </p>
           </div>
 
           {/* Policy Confidence Floor */}
           <div className="space-y-1.5">
             <label className="text-[11px] font-mono uppercase text-ink-secondary block">
-              Policy Match Threshold (Grounding Floor)
+              Policy helper match threshold
             </label>
             <input
               type="number"
@@ -156,7 +156,7 @@ export const SettingsPage: React.FC = () => {
               className="w-full px-3.5 py-2 border border-rule bg-canvas text-ink font-mono text-xs rounded-xs focus:outline-none focus:border-ink"
             />
             <p className="text-[11px] text-ink-secondary">
-              Minimum semantic similarity required before policy citations are surfaced.
+              Minimum match confidence required before an approved rule is suggested.
             </p>
           </div>
         </div>
@@ -164,7 +164,7 @@ export const SettingsPage: React.FC = () => {
         <div className="border-t border-rule pt-4 flex flex-wrap justify-between items-center gap-4">
           <div className="text-[11px] font-mono text-ink-secondary">
             {isSaved ? (
-              <span className="text-ledger-green font-medium">✓ Contract parameters updated and stored in operator session</span>
+              <span className="text-ledger-green font-medium">✓ Settings updated and stored for this session</span>
             ) : (
               <span>Values persist across browser sessions</span>
             )}
@@ -174,7 +174,7 @@ export const SettingsPage: React.FC = () => {
             type="submit"
             className="px-5 py-2.5 bg-ink hover:bg-ink/90 text-canvas font-medium text-xs rounded-xs transition-colors"
           >
-            Update contract rates
+            Save settings
           </button>
         </div>
       </form>

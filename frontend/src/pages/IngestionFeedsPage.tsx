@@ -6,35 +6,35 @@ import { TactileSegmentedControl, TabOption } from '../components/ui/TactileSegm
 const FEEDS = [
   {
     id: 'payments' as const,
-    label: '1. Merchant Payments',
-    description: 'Captured payments feed (payment_id, order_id, amount, currency, timestamp)',
+    label: '1. Customer Payments',
+    description: 'Records of payments made by customers',
     schema: 'payment_id, order_id, merchant_id, amount, currency, status, payment_timestamp',
   },
   {
     id: 'settlements' as const,
-    label: '2. Gateway Settlements',
-    description: 'Gateway payout batch items (settlement_id, gross, fee, tax, net payout)',
+    label: '2. Provider Payouts',
+    description: 'Records of payouts reported by the payment provider',
     schema: 'settlement_id, gross_payment_amount, fee_amount, tax_amount, net_settlement_amount, settlement_status, settlement_timestamp',
   },
   {
     id: 'refunds' as const,
     label: '3. Customer Refunds',
-    description: 'Reversals and partial refunds (refund_id, payment_id, refund_amount, refund_type)',
+    description: 'Records of refunds returned to customers',
     schema: 'refund_id, payment_id, order_id, refund_amount, currency, refund_status, refund_timestamp, refund_type',
   },
   {
     id: 'bank-credits' as const,
     label: '4. Bank Statement Credits',
-    description: 'Direct institutional credits (bank_credit_id, bank_reference/UTR, credited_amount)',
+    description: 'Records of credits appearing on the bank statement',
     schema: 'bank_credit_id, bank_account_id, bank_name, bank_reference, credited_amount, currency, bank_credit_timestamp, bank_credit_status',
   },
 ];
 
 const FEED_TAB_OPTIONS: TabOption<'payments' | 'settlements' | 'refunds' | 'bank-credits'>[] = [
-  { id: 'payments', label: '1. Payments' },
-  { id: 'settlements', label: '2. Settlements' },
-  { id: 'refunds', label: '3. Refunds' },
-  { id: 'bank-credits', label: '4. Bank Credits' },
+  { id: 'payments', label: '1. Customer Payments' },
+  { id: 'settlements', label: '2. Provider Payouts' },
+  { id: 'refunds', label: '3. Customer Refunds' },
+  { id: 'bank-credits', label: '4. Bank Statement Credits' },
 ];
 
 export const IngestionFeedsPage: React.FC = () => {
@@ -98,15 +98,15 @@ export const IngestionFeedsPage: React.FC = () => {
       {/* 1. Masthead */}
       <div className="space-y-1 border-b border-rule pb-6">
         <div className="flex items-center gap-2 text-xs font-mono text-ink-secondary">
-          <span>FOUR-SOURCE INTAKE CONTROLS</span>
+          <span>SOURCE FILES</span>
           <span>&bull;</span>
-          <span className="text-ink font-semibold">Idempotent Batch Processing</span>
+          <span className="text-ink font-semibold">Safe upload without duplicates</span>
         </div>
         <h1 className="font-editorial text-3xl sm:text-4xl font-medium text-ink">
-          Ingestion feeds & source intake
+          Bring in source files
         </h1>
         <p className="text-xs sm:text-sm text-ink-secondary font-sans max-w-2xl leading-relaxed">
-          Upload raw source CSV files for merchant payments, gateway settlements, customer refunds, and bank statements. Duplicate submissions are safely replayed via idempotency keys without mutating ledger facts.
+          Upload your source CSV files for customer payments, provider payouts, customer refunds, and bank statements. Upload protection ensures duplicate files cannot be imported twice.
         </p>
       </div>
 
@@ -159,10 +159,10 @@ export const IngestionFeedsPage: React.FC = () => {
         <div className="border border-rule bg-surface p-6 rounded-xs space-y-5 shadow-subtle">
           <div className="border-b border-rule pb-3 space-y-0.5">
             <span className="font-editorial text-xl font-medium text-ink block">
-              Submit batch for {activeFeedMeta.label}
+              Upload {activeFeedMeta.label}
             </span>
             <span className="text-xs text-ink-secondary font-mono">
-              Enforcing ACID persistence and source deduplication
+              All records save together or none do, with a duplicate-file check
             </span>
           </div>
 
@@ -172,7 +172,7 @@ export const IngestionFeedsPage: React.FC = () => {
               role="alert"
               className="p-3.5 bg-critical/10 border border-critical/40 rounded-xs text-xs text-critical font-mono"
             >
-              <strong>Validation Notice:</strong> {validationError}
+              <strong>Notice:</strong> {validationError}
             </div>
           )}
 
@@ -184,16 +184,16 @@ export const IngestionFeedsPage: React.FC = () => {
               className="p-4 bg-ledger-green/10 border border-ledger-green/40 rounded-xs space-y-2 text-xs font-mono text-ink"
             >
               <div className="flex items-center justify-between font-semibold text-ledger-green">
-                <span>✓ {uploadResult.status === 'duplicate_replayed' ? 'Duplicate Batch Replayed' : 'Batch Ingested Successfully'}</span>
-                <span>Batch: {uploadResult.batch_id}</span>
+                <span>✓ {uploadResult.status === 'duplicate_replayed' ? 'Duplicate file skipped (records already saved)' : 'Upload complete'}</span>
+                <span>ID: {uploadResult.batch_id}</span>
               </div>
               <div className="text-[11px] text-ink-secondary space-y-1 pt-1 border-t border-ledger-green/20">
                 <div>Accepted rows: <strong className="text-ink">{uploadResult.row_count_accepted ?? uploadResult.accepted_rows ?? uploadResult.total_rows ?? 0}</strong></div>
                 <div>Rejected rows: <strong className="text-ink">{uploadResult.row_count_rejected ?? uploadResult.rejected_rows ?? 0}</strong></div>
-                <div>Idempotency key: {uploadResult.idempotency_key || 'Auto-generated'}</div>
+                <div>Protection key: {uploadResult.idempotency_key || 'Auto-generated'}</div>
                 {uploadResult.status === 'duplicate_replayed' && (
                   <div className="text-brass italic pt-1">
-                    Notice: This exact payload was previously ingested. The existing records were returned without duplicating financial transactions.
+                    Notice: This file was already uploaded earlier. The existing records were kept without creating duplicates.
                   </div>
                 )}
               </div>
@@ -204,7 +204,7 @@ export const IngestionFeedsPage: React.FC = () => {
             {/* File selection */}
             <div className="space-y-1.5">
               <label className="text-[11px] font-mono uppercase text-ink-secondary block">
-                Source CSV Document
+                Choose CSV file
               </label>
               <input
                 type="file"
@@ -226,7 +226,7 @@ export const IngestionFeedsPage: React.FC = () => {
             {/* Optional Idempotency Key */}
             <div className="space-y-1">
               <label className="text-[11px] font-mono uppercase text-ink-secondary block">
-                Batch Idempotency Key (Optional)
+                Upload protection against duplicates (optional)
               </label>
               <input
                 type="text"
@@ -236,7 +236,7 @@ export const IngestionFeedsPage: React.FC = () => {
                 className="w-full px-3 py-1.5 border border-rule bg-canvas text-ink font-mono text-xs rounded-xs focus:outline-none focus:border-ink"
               />
               <span className="text-[10px] text-ink-muted block font-mono">
-                Submitting the same idempotency key prevents duplicate transaction creation.
+                Submitting with a unique key prevents the same records from being imported twice.
               </span>
             </div>
 
@@ -246,7 +246,7 @@ export const IngestionFeedsPage: React.FC = () => {
               disabled={isUploading}
               className="w-full py-2.5 bg-ink hover:bg-ink/90 text-canvas font-medium text-xs rounded-xs transition-colors disabled:opacity-50"
             >
-              {isUploading ? 'Validating & ingesting...' : 'Submit ingestion batch'}
+              {isUploading ? 'Checking and uploading...' : 'Upload records'}
             </button>
           </form>
         </div>
@@ -254,10 +254,10 @@ export const IngestionFeedsPage: React.FC = () => {
         {/* Schema Expectations & Contract Guide */}
         <div className="border border-rule bg-canvas p-6 rounded-xs space-y-4 text-xs font-sans">
           <span className="font-editorial text-lg font-medium text-ink block">
-            Contract schema expectations
+            Expected file format
           </span>
           <p className="text-xs text-ink-secondary leading-relaxed">
-            The deterministic ingestion engine validates header columns and enforces decimal float-free parsing before committing rows to the raw ingestion tables.
+            Files must be in CSV format with the required column headers below. Amounts must have exact numbers.
           </p>
 
           <div className="space-y-1 pt-2 border-t border-rule">
@@ -270,10 +270,10 @@ export const IngestionFeedsPage: React.FC = () => {
           </div>
 
           <div className="space-y-2 pt-2 border-t border-rule text-[11px] text-ink-secondary font-mono">
-            <div>&bull; Float values are strictly prohibited (numeric exact).</div>
-            <div>&bull; Timestamps must follow ISO-8601 with explicit timezone.</div>
-            <div>&bull; Missing required headers rejects the entire batch.</div>
-            <div>&bull; Invalid row amounts are rejected; valid rows continue.</div>
+            <div>&bull; Exact numbers are required for all amounts.</div>
+            <div>&bull; Dates and times should include timezone information.</div>
+            <div>&bull; If required column headers are missing, the file is rejected.</div>
+            <div>&bull; Valid records are saved even if an individual row has an issue.</div>
           </div>
         </div>
       </div>
@@ -283,34 +283,34 @@ export const IngestionFeedsPage: React.FC = () => {
         <div className="border border-rule bg-surface rounded-xs overflow-hidden shadow-subtle space-y-0">
           <div className="p-4 border-b border-rule flex justify-between items-center bg-canvas/60">
             <span className="font-editorial text-lg font-medium text-ink">
-              Recent ingestion batch ledger
+              Recent upload history
             </span>
             <span className="text-xs font-mono text-ink-secondary">
-              {statusData.batches.length} recorded batches
+              {statusData.batches.length} uploads recorded
             </span>
           </div>
 
           <table className="w-full text-left border-collapse text-xs">
             <thead>
               <tr className="border-b border-rule bg-canvas/80 text-[11px] font-mono text-ink-secondary">
-                <th className="py-2.5 px-4 font-normal">Source Type</th>
-                <th className="py-2.5 px-4 font-normal">Batch Identifier</th>
-                <th className="py-2.5 px-4 font-normal">Idempotency Key</th>
+                <th className="py-2.5 px-4 font-normal">Source File</th>
+                <th className="py-2.5 px-4 font-normal">Upload ID</th>
+                <th className="py-2.5 px-4 font-normal">Duplicate Protection Key</th>
                 <th className="py-2.5 px-4 font-normal text-right">Rows</th>
-                <th className="py-2.5 px-4 font-normal text-right">Ingested Timestamp</th>
+                <th className="py-2.5 px-4 font-normal text-right">Uploaded At</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-rule/60">
               {statusData.batches.map((b) => (
                 <tr key={b.id} className="h-[40px] hover:bg-canvas/40 transition-colors font-mono text-[11px]">
                   <td className="py-2 px-4 font-sans text-xs font-medium text-ink">
-                    {b.source_filename || (b.source_tables && b.source_tables.join(', ')) || 'Batch Feed'}
+                    {b.source_filename || (b.source_tables && b.source_tables.join(', ')) || 'Source File'}
                   </td>
                   <td className="py-2 px-4 text-ink-secondary truncate max-w-[140px]">
                     <button
                       onClick={() => copyText(b.id, b.id)}
                       className="hover:text-ink text-link underline"
-                      title="Click to copy batch ID"
+                      title="Click to copy upload ID"
                     >
                       {b.id.slice(0, 8)}...
                     </button>

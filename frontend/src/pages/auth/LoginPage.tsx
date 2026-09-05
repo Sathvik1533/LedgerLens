@@ -92,33 +92,31 @@ export const LoginPage: React.FC = () => {
             {/* Operational Kicker Tag */}
             <div className="inline-flex items-center gap-2 px-2.5 py-1 bg-surface border border-rule rounded-xs text-[11px] font-mono text-ink-secondary shadow-subtle">
               <span className="w-1.5 h-1.5 rounded-full bg-resolved" />
-              <span className="tracking-wider uppercase">Financial Control Room</span>
+              <span className="tracking-wider uppercase">Case Review</span>
             </div>
 
             {/* Editorial Headline & Narrative */}
             <div className="space-y-3.5">
               <h1 className="font-editorial text-3xl sm:text-4xl lg:text-[44px] leading-[1.14] font-normal text-ink tracking-tight">
-                Enter the room where financial records agree—or explain why they do not.
+                When four financial records do not agree, LedgerLens shows where the difference started.
               </h1>
-              <p className="text-sm sm:text-base text-ink-secondary leading-relaxed max-w-2xl">
-                LedgerLens compares payment, settlement, refund, and bank records across four independent sources.
-                When numbers disagree, it shows the exact difference, presents the approved rule, and records
-                a human decision into a permanent ledger.
+              <p className="text-sm sm:text-base text-ink-secondary leading-relaxed max-w-2xl font-sans">
+                LedgerLens compares payments, provider payouts, refunds, and bank credits. When numbers disagree, it shows the exact difference, presents the approved rule, and saves a human decision.
               </p>
             </div>
 
-            {/* Visual Proof Element: Realistic 4-Source Trace Specimen */}
+            {/* Visual Proof Element: Example 4-Source Trace */}
             <div className="border border-rule bg-surface rounded-xs shadow-subtle overflow-hidden">
-              {/* Specimen Header */}
+              {/* Header */}
               <div className="bg-surface-evidence px-4 py-2.5 border-b border-rule flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <span className="w-2 h-2 rounded-full bg-critical animate-pulse" />
                   <span className="text-[11px] font-mono uppercase tracking-wider text-ink font-medium">
-                    Live Trace Specimen • Case 08842
+                    Example case with difference &bull; Case 08842
                   </span>
                 </div>
                 <span className="text-[10px] font-mono text-ink-muted">
-                  HDFC NODAL &bull; BATCH #41
+                  Institutional Bank Statement
                 </span>
               </div>
 
@@ -127,17 +125,17 @@ export const LoginPage: React.FC = () => {
                 {/* Source 1: Payment */}
                 <div className="p-3 sm:px-4 flex items-center justify-between gap-4">
                   <div className="flex items-center gap-2.5 min-w-0">
-                    <span className="text-[10px] uppercase tracking-wider text-ink-muted w-16 shrink-0">1. Payment</span>
+                    <span className="text-[10px] uppercase tracking-wider text-ink-muted w-20 shrink-0">1. Payment</span>
                     <div className="truncate">
-                      <div className="text-ink font-medium truncate">pay_884291_HDFC</div>
-                      <div className="text-[10px] text-ink-secondary font-sans">Payment register entry</div>
+                      <div className="text-ink font-medium truncate">pay_884291</div>
+                      <div className="text-[10px] text-ink-secondary font-sans">What the customer paid</div>
                     </div>
                   </div>
                   <div className="text-right shrink-0">
                     <div className="text-ink font-medium">₹10,000.00</div>
                     <span className="text-[10px] text-resolved inline-flex items-center gap-1 font-sans">
                       <span className="w-1.5 h-1.5 rounded-full bg-resolved" />
-                      Captured gross
+                      Received
                     </span>
                   </div>
                 </div>
@@ -145,10 +143,10 @@ export const LoginPage: React.FC = () => {
                 {/* Source 2: Settlement */}
                 <div className="p-3 sm:px-4 flex items-center justify-between gap-4 bg-canvas/30">
                   <div className="flex items-center gap-2.5 min-w-0">
-                    <span className="text-[10px] uppercase tracking-wider text-ink-muted w-16 shrink-0">2. Settle</span>
+                    <span className="text-[10px] uppercase tracking-wider text-ink-muted w-20 shrink-0">2. Payout</span>
                     <div className="truncate">
-                      <div className="text-ink font-medium truncate">set_77392_NODAL</div>
-                      <div className="text-[10px] text-ink-secondary font-sans">Agreed Fee ₹300.00 + GST ₹86.00</div>
+                      <div className="text-ink font-medium truncate">set_77392</div>
+                      <div className="text-[10px] text-ink-secondary font-sans">What provider sent (Fee ₹300 + GST ₹86)</div>
                     </div>
                   </div>
                   <div className="text-right shrink-0">
@@ -157,34 +155,34 @@ export const LoginPage: React.FC = () => {
                   </div>
                 </div>
 
-                {/* Source 3: Refund (Clear: No refund applies) */}
+                {/* Source 3: Refund */}
                 <div className="p-3 sm:px-4 flex items-center justify-between gap-4">
                   <div className="flex items-center gap-2.5 min-w-0">
-                    <span className="text-[10px] uppercase tracking-wider text-ink-muted w-16 shrink-0">3. Refund</span>
+                    <span className="text-[10px] uppercase tracking-wider text-ink-muted w-20 shrink-0">3. Refund</span>
                     <div className="truncate">
                       <div className="text-ink-secondary truncate">No refund applies</div>
-                      <div className="text-[10px] text-ink-muted font-sans">Pure settlement shortfall — zero deductions</div>
+                      <div className="text-[10px] text-ink-muted font-sans">No customer return requested</div>
                     </div>
                   </div>
                   <div className="text-right shrink-0">
-                    <div className="text-ink-secondary">—</div>
+                    <div className="text-ink-secondary">₹0.00</div>
                     <span className="text-[10px] text-ink-muted font-sans">None</span>
                   </div>
                 </div>
 
-                {/* Source 4: Bank Credit (Variance) */}
+                {/* Source 4: Bank Credit */}
                 <div className="p-3 sm:px-4 flex items-center justify-between gap-4 bg-critical/5 border-l-2 border-l-critical">
                   <div className="flex items-center gap-2.5 min-w-0">
-                    <span className="text-[10px] uppercase tracking-wider text-critical font-medium w-16 shrink-0">4. Bank</span>
+                    <span className="text-[10px] uppercase tracking-wider text-critical font-medium w-20 shrink-0">4. Bank Credit</span>
                     <div className="truncate">
                       <div className="text-ink font-medium truncate">UTR993201488102</div>
-                      <div className="text-[10px] text-critical font-sans">Bank received less than expected</div>
+                      <div className="text-[10px] text-critical font-sans">Money received by the bank is short</div>
                     </div>
                   </div>
                   <div className="text-right shrink-0">
                     <div className="text-critical font-semibold">₹9,464.00</div>
                     <span className="text-[10px] text-critical font-sans font-medium inline-flex items-center gap-1">
-                      Δ -₹150.00 difference
+                      -₹150.00 missing
                     </span>
                   </div>
                 </div>
@@ -194,9 +192,9 @@ export const LoginPage: React.FC = () => {
               <div className="bg-surface-evidence/70 px-4 py-2.5 border-t border-rule text-[11px] flex flex-col sm:flex-row sm:items-center justify-between gap-2 font-sans">
                 <div className="flex items-center gap-1.5 text-ink-secondary">
                   <span className="font-mono text-[10px] bg-canvas border border-rule px-1.5 py-0.5 rounded-xs text-ink font-medium">
-                    SOP-2026-BNK-03 §4.2
+                    Technical reference: SOP-2026-BNK-03
                   </span>
-                  <span>Fee variance over ₹50 requires human sign-off</span>
+                  <span>Difference over ₹50 requires human decision</span>
                 </div>
                 <div className="inline-flex items-center gap-1.5 text-[10px] font-mono text-critical font-medium uppercase tracking-wider">
                   <span className="w-1.5 h-1.5 rounded-full bg-critical" />
@@ -209,18 +207,18 @@ export const LoginPage: React.FC = () => {
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1">
               <div className="border border-rule bg-surface p-3 rounded-xs space-y-1 shadow-subtle">
                 <div className="text-[10px] font-mono uppercase tracking-wider text-ink-secondary">Four Records</div>
-                <div className="text-xs font-medium text-ink">Exact Verification</div>
-                <p className="text-[11px] text-ink-muted leading-tight">Payment, Settlement, Refund, and Bank records checked down to the paisa.</p>
+                <div className="text-xs font-medium text-ink">Checked to the nearest paisa</div>
+                <p className="text-[11px] text-ink-muted leading-tight font-sans">Payments, provider payouts, refunds, and bank credits verified.</p>
               </div>
               <div className="border border-rule bg-surface p-3 rounded-xs space-y-1 shadow-subtle">
                 <div className="text-[10px] font-mono uppercase tracking-wider text-ink-secondary">Approved Guidance</div>
-                <div className="text-xs font-medium text-ink">Governing Rule</div>
-                <p className="text-[11px] text-ink-muted leading-tight">Shows the exact approved policy clause. No invented rules or numbers.</p>
+                <div className="text-xs font-medium text-ink">Guidance for action</div>
+                <p className="text-[11px] text-ink-muted leading-tight font-sans">Shows the approved rule so you know what to check next.</p>
               </div>
               <div className="border border-rule bg-surface p-3 rounded-xs space-y-1 shadow-subtle">
                 <div className="text-[10px] font-mono uppercase tracking-wider text-ink-secondary">Human Authority</div>
-                <div className="text-xs font-medium text-ink">Permanent Record</div>
-                <p className="text-[11px] text-ink-muted leading-tight">A human reviewer decides. The decision cannot be silently changed.</p>
+                <div className="text-xs font-medium text-ink">Saved review history</div>
+                <p className="text-[11px] text-ink-muted leading-tight font-sans">A person decides what to do. The decision is permanently saved.</p>
               </div>
             </div>
           </section>
@@ -236,17 +234,17 @@ export const LoginPage: React.FC = () => {
               <div className="space-y-1.5 border-b border-rule pb-4">
                 <div className="flex items-center justify-between">
                   <span className="text-[10px] sm:text-[11px] font-mono uppercase tracking-wider text-ink-secondary block">
-                    FINANCIAL CONTROL ROOM
+                    Financial case review
                   </span>
                   <span className="text-[10px] font-mono px-2 py-0.5 bg-surface-evidence border border-rule text-ink-secondary rounded-xs">
-                    Synthetic Demo Environment
+                    Demo data only
                   </span>
                 </div>
                 <h2 className="font-editorial text-2xl sm:text-3xl font-medium text-ink">
-                  Enter the control room
+                  Review financial cases
                 </h2>
                 <p className="text-xs text-ink-secondary leading-relaxed">
-                  Sign in to the protected LedgerLens reviewer control room to investigate financial exceptions and preserve human decisions.
+                  Sign in to compare records, read the approved rule, and save a human decision.
                 </p>
               </div>
 
