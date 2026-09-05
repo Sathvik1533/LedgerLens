@@ -2,7 +2,7 @@
   "rewrites": [
     {
       "source": "/api/:path*",
-      "destination": "https://beef-defendant-centered-entered.trycloudflare.com/api/:path*"
+      "destination": "https://rely-yesterday-salmon-postage.trycloudflare.com/api/:path*"
     },
     {
       "source": "/(.*)",
