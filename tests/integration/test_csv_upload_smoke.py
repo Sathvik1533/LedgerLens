@@ -144,7 +144,8 @@ pay_idem_02,600.00,INR,2026-09-04T10:05:00Z
 @pytest.mark.integration
 def test_no_production_database_access():
     """Safety invariant: test environment must point to isolated local test DB ending in _test."""
-    test_db = os.environ.get("TEST_DATABASE_URL", "")
+    from tests.conftest import DEFAULT_TEST_URL
+    test_db = os.environ.get("TEST_DATABASE_URL", DEFAULT_TEST_URL)
     assert test_db != "", "TEST_DATABASE_URL missing"
     assert test_db.rstrip("/").endswith("_test"), "Must end with _test"
     assert "supabase.co" not in test_db.lower(), "Production Supabase forbidden in tests"
