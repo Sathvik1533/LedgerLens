@@ -26,7 +26,7 @@ if config.config_file_name is not None:
 target_metadata = Base.metadata
 
 def run_migrations_offline() -> None:
-    url = os.environ.get("DATABASE_URL", "postgresql://postgres:password@localhost:5432/razorpay_reconciliation")
+    url = os.environ.get("DATABASE_URL", "postgresql://postgres:password@localhost:5432/finance_controller")
     context.configure(
         url=url,
         target_metadata=target_metadata,
@@ -39,7 +39,7 @@ def run_migrations_offline() -> None:
 def run_migrations_online() -> None:
     configuration = config.get_section(config.config_ini_section) or {}
     configuration["sqlalchemy.url"] = os.environ.get(
-        "DATABASE_URL", "postgresql://postgres:password@localhost:5432/razorpay_reconciliation"
+        "DATABASE_URL", "postgresql://postgres:password@localhost:5432/finance_controller"
     )
     connectable = engine_from_config(
         configuration,
