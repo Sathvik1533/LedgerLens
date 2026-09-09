@@ -19,7 +19,7 @@ The project is deliberately narrow. It does not try to be a general chatbot, a f
 | Is the AI safe in a financial workflow? | Deterministic arithmetic owns financial truth; RAG is read-only and evidence-grounded |
 | Can a human operate it? | Queue triage, plain-language reason, four-source case dossier, decision panel, and audit trail |
 | Is it engineered with care? | Decimal arithmetic, PostgreSQL persistence, idempotency, optimistic locking, CI, and failure-state design |
-| Is the student honest about the prototype? | Clear status table, synthetic-data disclaimer, security limitations, and pending authentication/public-demo gates |
+| Is the student honest about the prototype? | Clear status table, synthetic-data disclaimer, security limitations, verified session authentication, and public repository release |
 
 ## The three diagrams to keep
 
@@ -92,13 +92,13 @@ Keep the README focused on a five-minute reviewer journey:
 7. A short UI/UX rationale.
 8. Quickstart and test commands.
 9. Current status and honest limitations.
-10. Links to the reviewer guide, evaluation methodology, demo script, application outline, research references, and architecture details.
+10. Links to the reviewer guide, evaluation methodology, application outline, research references, and architecture details.
 
 ## What should stay out of the README opening
 
 The full competitor matrix should not appear in the README opening. It is useful as internal strategy and can remain in `docs/COMPETITOR_ANALYSIS.md`, but a judge should see what LedgerLens built and proved before seeing a long comparison against other repositories.
 
-The five-minute demo script should remain in `docs/demo-script.md`, linked from the README. It is a production aid for recording, not the product explanation itself.
+The internal recording notes remain in `docs/demo-script.md` as developer aids rather than public documentation.
 
 The application outline should remain in `docs/application-outline.md`, linked from the README. It is submission preparation, not a core product document.
 
