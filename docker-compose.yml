@@ -6,7 +6,7 @@ services:
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: password
-      POSTGRES_DB: razorpay_reconciliation
+      POSTGRES_DB: finance_controller
     ports:
       - "5432:5432"
     volumes:
@@ -24,7 +24,7 @@ services:
     ports:
       - "8000:8000"
     environment:
-      - DATABASE_URL=postgresql://postgres:password@db:5432/razorpay_reconciliation
+      - DATABASE_URL=postgresql://postgres:password@db:5432/finance_controller
     depends_on:
       db:
         condition: service_healthy
