@@ -310,6 +310,22 @@ async def test_local_zero_state_rendering():
         audit_text = await audit_empty.inner_text()
         assert "No reconciliation run active" in audit_text or "no events" in audit_text
 
+        # 4. Evaluation Page Zero State
+        await page.goto(f"{LOCAL_BASE_URL}/evaluation", wait_until="networkidle")
+        eval_empty = page.locator("[data-testid='evaluation-empty-state']")
+        await page.wait_for_selector("[data-testid='evaluation-empty-state']", timeout=10000)
+        assert await eval_empty.is_visible()
+        eval_text = await eval_empty.inner_text()
+        assert "No reconciliation run active" in eval_text or "No Evaluation Run Recorded" in eval_text
+
+        # 5. Case Dossier Zero State
+        await page.goto(f"{LOCAL_BASE_URL}/app/case/pay_eval_1003", wait_until="networkidle")
+        case_empty = page.locator("[data-testid='case-empty-state']")
+        await page.wait_for_selector("[data-testid='case-empty-state']", timeout=10000)
+        assert await case_empty.is_visible()
+        case_text = await case_empty.inner_text()
+        assert "No reconciliation run active" in case_text or "unreachable" in case_text
+
         await context.close()
         await browser.close()
 
@@ -317,7 +333,7 @@ async def test_local_zero_state_rendering():
 @pytest.mark.browser
 @pytest.mark.asyncio
 async def test_local_state_transition_refetch():
-    """Asserts transition from zero-state to populated state after fixture load and reconciliation."""
+    """Asserts transition from zero-state to populated state after fixture load and reconciliation across all 5 views."""
     from tests.conftest import truncate_all_tables
     truncate_all_tables()
 
@@ -359,24 +375,41 @@ async def test_local_state_transition_refetch():
                 )
                 assert res.status_code == 201
 
-        # Click 'Run reconciliation cycle' on the Dashboard banner
-        recon_btn = page.locator("[data-testid='no-run-banner'] button:has-text('Run reconciliation')")
+        # Click comparison button on the Dashboard banner
+        recon_btn = page.locator("[data-testid='no-run-banner'] button")
         assert await recon_btn.count() > 0
-        await recon_btn.click()
+        await recon_btn.first.click()
 
         # Wait for the zero banner to disappear
         await page.wait_for_selector("[data-testid='no-run-banner']", state="detached", timeout=15000)
 
-        # Confirm live computed metrics rendered on dashboard
-        await page.wait_for_selector("text=Parity Rate", timeout=10000)
+        # 1. Overview: Confirm live computed metrics rendered on dashboard
+        await page.wait_for_selector("text=Records matched", timeout=10000)
         content = await page.content()
         assert "70.0%" in content or "70%" in content
 
-        # Check queue has 18 rows
+        # 2. Queue: Check queue has 18 rows
         await page.goto(f"{LOCAL_BASE_URL}/app/queue", wait_until="networkidle")
         await page.wait_for_selector("[data-testid='queue-row']", timeout=15000)
         rows = page.locator("[data-testid='queue-row']")
         assert await rows.count() == 18
+
+        # 3. Case Dossier: Open first case and verify evidence
+        await rows.first.click()
+        await page.wait_for_function("() => window.location.pathname.includes('/app/case')", timeout=15000)
+        await page.wait_for_selector("[data-testid='evidence-payment']", timeout=15000)
+        assert await page.locator("[data-testid='evidence-payment']").first.is_visible()
+
+        # 4. Audit Ledger: Verify reconciliation cycle audit event is rendered
+        await page.goto(f"{LOCAL_BASE_URL}/app/audit", wait_until="networkidle")
+        await page.wait_for_selector("text=SAVED REVIEW HISTORY", timeout=10000)
+        assert await page.locator("[data-testid='audit-empty-state']").count() == 0
+
+        # 5. Evaluation: Verify benchmark has computed metrics
+        await page.goto(f"{LOCAL_BASE_URL}/evaluation", wait_until="networkidle")
+        await page.wait_for_selector("[data-testid='evaluation-formula']", timeout=10000)
+        eval_content = await page.content()
+        assert "70.00%" in eval_content or "70%" in eval_content
 
         # Clean up database after test
         truncate_all_tables()
