@@ -228,3 +228,13 @@ frontend/.vite/
 .env
 .env.*
 
+# Local scratch, resumes and candidate data
+scratch/
+*resume*
+*Resume*
+bangalore_*.csv
+hyderabad_*.csv
+funded_agentic_*.csv
+e2e_final.json
+
+
