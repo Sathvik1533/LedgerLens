@@ -326,6 +326,23 @@ def test_truthful_state_transition_full_cycle(client, db_session):
     assert len(queue_zero["cases"]) == 0
     assert queue_zero["total_amount_at_risk"] == "0.00"
 
+    # Evaluation Benchmark Zero State
+    res_bench_zero = client.get("/api/v1/reconciliation/benchmark")
+    assert res_bench_zero.status_code == 200
+    bench_zero = res_bench_zero.json()
+    assert bench_zero["has_run"] is False
+    assert bench_zero["dataset_size"] == 0
+    assert bench_zero["summary"]["total_records"] == 0
+
+    # Audit Ledger Zero State
+    res_audit_zero = client.get("/api/v1/review/audit/all")
+    assert res_audit_zero.status_code == 200
+    assert len(res_audit_zero.json()) == 0
+
+    # Case Dossier Zero State (non-existent before run)
+    res_case_zero = client.get("/api/v1/review/cases/00000000-0000-0000-0000-000000000000")
+    assert res_case_zero.status_code == 404
+
     # Ingestion Feeds Status
     res_ingest_zero = client.get("/api/v1/ingestion/status")
     assert res_ingest_zero.status_code == 200
@@ -404,6 +421,22 @@ def test_truthful_state_transition_full_cycle(client, db_session):
     assert Decimal(stats_after["total_amount_at_risk"]) > Decimal("0.00")
     assert stats_after["has_run"] is True
 
+    # Confirm Evaluation Benchmark has dynamically transitioned to computed state
+    res_bench_after = client.get("/api/v1/reconciliation/benchmark")
+    assert res_bench_after.status_code == 200
+    bench_after = res_bench_after.json()
+    assert bench_after["has_run"] is True
+    assert bench_after["dataset_size"] == 60
+    assert bench_after["match_rate_percentage"] == 70.0
+    assert bench_after["summary"]["auto_reconciled_count"] == 42
+    assert bench_after["summary"]["needs_review_count"] == 18
+
+    # Confirm Reconciliation Cycle audit event was appended to Audit Ledger
+    res_audit_recon = client.get("/api/v1/review/audit/all")
+    assert res_audit_recon.status_code == 200
+    assert len(res_audit_recon.json()) >= 1
+    assert any(e["event_type"] == "reconciliation_cycle_completed" for e in res_audit_recon.json())
+
     # Confirm 6 active exception categories from fixture
     exc_breakdown = stats_after["exception_breakdown"]
     assert exc_breakdown.get("amount_mismatch") == 4
@@ -476,3 +509,16 @@ def test_truthful_state_transition_full_cycle(client, db_session):
     assert res_stats_cleaned.json()["total_payments_count"] == 0
     assert res_stats_cleaned.json()["total_cases"] == 0
     assert res_stats_cleaned.json()["has_run"] is False
+
+    res_bench_cleaned = client.get("/api/v1/reconciliation/benchmark")
+    assert res_bench_cleaned.status_code == 200
+    assert res_bench_cleaned.json()["has_run"] is False
+    assert res_bench_cleaned.json()["dataset_size"] == 0
+
+    res_queue_cleaned = client.get("/api/v1/review/queue")
+    assert res_queue_cleaned.status_code == 200
+    assert res_queue_cleaned.json()["total_cases"] == 0
+
+    res_audit_cleaned = client.get("/api/v1/review/audit/all")
+    assert res_audit_cleaned.status_code == 200
+    assert len(res_audit_cleaned.json()) == 0
