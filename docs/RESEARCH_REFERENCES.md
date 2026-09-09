@@ -2,7 +2,7 @@
 
 **Document Title:** Institutional Financial AI Architecture & Synthetic Data Grounding  
 **Authoritative Reference:** [J.P. Morgan Chase AI Research — Synthetic Data & Financial Systems](https://www.jpmorganchase.com/about/technology/research/ai/synthetic-data)  
-**Project Application:** `Sathvik1533/razorpay-ai-finance-controller`  
+**Project Application:** `Sathvik1533/LedgerLens`  
 **Status:** Integrated into Gate 1 Data Foundation & Gate 5 RAG Architecture  
 
 ---
