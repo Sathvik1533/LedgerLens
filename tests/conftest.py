@@ -61,8 +61,17 @@ def truncate_all_tables():
         """))
 
 @pytest.fixture(scope="function", autouse=True)
-def clean_database():
-    """Guarantees a clean, unpolluted database state before and after every test."""
+def clean_database(request):
+    """
+    Guarantees a clean, unpolluted database state before and after every test.
+
+    Browser E2E suites manage their own lifecycle (bootstrap/teardown) and
+    intentionally depend on persisted local-stack state across test steps.
+    """
+    if request.node.get_closest_marker("browser"):
+        yield
+        return
+
     truncate_all_tables()
     yield
     truncate_all_tables()
@@ -158,5 +167,4 @@ async def client_async():
     transport = httpx.ASGITransport(app=app)
     async with httpx.AsyncClient(transport=transport, base_url="http://test") as c:
         yield c
-
 
