@@ -47,7 +47,7 @@ The architecture requires every AI call to go through one prompt-construction
 | When | On every request, for every non-public route. |
 | Where | FastAPI middleware / dependency layer (`docs/ARCHITECTURE.md` §7), enforced before a request reaches ingestion, review, or reporting services. |
 | Why | The system holds financial evidence and audit history; an unauthenticated reviewer action would be indistinguishable from a real one and would corrupt the audit trail’s meaning. |
-| How | `[PROTOTYPE]` **Not implemented.** The demo runs single-user, unauthenticated, against synthetic data only — this is an explicit, named limitation, not an oversight. `[PRODUCTION-ORIENTED]` Every write path (batch upload, review action) already records an `actor` field (`docs/FAILURE_AND_RECOVERY.md` §11 audit events; [research-exit-SOURCE-OF-TRUTH.md](http://research-exit-SOURCE-OF-TRUTH.md) §14) rather than assuming a single implicit user, so wiring in real auth populates a field that already exists instead of adding a new one. `[BEFORE LIVE USE]` Standard authentication (e.g., OAuth2/OIDC or a managed auth provider), session/token expiry, and MFA for reviewer accounts given the financial-approval power those accounts hold. |
+| How | `[PROTOTYPE]` **Implemented.** Session-cookie authentication (`ledgerlens_session`) using SHA-256 hashed tokens against a PostgreSQL `user_sessions` table (`backend/app/core/security.py`). Non-public routes enforce authentication via FastAPI dependency injection (`get_current_user`), returning HTTP 401 for unauthenticated calls. Every review action records `actor=current_user.email`. `[PRODUCTION-ORIENTED]` Dependency-injected session management allows plugging in enterprise OAuth2/OIDC or managed identity providers without changing business logic. `[BEFORE LIVE USE]` Enterprise SSO/SAML, multi-factor authentication (MFA) for reviewer accounts, and strict session IP pinning. |
 
 ## **4\. Authorisation**
 
@@ -58,7 +58,7 @@ The architecture requires every AI call to go through one prompt-construction
 | When | On every state-changing request (review approve/reject/unresolved, `docs/FAILURE_AND_RECOVERY.md` §14). |
 | Where | FastAPI dependency layer, same enforcement point as authentication. |
 | Why | Authentication alone answers “who are you,” not “what are you allowed to do” — a viewer account approving a financial exception is a distinct risk from an unauthenticated request. |
-| How | `[PROTOTYPE]` **Not implemented** — single implicit role, same limitation as §3. `[PRODUCTION-ORIENTED]` The review-action audit schema already separates `actor` from `action` and `previous_status → new_status` ([research-exit-SOURCE-OF-TRUTH.md](http://research-exit-SOURCE-OF-TRUTH.md) §14), which is the shape role-based checks need to hook into. `[BEFORE LIVE USE]` At minimum: viewer, reviewer (can approve/reject), and admin (can reconfigure thresholds, re-run batches) roles, with approve/reject gated to reviewer+; formal role definitions are a compliance-review input (§25) before going live. |
+| How | `[PROTOTYPE]` **Implemented.** Role-scoped authorization with `reviewer`, `admin`, and `auditor` roles (`backend/app/core/security.py`). Administrative operations (such as test dataset reset and contract reconfiguration) enforce `require_admin`, returning HTTP 403 for non-admin reviewers. `[PRODUCTION-ORIENTED]` Role checks are decoupled from route handlers via declarative dependencies, allowing migration to fine-grained RBAC or ABAC policies. `[BEFORE LIVE USE]` Maker-checker (dual control) authorization for high-value financial exceptions, and formal audit review procedures. |
 
 ## **5\. Tenant isolation**
 
@@ -184,7 +184,7 @@ This is the specific gap `docs/FAILURE_AND_RECOVERY.md` flagged as unsolved and 
 
 `[PRODUCTION-ORIENTED]` Because those metrics are already computed in a structured, logged form for evaluation, wiring the same computations into a live metrics pipeline (rather than a post-hoc evaluation report) is an integration task, not a new metrics-design task.
 
-`[BEFORE LIVE USE]` A live dashboard (not just an evaluation report) covering: batch throughput and `batch_status` distribution, `false_auto_approvals` (§7, and the safety-critical metric of the whole system — [research-exit-SOURCE-OF-TRUTH.md](http://research-exit-SOURCE-OF-TRUTH.md) §11), AI call latency/error rate, database connection-pool saturation, and the fallback-log-write event from §12 (an outage should page someone, not wait to be noticed).
+`[BEFORE LIVE USE]` A live dashboard (not just an evaluation report) covering: batch throughput and `batch_status` distribution, `false_auto_approvals` (§7, and the safety-critical metric of the whole system — `docs/ARCHITECTURE.md` §11), AI call latency/error rate, database connection-pool saturation, and the fallback-log-write event from §12 (an outage should page someone, not wait to be noticed).
 
 ## **19\. Alerts**
 
@@ -270,7 +270,7 @@ This section deliberately lists **open questions**, not answers — none of the 
 
 ## **29\. Human approval controls**
 
-`[PROTOTYPE]` Fully specified in [research-exit-SOURCE-OF-TRUTH.md](http://research-exit-source-of-truth.md/) §14 and reflected in the confidence/decision policy (`docs/ARCHITECTURE.md` §11): uncertain cases route to `needs_review`, cannot be silently approved, and every review action is recorded with actor, timestamp, before/after status, evidence, and comment.
+`[PROTOTYPE]` Fully specified in `docs/ARCHITECTURE.md` §14 and reflected in the confidence/decision policy (`docs/ARCHITECTURE.md` §11): uncertain cases route to `needs_review`, cannot be silently approved, and every review action is recorded with actor, timestamp, before/after status, evidence, and comment.
 
 `[PRODUCTION-ORIENTED]` This control is already strong for the prototype’s threat model (a single trusted operator); what production adds is *who is allowed to be that actor* — which is exactly the authorisation gap named in §4, not a redesign of the review-action model itself.
 
