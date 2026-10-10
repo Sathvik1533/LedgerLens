@@ -1,0 +1,36 @@
+graph TD
+    subgraph SecurityBoundary [Security Boundary: Session Cookies & Optimistic Locking]
+        subgraph Frontend [Frontend: React 18, TypeScript, Vite]
+            UI[Dashboard / Queue View]:::verified
+        end
+        
+        subgraph BackendSystem [Backend: FastAPI]
+            API[API Endpoints]:::verified
+            Engine[Deterministic Matcher - Decimal Math]:::verified
+            RAG[RAG Policy Retrieval]:::verified
+            Corpus[[rag/corpus/ Policies]]:::verified
+        end
+        
+        subgraph Database [Storage]
+            DB[(PostgreSQL 15)]:::verified
+        end
+    end
+
+    subgraph ExternalAI [External AI Provider: Groq]
+        LLM[Groq LLM - Explains SOPs]:::verified
+    end
+
+    UI -->|HTTP Requests| API
+    API -->|Reads/Writes| DB
+    API -->|Triggers| Engine
+    API -->|Requests Context| RAG
+    RAG -->|Reads| Corpus
+    RAG -->|Sends Context| LLM
+    LLM -->|Returns Grounded Explanation| RAG
+
+    note1>Known Failure Point: Concurrency Conflicts HTTP 409] -.-> DB
+    note2>Known Failure Point: RAG/LLM Failure falls back to deterministic] -.-> RAG
+    
+    classDef verified fill:#2E8B57,color:#fff;
+    classDef unverified fill:#B22222,color:#fff;
+    classDef planned fill:#4682B4,color:#fff;

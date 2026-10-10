@@ -1,0 +1,21 @@
+flowchart TD
+    A["GitHub Actions CI\nPush and pull-request checks"] --> B["Isolated PostgreSQL 15\nDocker test database"]
+    B --> C["Migrations + test fixtures"]
+    C --> D["Automated verification"]
+    D --> E["Domain and money math\nDecimal precision · invariants"]
+    D --> F["Integration and API\nIngestion · reconciliation · review"]
+    D --> G["End-to-end workflow\nFour-source case from input to audit"]
+    D --> H["Evaluation harness\nSeeded 60-record ground truth benchmark"]
+    D --> I["Concurrency and safety\nOptimistic locking · conflict response"]
+    D --> J["Grounded investigation\nSQL facts · policy citations · read-only AI"]
+    H --> K["Measured outputs\nMatch rate · precision · recall · throughput"]
+    H --> L["Honest exception export\nUnresolved cases with reason codes"]
+    K --> M["Reviewer proof\nReproducible command + seed + denominator"]
+    L --> M
+
+    classDef ci fill:#e9e3d7,stroke:#8b7f6d,color:#1c1b19,stroke-width:2px;
+    classDef verify fill:#dcebe4,stroke:#527c68,color:#1c1b19,stroke-width:2px;
+    classDef proof fill:#1c1b19,stroke:#1c1b19,color:#f4f1ea,stroke-width:2px;
+    class A,B,C ci;
+    class D,E,F,G,H,I,J,K,L verify;
+    class M proof;

@@ -1,0 +1,35 @@
+flowchart TD
+    subgraph INGEST["1. Multi-Source Ingestion & Validation"]
+        P_CSV["Payments CSV"] --> API["FastAPI Endpoints (/api/v1/ingestion)"]
+        S_CSV["Settlements CSV"] --> API
+        R_CSV["Refunds CSV"] --> API
+        B_CSV["Bank Credits CSV"] --> API
+        API --> IDEM["Batch Idempotency Check"]
+        IDEM --> RAW[("Retained Raw Source Records")]
+        IDEM --> NORM[("Normalized Domain Entities")]
+    end
+
+    subgraph ENGINE["2. Deterministic Reconciliation Engine"]
+        NORM --> MATCH["3-Stage Deterministic Matcher"]
+        MATCH --> AUTO["Auto-Reconciled (Parity Matches)"]
+        MATCH --> CASES[("Reconciliation Cases (needs_review)")]
+    end
+
+    subgraph REVIEW["3. Operations Review & Audit"]
+        CASES --> QUEUE_API["Review Queue API (GET /review/queue)"]
+        QUEUE_API --> UI["React Operations Dashboard"]
+        UI --> OPT_LOCK["Submit Decision (expected_version)"]
+        OPT_LOCK -->|Version Match| AUDIT[("Persisted Audit Events")]
+        OPT_LOCK -->|Version Mismatch| HTTP409["HTTP 409 Conflict Banner"]
+    end
+
+    subgraph COPILOT["4. Grounded Policy RAG (Read-Only)"]
+        CORPUS["Local Policy Markdown Files"] --> RETRIEVER["PolicyRetriever (Cosine >= 0.35)"]
+        CASES --> SQL_TOOL["SQLEvidenceTool (Read-Only DB Facts)"]
+        RETRIEVER --> ASST["InvestigationAssistant"]
+        SQL_TOOL --> ASST
+        ASST --> COPILOT_UI["Advisory Copilot Panel (Citations & Root Cause)"]
+    end
+
+    classDef db fill:#0f172a,stroke:#3b82f6,stroke-width:2px,color:#fff;
+    class RAW,NORM,CASES,AUDIT db;

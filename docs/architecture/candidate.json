@@ -1,0 +1,27 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "LedgerLens Architecture",
+    "output": "architecture.html",
+    "quality_profile": "showcase"
+  },
+  "components": [
+    { "id": "ui", "type": "frontend", "label": "Web UI", "sublabel": "React", "pos": [40, 300], "size": [120, 60], "tag": "Verified" },
+    { "id": "api", "type": "backend", "label": "Ledger API", "sublabel": "FastAPI", "pos": [250, 300], "size": [130, 60], "tag": "Verified" },
+    { "id": "db", "type": "database", "label": "PostgreSQL", "sublabel": "Relational Data", "pos": [460, 300], "size": [130, 60], "tag": "Verified" },
+    { "id": "ai", "type": "external", "label": "AI Provider", "sublabel": "LLM Service", "pos": [250, 150], "size": [130, 60], "tag": "Unverified" }
+  ],
+  "boundaries": [
+    { "kind": "security-group", "label": "Deterministic Logic", "wraps": ["ui", "api", "db"] }
+  ],
+  "connections": [
+    { "id": "ui-to-api", "from": "ui", "to": "api", "label": "HTTPS" },
+    { "id": "api-to-db", "from": "api", "to": "db", "label": "SQL" },
+    { "id": "api-to-ai", "from": "api", "to": "ai", "label": "AI Requests", "variant": "dashed" }
+  ],
+  "cards": [
+    { "dot": "emerald", "title": "Verified", "items": ["Frontend, API, DB (60k records/sec)"] },
+    { "dot": "amber", "title": "Failure Points", "items": ["LLM Hallucinations", "DB optimistic locking retries"] }
+  ]
+}

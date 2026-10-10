@@ -267,3 +267,8 @@ LedgerLens is an independent technical project built for the **Razorpay AI Build
 ## License
 
 This project is distributed under the MIT License. See [LICENSE](LICENSE).
+
+
+## Architecture and Demos
+- [Architecture Diagram and System Components](docs/architecture/README.md)
+- [Product Demo (Synthetic Data)](docs/demos/demo_01.md)
