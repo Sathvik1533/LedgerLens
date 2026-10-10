@@ -100,7 +100,7 @@ A recent local run produced the following result:
 | Automatic-match precision | 100.00% |
 | Automatic-match recall | 100.00% |
 | False automatic approvals | 0 |
-| Measured throughput | 60,379.85 payment records/sec in the local run |
+| Measured throughput | 63,188.36 payment records/sec in the local run |
 | Amount reconciled | INR 159,933.00 |
 | Amount still unexplained | INR 70,907.00 |
 
