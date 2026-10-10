@@ -33,3 +33,6 @@ class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
 settings = Settings()
+
+if not settings.SECRET_KEY and settings.APP_ENV != "test":
+    raise ValueError("SECRET_KEY must be set in non-test environments")

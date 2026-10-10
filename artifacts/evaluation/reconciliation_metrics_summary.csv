@@ -8,8 +8,8 @@ precision_auto_reconcile,100.00
 recall_auto_reconcile,100.00
 false_approvals,0
 zero_false_approval_invariant,PASSED
-throughput_records_per_sec,67390.44
-elapsed_seconds,0.00089
+throughput_records_per_sec,60379.85
+elapsed_seconds,0.000994
 auto_reconciled_count,42
 needs_review_count,18
 unresolved_count,0

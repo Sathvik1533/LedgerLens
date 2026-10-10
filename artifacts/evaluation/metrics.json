@@ -1,6 +1,6 @@
 {
   "benchmark_name": "reconciliation_evaluation_benchmark",
-  "timestamp_utc": "2026-09-09T07:29:44.740264+00:00",
+  "timestamp_utc": "2026-10-10T10:01:28.343255+00:00",
   "dataset": {
     "total_records": 60,
     "seed": 42,
@@ -12,8 +12,8 @@
     ]
   },
   "performance": {
-    "elapsed_seconds": 0.00089,
-    "throughput_records_per_sec": 67390.44
+    "elapsed_seconds": 0.000994,
+    "throughput_records_per_sec": 60379.85
   },
   "accuracy": {
     "match_rate_pct": 70.0,
