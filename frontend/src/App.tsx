@@ -7,6 +7,7 @@ import { TooltipProvider } from './components/Tooltip';
 import { AuthProvider } from './context/AuthContext';
 import { DemoSimulationProvider } from './context/DemoSimulationContext';
 import { ProtectedRoute } from './components/ProtectedRoute';
+import { GuidedMascot } from './components/GuidedMascot';
 import { LoginPage } from './pages/auth/LoginPage';
 
 // Layouts
@@ -121,6 +122,7 @@ function App() {
             {/* Fallback redirect */}
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
+          <GuidedMascot />
         </BrowserRouter>
       </DemoSimulationProvider>
     </AuthProvider>
