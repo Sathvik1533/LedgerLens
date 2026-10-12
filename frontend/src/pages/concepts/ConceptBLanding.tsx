@@ -95,7 +95,7 @@ export const ConceptBLanding: React.FC = () => {
             <span className="font-mono text-xs text-[#B94E3D] font-semibold">THESIS 01</span>
             <h3 className="font-editorial text-2xl font-medium text-[#1C1B19]">Zero Floating Points</h3>
             <p className="text-xs text-[#716E68] leading-relaxed">
-              Every amount is calculated with fixed-point decimal arithmetic in PostgreSQL and Python Decimal. Floating-point round-off error is legally unacceptable in corporate treasuries.
+              Every amount is calculated with exact fixed-point currency precision. Round-off errors are completely eliminated to ensure accounting accuracy.
             </p>
           </div>
 

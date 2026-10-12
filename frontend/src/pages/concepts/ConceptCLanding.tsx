@@ -92,7 +92,7 @@ export const ConceptCLanding: React.FC = () => {
             <div className="text-[10px] text-[#718096] uppercase">METRIC 01: ENGINE THROUGHPUT</div>
             <div className="text-2xl font-bold text-[#F7FAFC] font-mono">1,200 RPS</div>
             <p className="text-[#A0AEC0] font-sans text-xs">
-              Direct PostgreSQL hash joins and vectorized indexing without external pipeline latency.
+              High-speed automated reconciliation engine matching transactions in real time.
             </p>
           </div>
 
@@ -108,7 +108,7 @@ export const ConceptCLanding: React.FC = () => {
             <div className="text-[10px] text-[#718096] uppercase">METRIC 03: AUDIT LATENCY</div>
             <div className="text-2xl font-bold text-[#F7FAFC] font-mono">&lt; 12 MS</div>
             <p className="text-[#A0AEC0] font-sans text-xs">
-              Optimistic concurrency and ACID append-only ledger entries written synchronously on sign-off.
+              Guaranteed audit logging and collision-safe review recording on human sign-off.
             </p>
           </div>
         </div>

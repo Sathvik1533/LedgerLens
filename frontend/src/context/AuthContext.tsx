@@ -25,6 +25,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   useEffect(() => {
     let mounted = true;
+    const safetyTimer = setTimeout(() => {
+      if (mounted) {
+        setIsLoading(false);
+      }
+    }, 2500);
+
     async function checkAuth() {
       try {
         const currentUser = await fetchCurrentUser();
@@ -38,12 +44,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       } finally {
         if (mounted) {
           setIsLoading(false);
+          clearTimeout(safetyTimer);
         }
       }
     }
     checkAuth();
     return () => {
       mounted = false;
+      clearTimeout(safetyTimer);
     };
   }, []);
 

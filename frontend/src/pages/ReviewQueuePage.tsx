@@ -90,6 +90,7 @@ export const ReviewQueuePage: React.FC<{ onSelectCase?: (caseId: string) => void
   const [selectedSeverity, setSelectedSeverity] = useState<string>('all');
   const [sortBy, setSortBy] = useState<'discrepancy' | 'amount' | 'age'>('discrepancy');
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [isSimulation, setIsSimulation] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [copiedId, setCopiedId] = useState<string | null>(null);
 
@@ -100,6 +101,7 @@ export const ReviewQueuePage: React.FC<{ onSelectCase?: (caseId: string) => void
       const data = await fetchReviewQueue(selectedCategory === 'all' ? undefined : selectedCategory);
       setCases(data.cases || []);
       setTotalAmountAtRisk(data.total_amount_at_risk || '0.00');
+      setIsSimulation(Boolean(data.is_simulation));
     } catch (err: any) {
       setError(err.message || 'Failed to load review queue.');
     } finally {
@@ -195,6 +197,21 @@ export const ReviewQueuePage: React.FC<{ onSelectCase?: (caseId: string) => void
           </div>
         </div>
       </div>
+
+      {/* Simulation / Offline Notice */}
+      {isSimulation && (
+        <div className="p-3 bg-amber-500/10 border border-amber-500/30 rounded-xl text-xs text-amber-200 flex items-start justify-between gap-3 font-sans">
+          <div className="flex items-center gap-2">
+            <span className="h-2 w-2 rounded-full bg-amber-400 animate-pulse shrink-0" />
+            <span>
+              <strong>[Client Simulation / Demo Mode Active]:</strong> Backend / PostgreSQL is offline. Cases shown are seeded demo fixtures, and review decisions persist in browser localStorage only.
+            </span>
+          </div>
+          <span className="text-[10px] font-mono bg-amber-500/20 px-2 py-0.5 rounded text-amber-300 shrink-0">
+            Simulation Mode
+          </span>
+        </div>
+      )}
 
       {/* 2. Unified Filter Toolbar */}
       <div className="control-panel rounded-xl p-2.5 flex flex-wrap items-center justify-between gap-3 shadow-none">
@@ -356,6 +373,11 @@ export const ReviewQueuePage: React.FC<{ onSelectCase?: (caseId: string) => void
                           <span className="text-text-secondary font-mono text-[10px]">{item.case_id}</span>
                           <span className="text-text-secondary">&bull;</span>
                           <ExceptionBadge type={item.exception_type} size="sm" />
+                          {item.is_demo && (
+                            <span className="text-[10px] bg-amber-500/10 text-amber-300 border border-amber-500/20 px-1.5 py-0.5 rounded font-mono">
+                              [Demo Fixture]
+                            </span>
+                          )}
                         </div>
                       </td>
 

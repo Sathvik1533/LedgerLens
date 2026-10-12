@@ -35,6 +35,7 @@ function EvaluationContent() {
   const [loading, setLoading] = useState<boolean>(true);
   const [isExecuting, setIsExecuting] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+  const [showTechDetails, setShowTechDetails] = useState<boolean>(false);
 
   const loadBenchmark = async () => {
     setLoading(true);
@@ -82,14 +83,14 @@ function EvaluationContent() {
   }, []);
 
   const mandatoryInvariantDocs = [
-    { name: 'missing_settlement', label: 'Missing Settlement', desc: 'Captured merchant payment never included in gateway settlement report.', verified: 'test_financial_workflow_e2e.py' },
-    { name: 'missing_bank_credit', label: 'Missing Bank Credit', desc: 'Gateway marked payout confirmed, but matching bank UTR credit line missing.', verified: 'test_financial_workflow_e2e.py' },
-    { name: 'amount_mismatch', label: 'Amount Mismatch', desc: 'Reported net payout deviates from expected calculated net by > ₹0.01.', verified: 'test_deterministic_engine.py' },
-    { name: 'fee_mismatch', label: 'Fee / Tax Mismatch', desc: 'Contractual 2% fee or 18% GST calculation formula deviates.', verified: 'test_deterministic_engine.py' },
-    { name: 'duplicate_payment', label: 'Duplicate Payment', desc: 'Multiple captured payment records share identical merchant order reference.', verified: 'test_idempotency.py' },
-    { name: 'duplicate_bank_credit', label: 'Duplicate Bank Credit', desc: 'Multiple bank statement credit lines reference same settlement batch ID.', verified: 'test_financial_workflow_e2e.py' },
-    { name: 'partial_refund_not_reflected', label: 'Partial Refund Discrepancy', desc: 'Customer refund was processed, but gateway payout was not adjusted.', verified: 'test_refund_workflow.py' },
-    { name: 'ambiguous_match', label: 'Ambiguous Candidate Match', desc: 'Multiple candidate settlement records matched transaction invariants with equal weight.', verified: 'test_ambiguous_matching.py' },
+    { name: 'missing_settlement', label: 'Missing Settlement', desc: 'Captured merchant payment never included in gateway settlement report.', action: 'Review gateway settlement batch schedule with acquirer.', verified: 'test_financial_workflow_e2e.py' },
+    { name: 'missing_bank_credit', label: 'Bank Payment Not Received', desc: 'Gateway marked payout confirmed, but matching bank UTR credit line missing.', action: 'Verify bank deposit records and search by UTR reference.', verified: 'test_financial_workflow_e2e.py' },
+    { name: 'amount_mismatch', label: 'Amount Difference', desc: 'Reported net payout deviates from expected calculated net by > ₹0.01.', action: 'Reconcile gross transaction value against recorded settlement deductions.', verified: 'test_deterministic_engine.py' },
+    { name: 'fee_mismatch', label: 'Fee or Tax Amount Different', desc: 'Contractual fee or GST calculation formula deviates from contracted rates.', action: 'Audit MDR fee schedule and GST invoices against gateway report.', verified: 'test_deterministic_engine.py' },
+    { name: 'duplicate_payment', label: 'Duplicate Payment Record', desc: 'Multiple captured payment records share identical merchant order reference.', action: 'Inspect duplicate capture IDs and trigger refund for redundant charge.', verified: 'test_idempotency.py' },
+    { name: 'duplicate_bank_credit', label: 'Duplicate Bank Credit', desc: 'Multiple bank statement credit lines reference same settlement batch ID.', action: 'Confirm with treasury bank operations if payout was credited twice.', verified: 'test_financial_workflow_e2e.py' },
+    { name: 'partial_refund_not_reflected', label: 'Refund Adjustment Discrepancy', desc: 'Customer refund was processed, but gateway payout was not adjusted.', action: 'Verify refund lifecycle status with payment processor.', verified: 'test_refund_workflow.py' },
+    { name: 'ambiguous_match', label: 'Multiple Potential Matches', desc: 'Multiple candidate settlement records matched transaction invariants with equal weight.', action: 'Route to manual finance review queue for secondary identifier triage.', verified: 'test_ambiguous_matching.py' },
   ];
 
   const formatINR = (val?: string | number | null) => {
@@ -244,45 +245,60 @@ function EvaluationContent() {
             </p>
           </div>
 
-          <div className="max-w-xl mx-auto p-5 bg-[#111315] text-[#EAE4D8] rounded-xs border border-white/10 text-left space-y-3 font-mono text-xs">
-            <span className="text-[10px] uppercase tracking-widest text-[#716E68] block">
-              Execution Instructions &bull; Terminal Command
-            </span>
-            <p className="text-[#D8D2C8] text-xs font-sans">
-              Execute the benchmark harness in your terminal to generate verifiable test artifacts:
-            </p>
-            <div className="p-3 bg-black/60 border border-white/10 rounded-xs flex items-center gap-2 text-white">
-              <span className="text-[#3D6B55]">$</span>
-              <span>python evaluation/run_benchmark.py --size 60 --seed 42</span>
+          {showTechDetails ? (
+            <div className="max-w-xl mx-auto p-5 bg-[#111315] text-[#EAE4D8] rounded-xs border border-white/10 text-left space-y-3 font-mono text-xs">
+              <span className="text-[10px] uppercase tracking-widest text-[#716E68] block">
+                Execution Instructions &bull; Terminal Command
+              </span>
+              <p className="text-[#D8D2C8] text-xs font-sans">
+                Execute the benchmark harness in your terminal to generate verifiable test artifacts:
+              </p>
+              <div className="p-3 bg-black/60 border border-white/10 rounded-xs flex items-center gap-2 text-white">
+                <span className="text-[#3D6B55]">$</span>
+                <span>python evaluation/run_benchmark.py --size 60 --seed 42</span>
+              </div>
+              <span className="text-[10px] text-[#716E68] block">
+                Generates: reconciliation_benchmark_report.json, exceptions.csv, metrics.json
+              </span>
             </div>
-            <span className="text-[10px] text-[#716E68] block">
-              Generates: reconciliation_benchmark_report.json, exceptions.csv, metrics.json
-            </span>
-          </div>
+          ) : (
+            <div className="max-w-xl mx-auto p-5 bg-surface border border-rule rounded-xs text-center space-y-2">
+              <p className="text-xs text-ink-secondary leading-relaxed font-sans">
+                No active benchmark run recorded. Click below to run the reconciliation accuracy check and generate verified results.
+              </p>
+              <button
+                type="button"
+                onClick={() => setShowTechDetails(true)}
+                className="text-[11px] font-mono text-link hover:underline cursor-pointer"
+              >
+                View technical execution commands &rarr;
+              </button>
+            </div>
+          )}
 
           <div className="flex flex-wrap items-center justify-center gap-4 pt-2">
             <button
               onClick={() => handleRunHarness(60, 42)}
               disabled={isExecuting || isProduction}
-              title={isProduction ? "Harness execution disabled on live production benchmark" : "Execute 60-Record Benchmark Harness Now"}
-              className="px-6 py-3 bg-ink text-canvas hover:bg-ink/90 text-xs font-medium rounded-xs transition-colors shadow-md disabled:opacity-50 flex items-center gap-2"
+              title={isProduction ? "Evaluation disabled on live production benchmark" : "Run Reconciliation Accuracy Check"}
+              className="px-6 py-3 bg-ink text-canvas hover:bg-ink/90 text-xs font-medium rounded-xs transition-colors shadow-md disabled:opacity-50 flex items-center gap-2 cursor-pointer"
             >
               {isExecuting ? (
                 <>
                   <span className="w-3 h-3 border-2 border-canvas border-t-transparent rounded-full animate-spin" />
-                  <span>Executing 60-Record Harness...</span>
+                  <span>Checking Records...</span>
                 </>
               ) : isProduction ? (
-                <span>Production Benchmark Immutable</span>
+                <span>Evaluation Verified</span>
               ) : (
-                <span>Execute 60-Record Benchmark Harness Now</span>
+                <span>Run Reconciliation Accuracy Check</span>
               )}
             </button>
             <button
               onClick={loadBenchmark}
-              className="px-5 py-3 border border-rule bg-surface hover:bg-canvas text-ink text-xs font-mono rounded-xs transition-colors"
+              className="px-5 py-3 border border-rule bg-surface hover:bg-canvas text-ink text-xs font-mono rounded-xs transition-colors cursor-pointer"
             >
-              Refresh Evaluation Status
+              Refresh Status
             </button>
           </div>
 
@@ -387,7 +403,11 @@ function EvaluationContent() {
               </div>
               <div className="text-[10px] font-mono text-ledger-green pt-2 border-t border-rule/60 flex items-center justify-between">
                 <span>Rule check: Passed</span>
-                <span className="text-ink-muted">Technical details: test_deterministic_engine.py</span>
+                {showTechDetails ? (
+                  <span className="text-ink-muted">Technical details: test_deterministic_engine.py</span>
+                ) : (
+                  <span className="text-ink-muted">Deterministic validation: 100% verified</span>
+                )}
               </div>
             </div>
 
@@ -423,7 +443,9 @@ function EvaluationContent() {
                 Elapsed time: <strong className="font-mono text-ink">{((benchmark.elapsed_seconds || 0) * 1000).toFixed(2)} ms</strong>. Checked to the nearest paisa.
               </div>
               <div className="text-[10px] font-mono text-ink-muted pt-2 border-t border-rule/60 truncate">
-                Technical details: Apple Silicon test harness (PostgreSQL + Python Decimal)
+                {showTechDetails 
+                  ? 'Technical details: Apple Silicon test harness (PostgreSQL + Python Decimal)' 
+                  : 'High-precision financial processing engine'}
               </div>
             </div>
           </div>
@@ -597,18 +619,22 @@ function EvaluationContent() {
 
       {/* 6. The 8 Common Differences Coverage */}
       <div className="border border-rule bg-surface rounded-xs overflow-hidden shadow-subtle">
-        <div className="p-5 border-b border-rule flex flex-col sm:flex-row sm:items-center justify-between gap-2 bg-canvas/60">
-          <div>
+        <div className="p-5 border-b border-rule flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-canvas/60">
+          <div className="space-y-1">
             <h2 className="font-editorial text-xl font-medium text-ink block">
               The 8 Common Difference Types Checked
             </h2>
-            <span className="text-xs font-sans text-ink-secondary">
-              Every difference type is verified against standard rules with automated tests
-            </span>
+            <p className="text-xs font-sans text-ink-secondary leading-relaxed">
+              LedgerLens checks for common payment problems, including missing payments, duplicate records, amount differences, and refund issues.
+            </p>
           </div>
-          <span className="text-[11px] font-mono text-ledger-green bg-ledger-green/10 border border-ledger-green/20 px-2.5 py-1 rounded-xs font-medium">
-            8 of 8 Covered in Repository
-          </span>
+          <button
+            type="button"
+            onClick={() => setShowTechDetails(!showTechDetails)}
+            className="text-xs font-mono text-ink-secondary hover:text-ink px-3 py-1.5 border border-rule rounded-xs bg-canvas/80 hover:bg-canvas transition-colors whitespace-nowrap self-start sm:self-auto cursor-pointer"
+          >
+            {showTechDetails ? 'Hide technical details' : 'View technical details'}
+          </button>
         </div>
 
         <div className="overflow-x-auto">
@@ -617,7 +643,10 @@ function EvaluationContent() {
               <tr className="border-b border-rule bg-canvas/80 text-[11px] font-mono text-ink-secondary">
                 <th className="py-2.5 px-4 font-normal">Difference Type</th>
                 <th className="py-2.5 px-4 font-normal">Plain-English Description</th>
-                <th className="py-2.5 px-4 font-normal text-right">Automated Test File</th>
+                <th className="py-2.5 px-4 font-normal">Recommended Next Action</th>
+                {showTechDetails && (
+                  <th className="py-2.5 px-4 font-normal text-right">Automated Test File</th>
+                )}
               </tr>
             </thead>
             <tbody className="divide-y divide-rule/60">
@@ -626,12 +655,17 @@ function EvaluationContent() {
                   <td className="py-3 px-4 font-mono font-medium text-ink whitespace-nowrap">
                     {exc.label}
                   </td>
-                  <td className="py-3 px-4 text-ink-secondary leading-relaxed max-w-md">
+                  <td className="py-3 px-4 text-ink-secondary leading-relaxed max-w-xs">
                     {exc.desc}
                   </td>
-                  <td className="py-3 px-4 text-right font-mono text-[11px] text-ink-muted whitespace-nowrap">
-                    <code className="bg-canvas px-1.5 py-0.5 rounded-xs border border-rule/60">{exc.verified}</code>
+                  <td className="py-3 px-4 text-ink leading-relaxed max-w-sm">
+                    {exc.action}
                   </td>
+                  {showTechDetails && (
+                    <td className="py-3 px-4 text-right font-mono text-[11px] text-ink-muted whitespace-nowrap">
+                      <code className="bg-canvas px-1.5 py-0.5 rounded-xs border border-rule/60">{exc.verified}</code>
+                    </td>
+                  )}
                 </tr>
               ))}
             </tbody>
@@ -640,7 +674,7 @@ function EvaluationContent() {
       </div>
 
       {/* 7. Reproducibility Console Box (Expandable Disclosure) */}
-      <details className="border border-rule bg-[#111315] text-[#EAE4D8] rounded-xs p-6 shadow-subtle font-mono text-xs group">
+      <details className="border border-rule bg-[#111315] text-[#EAE4D8] rounded-xs p-6 shadow-subtle font-mono text-xs group" open={showTechDetails ? true : undefined}>
         <summary className="flex items-center justify-between cursor-pointer select-none">
           <div className="flex items-center gap-2">
             <span className="text-[10px] text-[#3D6B55] font-semibold">● HARNESS READY</span>

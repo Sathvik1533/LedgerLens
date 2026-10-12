@@ -13,9 +13,8 @@ from backend.app.models.user import UserModel
 
 router = APIRouter()
 
-# Global retriever instance to avoid reloading embeddings on every request
+# Global retriever instance (corpus is loaded lazily on first query)
 _retriever = PolicyRetriever()
-_retriever.load_corpus()
 
 @router.post(
     "/investigate/{case_id}",

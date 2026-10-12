@@ -27,6 +27,8 @@ target_metadata = Base.metadata
 
 def run_migrations_offline() -> None:
     url = os.environ.get("DATABASE_URL", "postgresql://postgres:password@localhost:5432/finance_controller")
+    if url.startswith("postgres://"):
+        url = url.replace("postgres://", "postgresql://", 1)
     context.configure(
         url=url,
         target_metadata=target_metadata,
@@ -38,9 +40,12 @@ def run_migrations_offline() -> None:
 
 def run_migrations_online() -> None:
     configuration = config.get_section(config.config_ini_section) or {}
-    configuration["sqlalchemy.url"] = os.environ.get(
+    raw_url = os.environ.get(
         "DATABASE_URL", "postgresql://postgres:password@localhost:5432/finance_controller"
     )
+    if raw_url.startswith("postgres://"):
+        raw_url = raw_url.replace("postgres://", "postgresql://", 1)
+    configuration["sqlalchemy.url"] = raw_url
     connectable = engine_from_config(
         configuration,
         prefix="sqlalchemy.",

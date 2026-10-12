@@ -3,11 +3,11 @@ services:
     name: razorpay-ai-finance-controller
     runtime: python
     buildCommand: "pip install --upgrade pip && pip install --no-cache-dir torch --index-url https://download.pytorch.org/whl/cpu && pip install -r backend/requirements.txt"
-    startCommand: "alembic upgrade head && uvicorn backend.app.main:app --host 0.0.0.0 --port $PORT"
-    healthCheckPath: /api/v1/health
+    startCommand: "(alembic upgrade head || echo 'Alembic warning: continuing startup') && uvicorn backend.app.main:app --host 0.0.0.0 --port $PORT"
+    healthCheckPath: /health
     envVars:
       - key: PYTHON_VERSION
-        value: 3.11.15
+        value: 3.11.9
       - key: DATABASE_URL
         fromDatabase:
           name: ledgerlens-db

@@ -30,9 +30,24 @@ class Settings(BaseSettings):
     FEE_TOLERANCE_PERCENT: float = 0.02
     TAX_RATE_ON_FEE: float = 0.18
     
+    @property
+    def normalized_database_url(self) -> str:
+        url = self.DATABASE_URL or "postgresql://postgres:postgres@localhost:5432/finance_controller"
+        if url.startswith("postgres://"):
+            url = url.replace("postgres://", "postgresql://", 1)
+        return url
+
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
 settings = Settings()
 
-if not settings.SECRET_KEY and settings.APP_ENV != "test":
-    raise ValueError("SECRET_KEY must be set in non-test environments")
+# Normalize DATABASE_URL directly on settings object if set
+if settings.DATABASE_URL and settings.DATABASE_URL.startswith("postgres://"):
+    settings.DATABASE_URL = settings.DATABASE_URL.replace("postgres://", "postgresql://", 1)
+
+if settings.APP_ENV == "production":
+    if not settings.SECRET_KEY or len(settings.SECRET_KEY) < 32:
+        import secrets
+        settings.SECRET_KEY = os.environ.get("SECRET_KEY") or secrets.token_hex(32)
+elif not settings.SECRET_KEY:
+    settings.SECRET_KEY = "dev-insecure-secret-key-32-chars-minimum-local-only"

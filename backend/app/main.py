@@ -59,6 +59,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+@app.get("/health", tags=["health"], summary="Service health check")
 @app.get("/healthz", tags=["health"], summary="Liveness probe")
 def healthz():
     """Returns OK if the API server process is alive."""

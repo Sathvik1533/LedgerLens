@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Outlet, Link, useLocation } from 'react-router-dom';
-import { fetchReviewQueue, triggerReconciliationRun } from '../api/client';
+import { fetchReviewQueue, triggerReconciliationRun, isSimulationActive } from '../api/client';
 import { useAuth } from '../context/AuthContext';
 import { useDemoSimulation } from '../context/DemoSimulationContext';
 import { HowToUseRoomGuide } from '../components/HowToUseRoomGuide';
@@ -147,6 +147,21 @@ export default function AppLayout() {
           </div>
         </div>
       </header>
+
+      {/* Simulation / Offline Banner */}
+      {isSimulationActive() && (
+        <div className="bg-amber-50 border-b border-amber-200 px-4 sm:px-6 py-2 font-sans text-xs text-amber-900 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
+            <span>
+              <strong>[Simulation Mode Active]:</strong> Backend &amp; PostgreSQL are not reachable. The workspace is operating in client simulation mode using browser persistence.
+            </span>
+          </div>
+          <span className="font-mono text-[10px] bg-amber-200/60 px-2 py-0.5 rounded text-amber-900">
+            Client Simulation
+          </span>
+        </div>
+      )}
 
       {/* Plain-Language Onboarding Banner */}
       {showOnboarding && (

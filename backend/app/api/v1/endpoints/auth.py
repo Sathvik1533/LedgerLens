@@ -35,15 +35,16 @@ class UserProfileResponse(BaseModel):
     email: str
     full_name: str
     role: str
+    token: Optional[str] = None
 
 
 def _set_session_cookie(response: Response, request: Request, session_token: str):
-    is_secure = request.headers.get("x-forwarded-proto") == "https" or request.url.scheme == "https"
+    is_secure = request.headers.get("x-forwarded-proto") == "https" or request.url.scheme == "https" or settings.APP_ENV == "production"
     response.set_cookie(
         key=settings.SESSION_COOKIE_NAME,
         value=session_token,
         httponly=True,
-        samesite="lax",
+        samesite="none" if is_secure else "lax",
         secure=is_secure,
         max_age=settings.SESSION_EXPIRE_SECONDS,
         path="/",
@@ -92,6 +93,7 @@ def login(
         email=user.email,
         full_name=user.full_name,
         role=user.role,
+        token=token,
     )
 
 
@@ -148,6 +150,7 @@ def demo_login(
         email=user.email,
         full_name=user.full_name,
         role=user.role,
+        token=token,
     )
 
 

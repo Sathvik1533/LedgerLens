@@ -29,16 +29,22 @@ export default function DocsPage() {
             </p>
           </div>
           
-          <div className="pt-3 border-t border-rule/60 space-y-2 text-xs">
-            <span className="text-[10px] uppercase font-mono tracking-wider text-ink-secondary block font-semibold">Technical details</span>
-            <p className="text-[11px] font-sans text-ink-secondary leading-relaxed">
-              All monetary math uses Python <code className="text-ink font-mono">Decimal</code> and PostgreSQL <code className="text-ink font-mono">numeric(18,2)</code>. Floating-point types are strictly forbidden.
-            </p>
-            <div className="p-2.5 bg-canvas border border-rule rounded-xs font-mono text-[10px] text-ink space-y-0.5">
-              <div>Expected Net = Gross - [Fee (2%) + GST (18%)] - Refunds</div>
-              <div className="text-ink-secondary">&Delta; Tolerable difference &le; ₹0.01</div>
+          <details className="tech-details-disclosure group pt-3 border-t border-rule/60 space-y-2 text-xs">
+            <summary className="text-[10px] uppercase font-mono tracking-wider text-ink-secondary hover:text-ink cursor-pointer font-semibold list-none flex items-center justify-between select-none">
+              <span>Technical details</span>
+              <span className="text-ink-muted group-open:hidden">+ View details</span>
+              <span className="text-ink-muted hidden group-open:inline">&minus; Hide details</span>
+            </summary>
+            <div className="pt-2 space-y-2">
+              <p className="text-[11px] font-sans text-ink-secondary leading-relaxed">
+                All monetary math uses Python <code className="text-ink font-mono">Decimal</code> and PostgreSQL <code className="text-ink font-mono">numeric(18,2)</code>. Floating-point types are strictly forbidden.
+              </p>
+              <div className="p-2.5 bg-canvas border border-rule rounded-xs font-mono text-[10px] text-ink space-y-0.5">
+                <div>Expected Net = Gross - [Fee (2%) + GST (18%)] - Refunds</div>
+                <div className="text-ink-secondary">&Delta; Tolerable difference &le; ₹0.01</div>
+              </div>
             </div>
-          </div>
+          </details>
         </div>
 
         {/* Section 2: Four records checked */}
@@ -52,15 +58,21 @@ export default function DocsPage() {
             </p>
           </div>
           
-          <div className="pt-3 border-t border-rule/60 space-y-2 text-xs">
-            <span className="text-[10px] uppercase font-mono tracking-wider text-ink-secondary block font-semibold">Technical details</span>
-            <ul className="text-[11px] font-mono text-ink-secondary space-y-1 list-disc pl-4">
-              <li><strong className="text-ink">Payments:</strong> captured customer order references</li>
-              <li><strong className="text-ink">Provider payouts:</strong> reported net payout line items</li>
-              <li><strong className="text-ink">Refunds:</strong> customer returns and reversals</li>
-              <li><strong className="text-ink">Bank credits:</strong> verified bank reference numbers (UTR)</li>
-            </ul>
-          </div>
+          <details className="tech-details-disclosure group pt-3 border-t border-rule/60 space-y-2 text-xs">
+            <summary className="text-[10px] uppercase font-mono tracking-wider text-ink-secondary hover:text-ink cursor-pointer font-semibold list-none flex items-center justify-between select-none">
+              <span>Technical details</span>
+              <span className="text-ink-muted group-open:hidden">+ View details</span>
+              <span className="text-ink-muted hidden group-open:inline">&minus; Hide details</span>
+            </summary>
+            <div className="pt-2 space-y-2">
+              <ul className="text-[11px] font-mono text-ink-secondary space-y-1 list-disc pl-4">
+                <li><strong className="text-ink">Payments:</strong> captured customer order references</li>
+                <li><strong className="text-ink">Provider payouts:</strong> reported net payout line items</li>
+                <li><strong className="text-ink">Refunds:</strong> customer returns and reversals</li>
+                <li><strong className="text-ink">Bank credits:</strong> verified bank reference numbers (UTR)</li>
+              </ul>
+            </div>
+          </details>
         </div>
 
         {/* Section 3: Safe upload without duplicates */}
@@ -74,16 +86,22 @@ export default function DocsPage() {
             </p>
           </div>
           
-          <div className="pt-3 border-t border-rule/60 space-y-2 text-xs">
-            <span className="text-[10px] uppercase font-mono tracking-wider text-ink-secondary block font-semibold">Technical details</span>
-            <p className="text-[11px] font-sans text-ink-secondary leading-relaxed">
-              Upload endpoints support optional <code className="text-ink font-mono">X-Idempotency-Key</code> headers. Replaying an identical batch returns the original receipt without duplicating rows.
-            </p>
-            <div className="p-2.5 bg-canvas border border-rule rounded-xs font-mono text-[10px] text-ink space-y-0.5">
-              <div>POST /api/v1/ingestion/:source_type</div>
-              <div className="text-ink-secondary">Enforces atomic multi-row commits and duplicate-file checks</div>
+          <details className="tech-details-disclosure group pt-3 border-t border-rule/60 space-y-2 text-xs">
+            <summary className="text-[10px] uppercase font-mono tracking-wider text-ink-secondary hover:text-ink cursor-pointer font-semibold list-none flex items-center justify-between select-none">
+              <span>Technical details</span>
+              <span className="text-ink-muted group-open:hidden">+ View details</span>
+              <span className="text-ink-muted hidden group-open:inline">&minus; Hide details</span>
+            </summary>
+            <div className="pt-2 space-y-2">
+              <p className="text-[11px] font-sans text-ink-secondary leading-relaxed">
+                Upload endpoints support optional <code className="text-ink font-mono">X-Idempotency-Key</code> headers. Replaying an identical batch returns the original receipt without duplicating rows.
+              </p>
+              <div className="p-2.5 bg-canvas border border-rule rounded-xs font-mono text-[10px] text-ink space-y-0.5">
+                <div>POST /api/v1/ingestion/:source_type</div>
+                <div className="text-ink-secondary">Enforces atomic multi-row commits and duplicate-file checks</div>
+              </div>
             </div>
-          </div>
+          </details>
         </div>
 
         {/* Section 4: Saved review history */}
@@ -97,16 +115,22 @@ export default function DocsPage() {
             </p>
           </div>
           
-          <div className="pt-3 border-t border-rule/60 space-y-2 text-xs">
-            <span className="text-[10px] uppercase font-mono tracking-wider text-ink-secondary block font-semibold">Technical details</span>
-            <p className="text-[11px] font-sans text-ink-secondary leading-relaxed">
-              Operator actions enforce optimistic concurrency (version checks). Colliding reviews return HTTP 409 to prevent accidental overwrites. All changes write to an append-only event ledger.
-            </p>
-            <div className="p-2.5 bg-canvas border border-rule rounded-xs font-mono text-[10px] text-ink space-y-0.5">
-              <div>Signer &bull; Action &bull; Version &bull; Timestamp &bull; Reason</div>
-              <div className="text-ink-secondary">Shared persisted event store between case and global views</div>
+          <details className="tech-details-disclosure group pt-3 border-t border-rule/60 space-y-2 text-xs">
+            <summary className="text-[10px] uppercase font-mono tracking-wider text-ink-secondary hover:text-ink cursor-pointer font-semibold list-none flex items-center justify-between select-none">
+              <span>Technical details</span>
+              <span className="text-ink-muted group-open:hidden">+ View details</span>
+              <span className="text-ink-muted hidden group-open:inline">&minus; Hide details</span>
+            </summary>
+            <div className="pt-2 space-y-2">
+              <p className="text-[11px] font-sans text-ink-secondary leading-relaxed">
+                Operator actions enforce optimistic concurrency (version checks). Colliding reviews return HTTP 409 to prevent accidental overwrites. All changes write to an append-only event ledger.
+              </p>
+              <div className="p-2.5 bg-canvas border border-rule rounded-xs font-mono text-[10px] text-ink space-y-0.5">
+                <div>Signer &bull; Action &bull; Version &bull; Timestamp &bull; Reason</div>
+                <div className="text-ink-secondary">Shared persisted event store between case and global views</div>
+              </div>
             </div>
-          </div>
+          </details>
         </div>
       </div>
 

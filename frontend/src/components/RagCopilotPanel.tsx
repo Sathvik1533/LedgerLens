@@ -187,6 +187,31 @@ export const RagCopilotPanel: React.FC<PolicyNoteProps> = ({ caseId, autoRun = t
             </p>
           </div>
 
+          {/* Technical Details (Hidden by default) */}
+          <details className="tech-details-disclosure group pt-2 border-t border-rule/60 space-y-2 text-xs">
+            <summary className="text-[10px] uppercase font-mono tracking-wider text-ink-secondary hover:text-ink cursor-pointer font-semibold list-none flex items-center justify-between select-none">
+              <span>Technical details</span>
+              <span className="text-ink-muted group-open:hidden">+ View details</span>
+              <span className="text-ink-muted hidden group-open:inline">&minus; Hide details</span>
+            </summary>
+            <div className="pt-2 space-y-2 font-mono text-[11px] text-ink-secondary">
+              <div>• Governing Contract: {primarySop}</div>
+              <div>• Retrieval Engine: Local semantic vector embeddings (all-MiniLM-L6-v2)</div>
+              <div>• Decision Boundary: Strictly advisory (0 financial authority granted to LLM)</div>
+              {result?.citations && result.citations.length > 0 && (
+                <div className="space-y-1 pt-1">
+                  <div className="font-semibold text-ink text-[10px] uppercase">Retrieved Source Evidence:</div>
+                  {result.citations.map((c, i) => (
+                    <div key={i} className="p-2 bg-canvas border border-rule rounded-xs text-[10px] space-y-0.5">
+                      <div className="text-ink font-semibold">{c.source_file}</div>
+                      <div className="text-ink-muted italic">&ldquo;{c.quote}&rdquo;</div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </details>
+
           {/* Mandatory Rule Invariant Footer */}
           <div className="pt-2 border-t border-rule/60 flex flex-col sm:flex-row sm:items-center justify-between text-[10px] font-mono text-ink-muted gap-1">
             <span>Policy reference: {primarySop}</span>

@@ -21,12 +21,14 @@ export interface ReviewQueueItem {
   settlement_discrepancy: string | null;
   case_opened_at: string;
   amount_at_risk: string | null;
+  is_demo?: boolean;
 }
 
 export interface ReviewQueueResponse {
   total_cases: number;
   total_amount_at_risk: string;
   cases: ReviewQueueItem[];
+  is_simulation?: boolean;
 }
 
 export interface PaymentFacts {
