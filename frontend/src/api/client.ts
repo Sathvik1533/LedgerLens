@@ -19,7 +19,7 @@ import {
   DecisionStatus,
 } from '../types/api';
 
-const API_BASE = (import.meta.env.VITE_API_URL ? String(import.meta.env.VITE_API_URL).replace(/\/+$/, '') : '') + '/api/v1';
+const API_BASE = ((import.meta as any).env?.VITE_API_URL ? String((import.meta as any).env.VITE_API_URL).replace(/\/+$/, '') : '') + '/api/v1';
 
 export class ApiError extends Error {
   status: number;
@@ -34,12 +34,11 @@ export class ApiError extends Error {
 }
 
 async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
-  const token = typeof window !== 'undefined' ? localStorage.getItem('ledgerlens_session_token') : null;
+  // Exclusive secure HttpOnly cookie authentication via Vercel /api rewrite proxy
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
     'X-Requested-With': 'XMLHttpRequest',
     'X-LedgerLens-CSRF': '1',
-    ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
     ...((options.headers as Record<string, string>) || {}),
   };
 
@@ -1025,14 +1024,10 @@ export async function queryPolicyCorpus(
 
 export async function loginUser(email: string, password: string): Promise<AuthUser> {
   try {
-    const user = await request<AuthUser & { token?: string }>('/auth/login', {
+    return await request<AuthUser>('/auth/login', {
       method: 'POST',
       body: JSON.stringify({ email, password }),
     });
-    if (user && user.token && typeof window !== 'undefined') {
-      localStorage.setItem('ledgerlens_session_token', user.token);
-    }
-    return user;
   } catch {
     // Dynamic fallback
   }
@@ -1047,14 +1042,10 @@ export async function loginUser(email: string, password: string): Promise<AuthUs
 
 export async function loginDemoUser(role: 'reviewer' | 'admin' = 'reviewer'): Promise<AuthUser> {
   try {
-    const user = await request<AuthUser & { token?: string }>('/auth/demo', {
+    return await request<AuthUser>('/auth/demo', {
       method: 'POST',
       body: JSON.stringify({ role }),
     });
-    if (user && user.token && typeof window !== 'undefined') {
-      localStorage.setItem('ledgerlens_session_token', user.token);
-    }
-    return user;
   } catch {
     // Dynamic fallback
   }
@@ -1068,9 +1059,6 @@ export async function loginDemoUser(role: 'reviewer' | 'admin' = 'reviewer'): Pr
 }
 
 export async function logoutUser(): Promise<void> {
-  if (typeof window !== 'undefined') {
-    localStorage.removeItem('ledgerlens_session_token');
-  }
   try {
     await request<{ status: string }>('/auth/logout', { method: 'POST' });
   } catch {
